@@ -1,1 +1,20 @@
-# Rien a suivre hors sous-modules pour le moment
+# Racine du depot unique : les exclusions propres a chaque application restent
+# dans planner.campustrack.cm/.gitignore et planner-api.campustrack.cm/.gitignore
+
+# Fichiers d'environnement locaux
+.env
+.env.*
+!.env.example
+
+# Dependances installees et artefacts de build
+node_modules/
+dist/
+dist-ssr/
+
+# Editeurs et systeme
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.sw?
