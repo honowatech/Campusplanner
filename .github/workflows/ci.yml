@@ -8,6 +8,10 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: planner-api.campustrack.cm
+
     steps:
       - uses: actions/checkout@v4
 
