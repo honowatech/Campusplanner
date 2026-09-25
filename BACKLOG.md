@@ -37,7 +37,7 @@
 - [x] **10. Tests des CRUD principaux** — ✅ `CrudEndpointsTest` (10 tests) : CRUD complet teachers/rooms/students/plannings, suppressions gardées (400 si plannings), matrice 401/403, régression des relations renommées, comptage des conflits réels. Suite : 74 tests / 230 assertions.
 - [x] **11. Index et FK manquants** — ✅ Précision d'audit : l'index composite `teacher_blockings` et la FK/index `students.course_class_id` existaient déjà. Réellement manquant : FK `classes.room_id` → ajoutée (MySQL, orphelins neutralisés, `nullOnDelete`), appliquée à la base dev.
 - [x] **12. Dashboard : détection de conflits fausse** — ✅ Nouveau `schedule_conflicts` calculé côté API (chevauchements réels enseignant/salle/classe, SQL portable, scoping département) ; le Dashboard affiche cette valeur. Un bug de sous-comptage dans la première version de la requête a été corrigé par le test de régression.
-- [ ] **13. Jeton en localStorage** — ⏸ **Reporté volontairement** : migration vers le mode SPA Sanctum (cookie httpOnly). Étapes : `SANCTUM_STATEFUL_DOMAINS=localhost:3000`, CORS `supports_credentials`, `SESSION_DOMAIN`, route `/sanctum/csrf-cookie`, axios `withCredentials` + en-tête `X-XSRF-TOKEN`, retrait du Bearer/localStorage (`api.ts`, `auth.tsx`), adaptation des tests. **Pourquoi attendre** : les cookies cross-origine (3000 → 8000) et le flot CSRF ne se valident que dans un vrai navigateur — à faire en session dédiée avec l'app lancée. Mitigations déjà en place : expiration 3 j, révocation immédiate, approbation admin, throttle.
+- [ ] **13. Jeton en localStorage** — 🟡 **Code fait, validation navigateur restante**. Migration SPA Sanctum livrée : `statefulApi()` + `EnsureUserIsApproved` côté API, `withCredentials`/`withXSRF-TOKEN` + bootstrap CSRF et suppression du Bearer/`api-user` côté front, docs et tests réécrits (`CookieAuthTest` : 8 tests, session cookie rejouée comme un navigateur). `SANCTUM_STATEFUL_DOMAINS`, CORS `supports_credentials` et `SESSION_SECURE_COOKIE` sont alignés ; `.env` de prod à compléter. **Reste** : passer l'app en local puis en prod (`planner.campustrack.cm` → `planner-api.campustrack.cm`) pour valider login / rechargement dur / mutation sans 419 / logout — les cookies cross-origine et le CSRF ne se prouvent qu'au navigateur. Mitigations conservées : expiration de session (`SESSION_LIFETIME`), approbation admin, suspension immédiate, throttle.
 - [x] **14. `max_iterations` non validé** — ✅ Borné `1..1000` dans la validation de `POST /plannings/generate`.
 
 ## P3 — Backlog (endurance, ergonomie, confort)
@@ -58,7 +58,7 @@
 1. ~~**P0 (1-3)** en une session~~ ✅ fait.
 2. ~~**Point 8** (retrait du dump SQL)~~ ✅ fait (historique réécrit, dump untracké).
 3. ~~**P1-4 / P1-6 / P1-7**~~ ✅ faits. **P1-5 restant** : au moment du déploiement (config prod, MySQL, seeder).
-4. ~~**P2 (9-12, 14)**~~ ✅ faits. **P2-13** (httpOnly) : session navigateur dédiée.
+4. ~~**P2 (9-12, 14)**~~ ✅ faits. **P2-13** (httpOnly) : code livré, reste la passe navigateur (local puis prod).
 5. ~~**P3 (15-19, 21)**~~ ✅ faits. **P3-20/22** : selon infra (SMTP / Reverb).
 
-Restent donc : **P1-5**, **P2-13**, **P3-20**, **P3-22** — les quatre attendent des décisions d'infrastructure ou un contexte de déploiement.
+Restent donc : **P1-5**, **P2-13** (passe navigateur), **P3-20**, **P3-22** — les quatre attendent des décisions d'infrastructure, un contexte de déploiement ou une session avec l'app lancée.
