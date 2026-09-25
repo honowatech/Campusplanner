@@ -1,0 +1,5 @@
+{
+  "name": "CampusTrack - University Timetable Manager",
+  "description": "A comprehensive university timetable management system featuring teacher CRUD, interactive dashboards, and AI-powered scheduling insights.",
+  "requestFramePermissions": []
+}

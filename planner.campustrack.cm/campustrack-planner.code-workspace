@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../campustrack-planner-api"
+		}
+	],
+	"settings": {}
+}
