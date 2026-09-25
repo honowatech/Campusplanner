@@ -1,0 +1,6 @@
+[submodule "planner"]
+	path = planner.campustrack.cm
+	url = ./planner.campustrack.cm
+[submodule "planner-api"]
+	path = planner-api.campustrack.cm
+	url = ./planner-api.campustrack.cm
