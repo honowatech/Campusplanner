@@ -20,7 +20,7 @@ export const apiClient: AxiosInstance = axios.create({
 });
 
 const SAFE_METHODS = ['get', 'head', 'options'];
-const CSRF_URL = 'api/csrf-cookie';
+const CSRF_URL = '/api/csrf-cookie';
 
 let csrfCookieRequest: Promise<void> | null = null;
 
