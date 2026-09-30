@@ -72,6 +72,7 @@ function RootComponent() {
             <button
               onClick={toggleLanguage}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-indigo-50 text-primary hover:bg-indigo-100 transition-colors text-sm font-semibold"
+              type="button"
             >
               <Globe size={16} />
               <span>{language.toUpperCase()}</span>
@@ -96,7 +97,7 @@ function RootComponent() {
               <div
                 className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'admin' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
               >
-                {auth.user?.name.charAt(0)}
+                {auth.user?.name ? auth.user?.name.charAt(0) : "U"}
               </div>
 
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">

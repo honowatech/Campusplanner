@@ -15,6 +15,7 @@ const translations = {
     courseClassCode: 'Course Class Code',
     rooms: 'Rooms',
     timetable: 'Timetable',
+    timetables: 'Timetables',
     profile: 'My Profile',
     settings: 'Settings',
     search: 'Search',
@@ -310,6 +311,7 @@ const translations = {
     courseClassCode: 'Code de la Classe',
     rooms: 'Salles',
     timetable: 'Emploi du Temps',
+    timetables: 'Emplois du Temps',
     profile: 'Mon Profil',
     settings: 'Paramètres',
     search: 'Rechercher',
@@ -642,24 +644,28 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
 
-    for (const k of keys) {
-      if (value && value[k]) {
-        value = value[k];
-      } else {
-        // Fallback to english or key
-        if (language !== 'en') {
-          let enValue: any = translations['en'];
-          for (const ek of keys) {
-            if (enValue && enValue[ek]) enValue = enValue[ek];
-          }
-          if (enValue) return enValue;
+    const lookup = (dict: any): string | undefined => {
+      let value: any = dict;
+      for (const k of keys) {
+        if (value && typeof value === 'object' && value[k] !== undefined) {
+          value = value[k];
+        } else {
+          return undefined;
         }
-        return key;
       }
+      return typeof value === 'string' ? value : undefined;
+    };
+
+    const value = lookup(translations[language]);
+    if (value !== undefined) return value;
+
+    if (language !== 'en') {
+      const enValue = lookup(translations.en);
+      if (enValue !== undefined) return enValue;
     }
-    return value as string;
+
+    return key;
   };
 
   return (
