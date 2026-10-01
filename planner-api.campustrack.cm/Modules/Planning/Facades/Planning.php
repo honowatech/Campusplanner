@@ -2,9 +2,7 @@
 
 namespace Modules\Planning\Facades;
 
-use App\Models\CourseClass;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Facades\Log;
 use Modules\Planning\Entities\Planning as PlanningEntity;
 use Modules\Planning\Entities\ShiftPlanning;
 
@@ -13,16 +11,6 @@ class Planning extends Facade
     // ///////////
     // Plannings//
     // ///////////
-
-    /**
-     * Return an empty Planning
-     *
-     * @return PlanningEntity
-     */
-    public static function newPlanning()
-    {
-        return new PlanningEntity;
-    }
 
     /**
      * Get all plannings
@@ -97,115 +85,9 @@ class Planning extends Facade
         return $planning->delete();
     }
 
-    // /////////
-    // Classes//
-    // /////////
-
-    /**
-     * Return an empty CourseClass
-     *
-     * @return CourseClass
-     */
-    public static function newclasse()
-    {
-        return new CourseClass;
-    }
-
-    /**
-     * Get all work stations
-     *
-     * @param  bool  $pluck
-     * @return mixed
-     */
-    public static function getAllClasses($pluck = false)
-    {
-        $classes = CourseClass::latest()->paginate(10);
-
-        if ($pluck) {
-            return $classes->pluck('name', 'id');
-        }
-
-        return $classes;
-    }
-
-    /**
-     * Create a new work station
-     *
-     * @return mixed
-     */
-    public static function createClasse(object $data)
-    {
-        return CourseClass::create($data->all());
-    }
-
-    /**
-     * Find a work station by ID
-     *
-     * @param  int  $id
-     * @return mixed
-     */
-    public static function findClasseById($id)
-    {
-        return CourseClass::findOrFail($id);
-    }
-
-    /**
-     * Update a work station
-     *
-     * @return mixed
-     */
-    public static function updateClasse(int $id, object $data)
-    {
-        $classe = CourseClass::findOrFail($id);
-
-        return $classe->update($data->all());
-    }
-
-    /**
-     * Delete a work station
-     *
-     * @return mixed
-     */
-    public static function deleteClasse($id)
-    {
-        $classe = CourseClass::findOrFail($id);
-
-        return $classe->delete();
-    }
-
     // ////////////////
     // Shift Planning//
     // ////////////////
-
-    /**
-     * Return an empty ShiftPlanning
-     *
-     * @return ShiftPlanning
-     */
-    public static function newShiftPlanning()
-    {
-        return new ShiftPlanning;
-    }
-
-    /**
-     * Get all shift planning
-     *
-     *@param PlanningEntity
-     *@param CourseClass
-     * @return mixed
-     */
-    public static function getAllShiftPlannings(?PlanningEntity $planning = null, ?CourseClass $classe = null)
-    {
-        $shiftPlannings = ShiftPlanning::orderBy('date', 'desc')->orderBy('planning_id', 'asc');
-        if ($classe?->id !== null) {
-            $shiftPlannings = $shiftPlannings->where('course_class_id', $classe->id);
-        }
-        if ($planning?->id !== null) {
-            $shiftPlannings = $shiftPlannings->where('planning_id', $planning->id);
-        }
-
-        return $shiftPlannings->paginate(10);
-    }
 
     /**
      * Create a new shift planning
@@ -214,9 +96,6 @@ class Planning extends Facade
      */
     public static function createShiftPlanning(array $data)
     {
-
-        Log::debug('calculated hours: '.$data['calculated_hours']);
-
         $calculatedHours = $data['calculated_hours'] ?? 1;
 
         if ($calculatedHours <= 1) {

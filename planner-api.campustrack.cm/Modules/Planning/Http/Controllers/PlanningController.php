@@ -23,11 +23,7 @@ class PlanningController extends Controller
 
         $plannings = Planning::getAllPlannings();
 
-        if ($request->expectsJson() || $request->input('json')) {
-            return $this->success(['plannings' => $plannings], 'Plannings récupérés');
-        }
-
-        return view('planning::planning.index', compact('plannings'));
+        return $this->success(['plannings' => $plannings], 'Plannings récupérés');
     }
 
     public function store(StorePlanningRequest $request)
@@ -54,14 +50,10 @@ class PlanningController extends Controller
             ->orderBy('starting_hour', 'asc')
             ->get();
 
-        if ($request->expectsJson() || $request->input('json')) {
-            return $this->success([
-                'planning' => $planning,
-                // 'shift_plannings' => $shiftPlannings,
-            ], 'Planning récupéré');
-        }
-
-        return view('planning::planning.show', compact('planning', 'shiftPlannings'));
+        return $this->success([
+            'planning' => $planning,
+            // 'shift_plannings' => $shiftPlannings,
+        ], 'Planning récupéré');
     }
 
     public function update(UpdatePlanningRequest $request, int $id)
@@ -84,27 +76,5 @@ class PlanningController extends Controller
         Planning::deletePlanning($id);
 
         return $this->success(null, 'Planning supprimé avec succès', 200);
-    }
-
-    public function getForm(Request $request)
-    {
-        $this->authorize('viewAny', PlanningEntity::class);
-
-        $planning = $request->input('id')
-            ? Planning::findPlanningById($request->input('id'))
-            : Planning::newPlanning();
-
-        return view('planning::components.modules.planning.plannings_form', compact('planning'));
-    }
-
-    public function getSelectOptions(Request $request)
-    {
-        $this->authorize('viewAny', PlanningEntity::class);
-
-        $plannings = Planning::getAllPlannings(true);
-
-        return $this->success([
-            'plannings' => $plannings,
-        ], 'Options récupérées');
     }
 }
