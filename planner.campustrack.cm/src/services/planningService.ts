@@ -40,8 +40,8 @@ export type ShiftPlanningParams = {
 export type CreateShiftPlanningData = {
   planning_id: number;
   course_id: number;
-  teacher_id: number;
-  room_id: number;
+  teacher_id?: number;
+  room_id?: number;
   course_class_id: number;
   date: string;
   starting_hour: string;
@@ -49,7 +49,7 @@ export type CreateShiftPlanningData = {
   number_teachers?: number;
 };
 
-export type UpdateShiftPlanningData = Partial<Omit<CreateShiftPlanningData, ' id'>>;
+export type UpdateShiftPlanningData = Partial<CreateShiftPlanningData>;
 
 export type GeneratePlanningData = {
   planning_id: number;

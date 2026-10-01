@@ -4,6 +4,7 @@ namespace Modules\Planning\Http\Requests;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Planning\Entities\ShiftPlanning;
 use Modules\Planning\Facades\Planning;
 
 class UpdateShiftPlanningRequest extends FormRequest
@@ -80,8 +81,8 @@ class UpdateShiftPlanningRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', ShiftPlanning::findOrFail($this->route('id')));
     }
 }

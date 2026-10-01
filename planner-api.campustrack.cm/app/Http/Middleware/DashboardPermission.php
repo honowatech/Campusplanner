@@ -16,22 +16,14 @@ class DashboardPermission
     {
         $user = Auth::user();
 
-        // Check if user has required role
-        if (! $user->hasAnyRole(['super-admin', 'administrateur'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Accès non autorisé. Rôle requis: super-admin ou administrateur',
-                'data' => null,
-            ], 403);
-        }
-
-        // For admin, ensure they can't access other departments
+        // La route applique déjà role:super-admin|administrateur ; on borne ici
+        // simplement l'administrateur à son propre département.
         if ($user->hasRole('administrateur') && ! $user->hasRole('super-admin')) {
             $requestedDeptId = $request->get('department_id');
 
             if ($requestedDeptId && $requestedDeptId != $user->department_id) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'failed',
                     'message' => 'Accès non autorisé. Vous ne pouvez voir que les données de votre département',
                     'data' => null,
                 ], 403);

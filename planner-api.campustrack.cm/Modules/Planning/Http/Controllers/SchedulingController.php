@@ -312,13 +312,17 @@ class SchedulingController extends Controller
     {
         $this->authorize('update', ShiftPlanning::findOrFail($id));
 
-        $request->validate([
+        $validated = $request->validate([
             'proposal' => 'required|array',
             'proposal.type' => 'required|in:change_room,change_teacher,change_time',
+            'proposal.room_id' => 'nullable|integer|exists:rooms,id',
+            'proposal.teacher_id' => 'nullable|integer|exists:teachers,id',
+            'proposal.starting_hour' => 'nullable|string',
+            'proposal.ending_hour' => 'nullable|string',
         ]);
 
         $shiftPlanning = ShiftPlanning::findOrFail($id);
-        $proposal = $request->input('proposal');
+        $proposal = $validated['proposal'];
 
         $updates = [];
 

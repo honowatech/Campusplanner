@@ -3,6 +3,7 @@
 namespace Modules\Planning\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Planning\Entities\Planning;
 
 class StorePlanningRequest extends FormRequest
 {
@@ -33,8 +34,8 @@ class StorePlanningRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Planning::class);
     }
 }

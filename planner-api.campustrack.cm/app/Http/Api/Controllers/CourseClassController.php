@@ -66,7 +66,7 @@ class CourseClassController extends Controller
             'department_id' => 'required|exists:departments,id',
             'level' => 'required|string|max:50',
             'capacity' => 'required|integer|min:1',
-            'room_id' => 'nullable|integer',
+            'room_id' => 'nullable|integer|exists:rooms,id',
             'academic_year' => 'required|string|max:20',
             'is_active' => 'boolean',
         ]);
@@ -116,7 +116,7 @@ class CourseClassController extends Controller
             'department_id' => 'sometimes|exists:departments,id',
             'level' => 'sometimes|string|max:50',
             'capacity' => 'sometimes|integer|min:1',
-            'room_id' => 'nullable|integer',
+            'room_id' => 'nullable|integer|exists:rooms,id',
             'academic_year' => 'sometimes|string|max:20',
             'is_active' => 'boolean',
         ]);

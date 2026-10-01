@@ -33,11 +33,22 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 - [x] **`checkRoomAvailability` sans préfixe `/api`**. ✅ URL corrigée.
 - [x] **Sidebar sans garde de rôle** — `users`/`settings` visibles par tous. ✅ Masqués pour les non-admins. ⚠️ **Reste** : gardes de routes (`__root.tsx`) et filtrage fin par rôle (un étudiant voit encore `departments`/`courses`/`rooms`…).
 
+### P2 — traités en session (2e passe)
+
+- [x] `DepartmentController::destroy` : `authorize('delete')` ajouté.
+- [x] `CourseClassController` : `room_id` validé `exists:rooms,id`.
+- [x] `SchedulingController::applyProposal` : validation des cibles (`room_id`/`teacher_id` `exists`, créneaux).
+- [x] `DashboardPermission` : réponse normalisée (`status`) + contrôle de rôle redondant retiré.
+- [x] `UpdateUserRequest` (mort) supprimé.
+- [x] Règles `unique` : virgule finale retirée (`UpdateTeacherRequest`, `UpdateStudentRequest`, `UpdateRoomRequest`).
+- [x] FormRequests module Planning : `authorize()` avec `can()` (Store/Update Planning + ShiftPlanning).
+- [x] Frontend : `courseService.getAll` via `apiClient.get`, typo `' id'` corrigée, `teacher_id`/`room_id` optionnels (plus de `|| 0`).
+
 ### Reste à traiter (décisions / infra / profilage)
 
 - **P1-7 (suite)** : périmètre classe/matière pour `plannings.edit.class`/`.subject` — décision produit sur le modèle de scoping.
 - **P1-13 (suite)** : garde de routes complète par rôle côté client.
-- **P2** : FormRequests module Planning `authorize(){return true;}`, `applyProposal` sans validation, `room_id` sans `exists`, `clearCache` flushe tout, `DashboardPermission` redondant/non normalisé, `UpdateUserRequest` mort, casts `any[]` front, `teacher_id`/`room_id` forcés à 0, devtools router importé via dépendance transitive, dead code (`RoleManager`/`useRbac`/`availabilityService`/`usePermissions`/`Workstation`/`routeTree.gen.ts` racine).
+- **P2 restant** : `clearCache` (pattern ignoré, `Cache::flush` global), `TIMESTAMPDIFF` non portable dans `ResourceAvailabilityService` (flag `check_hours`), casts `any[]` front (`planningService`/`userService`/`studentService`), devtools router importé via dépendance transitive, dead code front (`RoleManager`/`useRbac`/`availabilityService`/`usePermissions`/`Workstation`/`routeTree.gen.ts` racine), `ToggleSwitch` défini dans le rendu, gestion d'erreur silencieuse (`Login`/`Dashboard`/`index`).
 - **P3** : accessibilité (boutons `type`, labels, alt), graphes Dashboard incorrects, dette module Planning (Blade/`lang/fr.json`), `TestConnexion` inexistant (routes web mortes).
 
 Validation : `tsc --noEmit` OK ; suite API **81 tests / 266 assertions** verte.

@@ -107,6 +107,7 @@ class DepartmentController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $department = Department::findOrFail($id);
+        $this->authorize('delete', $department);
 
         // Check if department has users
         if ($department->users()->count() > 0) {

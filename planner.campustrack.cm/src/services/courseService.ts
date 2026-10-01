@@ -28,7 +28,7 @@ export type UpdateCourseData = Partial<CreateCourseData>;
 
 export const courseService = {
   getAll: async (params?: CourseParams): Promise<PaginatedResponse<Course>> => {
-    const res = await apiClient(BASE, { params });
+    const res = await apiClient.get(BASE, { params });
     return res.data.data.courses as PaginatedResponse<Course>;
   },
 

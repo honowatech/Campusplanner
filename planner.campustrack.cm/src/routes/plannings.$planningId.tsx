@@ -35,8 +35,8 @@ function TimetableDetailPage() {
     createShift.mutate({
       planning_id: shift.planning_id,
       course_id: shift.course_id,
-      teacher_id: shift.teacher_id || 0,
-      room_id: shift.room_id || 0,
+      teacher_id: shift.teacher_id,
+      room_id: shift.room_id,
       course_class_id: shift.course_class_id,
       date: shift.date,
       starting_hour: shift.starting_hour.slice(0, 5),

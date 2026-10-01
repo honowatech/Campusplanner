@@ -26,7 +26,7 @@ class UpdateRoomRequest extends FormRequest
     public function rules(): array
     {
         return ['name' => 'sometimes|string|max:255',
-            'code' => 'sometimes|string|max:50|unique:rooms,code,'.$this->route('room').',',
+            'code' => 'sometimes|string|max:50|unique:rooms,code,'.$this->route('room'),
             'department_id' => 'nullable|exists:departments,id',
             'type' => 'sometimes|in:classroom,lab,amphitheater,conference,study_room',
             'capacity' => 'sometimes|integer|min:1',
