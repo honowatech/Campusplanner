@@ -44,14 +44,17 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 - [x] FormRequests module Planning : `authorize()` avec `can()` (Store/Update Planning + ShiftPlanning).
 - [x] Frontend : `courseService.getAll` via `apiClient.get`, typo `' id'` corrigée, `teacher_id`/`room_id` optionnels (plus de `|| 0`).
 
+### P1 — traités en session (2e passe)
+
+- [x] **P1-7 (périmètre classe/matière)** — `PlanningPolicy`/`ShiftPlanningPolicy` : `plannings.edit.class`/`.subject` (et `view.class`/`.subject`) ne donnent plus un accès global (`return true`). Scope réel : classes de l'étudiant + classes enseignées par le professeur (via `ShiftPlanning`), matières via `Teacher.courses()`. Relations `User::teacher()`/`User::student()` ajoutées, helpers `userClassIds()`/`userCourseIds()` dans `Policy`. Test `PlanningScopeTest`.
+- [x] **P1-13 (gardes de routes + rôles auth)** — cause racine corrigée : `login`/`authUser` renvoyaient le user **sans rôles/permissions** (et `login` avec un shape `{user}` incohérent) → le front ne pouvait pas déterminer le rôle. Désormais `authUserPayload()` renvoie rôles + permissions effectives (`getAllPermissions()`), shape unifié. Front : `routePermissions.ts` (miroir des permissions `viewAny`) + garde dans `__root.tsx` + Sidebar filtrée. Tests `CookieAuthTest`/`RegistrationApprovalTest` alignés.
+
 ### Reste à traiter (décisions / infra / profilage)
 
-- **P1-7 (suite)** : périmètre classe/matière pour `plannings.edit.class`/`.subject` — décision produit sur le modèle de scoping.
-- **P1-13 (suite)** : garde de routes complète par rôle côté client.
 - **P2 restant** : `clearCache` (pattern ignoré, `Cache::flush` global), `TIMESTAMPDIFF` non portable dans `ResourceAvailabilityService` (flag `check_hours`), casts `any[]` front (`planningService`/`userService`/`studentService`), devtools router importé via dépendance transitive, dead code front (`RoleManager`/`useRbac`/`availabilityService`/`usePermissions`/`Workstation`/`routeTree.gen.ts` racine), `ToggleSwitch` défini dans le rendu, gestion d'erreur silencieuse (`Login`/`Dashboard`/`index`).
 - **P3** : accessibilité (boutons `type`, labels, alt), graphes Dashboard incorrects, dette module Planning (Blade/`lang/fr.json`), `TestConnexion` inexistant (routes web mortes).
 
-Validation : `tsc --noEmit` OK ; suite API **81 tests / 266 assertions** verte.
+Validation : `tsc --noEmit` OK ; suite API **82 tests / 272 assertions** verte.
 
 ---
 

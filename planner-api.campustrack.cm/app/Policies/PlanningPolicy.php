@@ -19,12 +19,27 @@ class PlanningPolicy extends Policy
 
     public function view(User $user, Planning $planning): bool
     {
-        if ($this->hasGlobalScope($user, 'plannings.view.all')) {
+        if ($user->hasPermissionTo('plannings.view.all')) {
             return true;
         }
 
-        return $user->hasAnyPermission(['plannings.view.department', 'plannings.view.class', 'plannings.view.subject'])
-            && $this->sameDepartment($user, $planning->department_id);
+        if ($user->hasPermissionTo('plannings.view.department')) {
+            return $this->sameDepartment($user, $planning->department_id);
+        }
+
+        if ($user->hasPermissionTo('plannings.view.class')) {
+            return $planning->shiftPlannings()
+                ->whereIn('course_class_id', $this->userClassIds($user))
+                ->exists();
+        }
+
+        if ($user->hasPermissionTo('plannings.view.subject')) {
+            return $planning->shiftPlannings()
+                ->whereIn('course_id', $this->userCourseIds($user))
+                ->exists();
+        }
+
+        return false;
     }
 
     public function create(User $user): bool
@@ -39,12 +54,27 @@ class PlanningPolicy extends Policy
 
     public function update(User $user, Planning $planning): bool
     {
-        if ($user->hasAnyPermission(['plannings.edit.all', 'plannings.edit.class', 'plannings.edit.subject'])) {
+        if ($user->hasPermissionTo('plannings.edit.all')) {
             return true;
         }
 
-        return $user->hasPermissionTo('plannings.edit.department')
-            && $this->sameDepartment($user, $planning->department_id);
+        if ($user->hasPermissionTo('plannings.edit.department')) {
+            return $this->sameDepartment($user, $planning->department_id);
+        }
+
+        if ($user->hasPermissionTo('plannings.edit.class')) {
+            return $planning->shiftPlannings()
+                ->whereIn('course_class_id', $this->userClassIds($user))
+                ->exists();
+        }
+
+        if ($user->hasPermissionTo('plannings.edit.subject')) {
+            return $planning->shiftPlannings()
+                ->whereIn('course_id', $this->userCourseIds($user))
+                ->exists();
+        }
+
+        return false;
     }
 
     public function delete(User $user, Planning $planning): bool

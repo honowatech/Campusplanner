@@ -19,12 +19,23 @@ class ShiftPlanningPolicy extends Policy
 
     public function view(User $user, ShiftPlanning $shiftPlanning): bool
     {
-        if ($this->hasGlobalScope($user, 'plannings.view.all')) {
+        if ($user->hasPermissionTo('plannings.view.all')) {
             return true;
         }
 
-        return $user->hasAnyPermission(['plannings.view.department', 'plannings.view.class', 'plannings.view.subject'])
-            && $this->sameDepartment($user, $shiftPlanning->planning?->department_id);
+        if ($user->hasPermissionTo('plannings.view.department')) {
+            return $this->sameDepartment($user, $shiftPlanning->planning?->department_id);
+        }
+
+        if ($user->hasPermissionTo('plannings.view.class')) {
+            return in_array($shiftPlanning->course_class_id, $this->userClassIds($user));
+        }
+
+        if ($user->hasPermissionTo('plannings.view.subject')) {
+            return in_array($shiftPlanning->course_id, $this->userCourseIds($user));
+        }
+
+        return false;
     }
 
     public function create(User $user): bool
@@ -39,12 +50,23 @@ class ShiftPlanningPolicy extends Policy
 
     public function update(User $user, ShiftPlanning $shiftPlanning): bool
     {
-        if ($user->hasAnyPermission(['plannings.edit.all', 'plannings.edit.class', 'plannings.edit.subject'])) {
+        if ($user->hasPermissionTo('plannings.edit.all')) {
             return true;
         }
 
-        return $user->hasPermissionTo('plannings.edit.department')
-            && $this->sameDepartment($user, $shiftPlanning->planning?->department_id);
+        if ($user->hasPermissionTo('plannings.edit.department')) {
+            return $this->sameDepartment($user, $shiftPlanning->planning?->department_id);
+        }
+
+        if ($user->hasPermissionTo('plannings.edit.class')) {
+            return in_array($shiftPlanning->course_class_id, $this->userClassIds($user));
+        }
+
+        if ($user->hasPermissionTo('plannings.edit.subject')) {
+            return in_array($shiftPlanning->course_id, $this->userCourseIds($user));
+        }
+
+        return false;
     }
 
     public function delete(User $user, ShiftPlanning $shiftPlanning): bool

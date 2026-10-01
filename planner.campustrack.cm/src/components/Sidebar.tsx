@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
 import { useAuth } from '@/src/auth';
+import { canAccessRoute } from '@/src/utils/routePermissions';
 import logoURL from '../public/campus track logo icon.png';
 
 interface SidebarProps {
@@ -25,8 +26,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
   const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
-
-  const isAdmin = user?.role === 'admin' || user?.role === 'super-admin';
 
   const allMenuItems = [
     {
@@ -57,9 +56,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
     { id: 'profile', path: '/profile', label: t('profile'), icon: UserCircle },
   ];
 
-  // Les pages de gestion (utilisateurs, paramètres) sont réservées aux admins
-  const adminOnlyIds = ['users', 'settings'];
-  const menuItems = allMenuItems.filter((item) => !adminOnlyIds.includes(item.id) || isAdmin);
+  // Masque les entrées auxquelles l'utilisateur n'a pas accès (miroir des
+  // permissions viewAny côté API).
+  const menuItems = allMenuItems.filter((item) => canAccessRoute(user ?? null, item.path));
 
   const isActive = (path: string) => {
     if (path === '/') {

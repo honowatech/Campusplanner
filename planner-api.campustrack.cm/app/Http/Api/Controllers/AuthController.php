@@ -55,7 +55,7 @@ class AuthController extends Controller
             // aucun token n'est délivré au client.
             $request->session()->regenerate();
 
-            return $this->success(['user' => $user], 'User signed in successfully', 200);
+            return $this->success($this->authUserPayload($user), 'User signed in successfully', 200);
         }
 
         return $this->error(null, 'Invalid credentials', 401);
@@ -74,6 +74,25 @@ class AuthController extends Controller
 
     public function authUser(): JsonResponse
     {
-        return Auth::user() ? $this->success(Auth::user(), 'User is authenticated', 200) : $this->error(null, 'User not authenticated', 401);
+        $user = Auth::user();
+
+        if (! $user) {
+            return $this->error(null, 'User not authenticated', 401);
+        }
+
+        return $this->success($this->authUserPayload($user), 'User is authenticated', 200);
+    }
+
+    /**
+     * Serialise l'utilisateur authentifié avec ses rôles et ses permissions
+     * effectives (directes + héritées des rôles), nécessaires au front pour
+     * déterminer le rôle primaire et les gardes d'accès.
+     */
+    private function authUserPayload(User $user): User
+    {
+        $user->load('roles');
+        $user->setRelation('permissions', $user->getAllPermissions());
+
+        return $user;
     }
 }

@@ -5,6 +5,7 @@ import { Sidebar } from '@/src/components/Sidebar';
 import { Menu, Bell, Globe, LogOut } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
 import { useAuth } from '@/src/auth';
+import { canAccessRoute } from '@/src/utils/routePermissions';
 import { Toaster } from '@/src/components/ui/sonner';
 
 export const Route = createRootRoute({
@@ -26,10 +27,20 @@ function RootComponent() {
 
     if (!auth.isAuthenticated && !isPublicRoute) {
       navigate({ to: '/login' });
-    } else if (auth.isAuthenticated && location.pathname === '/login') {
+      return;
+    }
+
+    if (auth.isAuthenticated && location.pathname === '/login') {
+      navigate({ to: '/' });
+      return;
+    }
+
+    // Garde de rôle : redirige vers le tableau de bord si la permission
+    // requise pour la page est absente (l'API renvoie de toute façon 403).
+    if (auth.isAuthenticated && !canAccessRoute(auth.user, location.pathname)) {
       navigate({ to: '/' });
     }
-  }, [auth.isAuthenticated, location.pathname, navigate]);
+  }, [auth.isAuthenticated, auth.user, location.pathname, navigate]);
 
   if (location.pathname === '/login' && !auth.isAuthenticated) {
     return (

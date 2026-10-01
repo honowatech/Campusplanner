@@ -114,7 +114,7 @@ class RegistrationApprovalTest extends TestCase
             'password' => 'Password123!',
         ]);
         $loginResponse->assertStatus(200)
-            ->assertJsonPath('data.user.id', $user->id)
+            ->assertJsonPath('data.id', $user->id)
             ->assertJsonMissingPath('data.token');
         $this->assertAuthenticatedAs($user, 'web');
     }

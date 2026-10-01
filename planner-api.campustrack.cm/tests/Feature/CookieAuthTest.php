@@ -52,9 +52,12 @@ class CookieAuthTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.user.id', $user->id)
+            ->assertJsonPath('data.id', $user->id)
+            ->assertJsonPath('data.roles.0.name', 'administrateur')
             ->assertJsonMissingPath('data.token')
             ->assertJsonMissingPath('token');
+
+        $this->assertNotEmpty($response->json('data.permissions'), 'Les permissions effectives doivent être renvoyées.');
 
         $this->captureSessionCookie($response);
     }
@@ -103,7 +106,7 @@ class CookieAuthTest extends TestCase
             'password' => self::PASSWORD,
         ]);
         $login->assertStatus(200)
-            ->assertJsonPath('data.user.id', $user->id)
+            ->assertJsonPath('data.id', $user->id)
             ->assertJsonMissingPath('data.token');
         $this->captureSessionCookie($login);
 
