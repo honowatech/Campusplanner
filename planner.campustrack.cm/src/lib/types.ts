@@ -428,13 +428,13 @@ export type PaginatedResponse<T> = {
 };
 
 export type ApiResponse<T> = {
-  status: string;
+  status: 'success' | 'failed';
   message: string;
   data: T;
 };
 
 export type ApiErrorResponse = {
-  status: string;
+  status: 'failed';
   message: string;
   data: Record<string, string[]> | null;
 };

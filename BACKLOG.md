@@ -68,10 +68,12 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 - [x] **Graphes Dashboard** — `departmentDistribution` affiche le nom du département (plus l'ID) ; « coursesPerDept » utilise le vrai comptage de cours par département (`coursesPerDepartment`) ; `displayedTeachers` filtre réellement les enseignants du HOD.
 - [x] **Accessibilité** — `alt` sur le logo (Sidebar) ; `div onClick` accessibles au clavier (Dashboard, TeacherManager) via `role="button"` + `onKeyDown`.
 - [x] **Accessibilité fine** — `type="button"` sur 73 boutons d'action (`type="submit"` conservés), 81 paires `htmlFor`/`id` ajoutées (18 fichiers).
+- [x] `params: any` typé ; méthodes mortes `getByDepartment`/`getUnassigned` supprimées.
+- [x] **Typage des réponses API** — `ApiResponse<T>` raffiné (`status: 'success' | 'failed'`) ; tous les `any[]` de `planningService` remplacés par des types précis (`PlanningConflict`, `GenerationFailure`, `ResolutionProposals`, `DoubleurOpportunity`, `SimultaneousCourse`).
 
 ### Reste à traiter (décisions / infra / profilage)
 
-- **P2 restant** : casts `any[]` restants dans `planningService` (shapes de réponse à typer).
+Aucun point de code restant dans cette passe. Restent les éléments d'infra/déploiement documentés plus bas : **P1-5** (config prod), **P2-13** (validation navigateur httpOnly), **P3-20** (email/SMTP), **P3-22** (temps réel/SMS), ainsi que le **force-push** et la **rotation `APP_KEY`**.
 
 Validation : `tsc --noEmit` OK ; suite API **82 tests / 272 assertions** verte.
 

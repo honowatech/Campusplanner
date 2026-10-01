@@ -5,6 +5,7 @@ import {
   ApiResponse,
   PaginatedResponse,
   PlanningType,
+  Room,
 } from '@/src/lib/types';
 
 const PLANNING_BASE = '/api/plannings';
@@ -102,6 +103,95 @@ export type ApplyProposalData = {
   };
 };
 
+// ============ TYPES DES RÉPONSES (miroir des services du module Planning) ============
+
+export type PlanningConflictType =
+  | 'room_conflict'
+  | 'teacher_conflict'
+  | 'class_conflict'
+  | 'room_blocking'
+  | 'teacher_blocking'
+  | 'hours_exceeded';
+
+export type PlanningConflict = {
+  type: PlanningConflictType;
+  message: string;
+  room_id?: number;
+  teacher_id?: number;
+  course_class_id?: number;
+  conflicting_plannings?: number[];
+  blocking_id?: number;
+  blocking_reason?: string;
+  current_hours?: number;
+  hours_needed?: number;
+  max_hours?: number;
+};
+
+export type GenerationFailure = {
+  class_id: number;
+  class_name: string;
+  course_id: number;
+  course_name: string;
+  hours_scheduled: number;
+  hours_needed: number;
+  reason: string;
+};
+
+export type RoomAlternative = {
+  type: 'change_room';
+  room_id: number;
+  room_name: string;
+  room_building: string | null;
+  room_floor: number | null;
+  room_capacity: number;
+  description: string;
+};
+
+export type TeacherAlternative = {
+  type: 'change_teacher';
+  teacher_id: number;
+  teacher_name: string;
+  teacher_speciality: string | null;
+  description: string;
+};
+
+export type TimeAlternative = {
+  type: 'change_time';
+  date: string;
+  starting_hour: string;
+  ending_hour: string;
+  description: string;
+};
+
+export type ResolutionProposals = {
+  room_alternatives?: RoomAlternative[];
+  teacher_alternatives?: TeacherAlternative[];
+  time_alternatives?: TimeAlternative[];
+};
+
+export type DoubleurOpportunity = {
+  time_slot: string;
+  course_id: number;
+  course_name: string | null;
+  classes_involved: number[];
+  suggested_room: Room;
+  potential_savings: number;
+};
+
+export type SimultaneousCourse = {
+  date: string;
+  starting_hour: string;
+  ending_hour: string;
+  courses: {
+    id: number;
+    class: string | null;
+    course: string | null;
+    teacher: string | null;
+    room: string | null;
+  }[];
+  total_classes: number;
+};
+
 export const planningService = {
   // ============ PLANNING (Périodes) ============
 
@@ -163,7 +253,7 @@ export const planningService = {
     data: GeneratePlanningData,
   ): Promise<{
     generated: ShiftPlanning[];
-    failed: any[];
+    failed: GenerationFailure[];
     warnings: string[];
     total_generated: number;
     total_failed: number;
@@ -171,7 +261,7 @@ export const planningService = {
     const res = await apiClient.post<
       ApiResponse<{
         generated: ShiftPlanning[];
-        failed: any[];
+        failed: GenerationFailure[];
         warnings: string[];
         total_generated: number;
         total_failed: number;
@@ -185,12 +275,12 @@ export const planningService = {
   detectConflicts: async (
     data: DetectConflictsData,
   ): Promise<{
-    conflicts: any[];
+    conflicts: PlanningConflict[];
     total_conflicts: number;
   }> => {
     const res = await apiClient.post<
       ApiResponse<{
-        conflicts: any[];
+        conflicts: PlanningConflict[];
         total_conflicts: number;
       }>
     >(`${PLANNING_BASE}/detect-conflicts`, data);
@@ -274,17 +364,23 @@ export const planningService = {
   getDoubleurOpportunities: async (
     planningId: number,
     minSameTimeSlot?: number,
-  ): Promise<any[]> => {
+  ): Promise<{ opportunities: DoubleurOpportunity[]; total: number }> => {
     const params: { planning_id: number; min_same_time_slot?: number } = { planning_id: planningId };
     if (minSameTimeSlot) params.min_same_time_slot = minSameTimeSlot;
-    const res = await apiClient.get<ApiResponse<any[]>>(`${PLANNING_BASE}/doubleur-opportunities`, {
+    const res = await apiClient.get<
+      ApiResponse<{ opportunities: DoubleurOpportunity[]; total: number }>
+    >(`${PLANNING_BASE}/doubleur-opportunities`, {
       params,
     });
     return res.data.data;
   },
 
-  getSimultaneousCourses: async (planningId: number): Promise<any[]> => {
-    const res = await apiClient.get<ApiResponse<any[]>>(`${PLANNING_BASE}/simultaneous-courses`, {
+  getSimultaneousCourses: async (
+    planningId: number,
+  ): Promise<{ simultaneous: SimultaneousCourse[]; total: number }> => {
+    const res = await apiClient.get<
+      ApiResponse<{ simultaneous: SimultaneousCourse[]; total: number }>
+    >(`${PLANNING_BASE}/simultaneous-courses`, {
       params: { planning_id: planningId },
     });
     return res.data.data;
@@ -295,21 +391,13 @@ export const planningService = {
   getProposals: async (
     id: number,
   ): Promise<{
-    conflicts: any[];
-    proposals: {
-      room_alternatives: any[];
-      teacher_alternatives: any[];
-      time_alternatives: any[];
-    };
+    conflicts: PlanningConflict[];
+    proposals: ResolutionProposals;
   }> => {
     const res = await apiClient.get<
       ApiResponse<{
-        conflicts: any[];
-        proposals: {
-          room_alternatives: any[];
-          teacher_alternatives: any[];
-          time_alternatives: any[];
-        };
+        conflicts: PlanningConflict[];
+        proposals: ResolutionProposals;
       }>
     >(`${SHIFT_BASE}/${id}/proposals`);
     return res.data.data;
@@ -334,7 +422,7 @@ export const planningService = {
     by_room: Record<number, number>;
     by_class: Record<number, number>;
     conflicts_count: number;
-    conflicts: any[];
+    conflicts: PlanningConflict[];
   }> => {
     const res = await apiClient.get<
       ApiResponse<{
@@ -344,7 +432,7 @@ export const planningService = {
         by_room: Record<number, number>;
         by_class: Record<number, number>;
         conflicts_count: number;
-        conflicts: any[];
+        conflicts: PlanningConflict[];
       }>
     >(`${PLANNING_BASE}/statistics/${planningId}`);
     return res.data.data;
