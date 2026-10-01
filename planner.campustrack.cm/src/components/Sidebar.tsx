@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
       >
         <div className="flex items-center justify-center w-full h-22 bg-white border-r">
           <div className="flex items-center justify-between">
-            <img className="size-12" src={logoURL} />
+            <img className="size-12" src={logoURL} alt={t('appName')} />
             <span className="text-xl font-bold tracking-wider text-primary">{t('appName')}</span>
           </div>
         </div>

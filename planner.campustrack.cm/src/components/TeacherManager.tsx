@@ -589,7 +589,15 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           <div
             key={teacher.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group cursor-pointer"
+            role="button"
+            tabIndex={0}
             onClick={() => handleTeacherClick(teacher.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleTeacherClick(teacher.id);
+              }
+            }}
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">

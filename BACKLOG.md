@@ -63,10 +63,15 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 - [x] Dead code front supprimé : `RoleManager`, `useRbac`, `usePermissions`, `availabilityService`, `rbacService`, `Workstation`, `routeTree.gen.ts` racine, ré-exports `useRbac`.
 - [x] `params: any` typé ; méthodes mortes `getByDepartment`/`getUnassigned` supprimées.
 
+### P3 — traités en session
+
+- [x] **Graphes Dashboard** — `departmentDistribution` affiche le nom du département (plus l'ID) ; « coursesPerDept » utilise le vrai comptage de cours par département (`coursesPerDepartment`) ; `displayedTeachers` filtre réellement les enseignants du HOD.
+- [x] **Accessibilité** — `alt` sur le logo (Sidebar) ; `div onClick` accessibles au clavier (Dashboard, TeacherManager) via `role="button"` + `onKeyDown`.
+
 ### Reste à traiter (décisions / infra / profilage)
 
 - **P2 restant** : casts `any[]` restants dans `planningService` (shapes de réponse à typer).
-- **P3 restant** : accessibilité (boutons `type`, labels, alt), graphes Dashboard incorrects.
+- **P3 restant** : `type="button"` sur les boutons de formulaire et `<label htmlFor>`/`id` sur les champs (accessibilité fine).
 
 Validation : `tsc --noEmit` OK ; suite API **82 tests / 272 assertions** verte.
 

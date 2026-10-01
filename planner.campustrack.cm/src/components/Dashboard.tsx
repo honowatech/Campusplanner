@@ -95,21 +95,42 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
 
   const displayedTeachers = React.useMemo(() => {
     if (user?.role === 'hod' && user.department_id) {
-      return teachers;
+      return teachers.filter((teacher) => teacher.department_id === user.department_id);
     }
     return teachers;
   }, [teachers, user]);
 
   const stats = React.useMemo(() => {
-    const deptCounts: Record<string, number> = {};
+    const deptName = (id?: number, name?: string): string =>
+      name ?? (id != null ? `Dépt ${id}` : 'N/A');
+
+    // Carte ID -> nom, déduite des enseignants (qui embarquent leur département).
+    const deptNameById = new Map<number, string>();
     displayedTeachers?.forEach((teacher) => {
-      deptCounts[teacher.department_id] = (deptCounts[teacher.department_id] || 0) + 1;
+      if (teacher.department_id != null && teacher.department?.name) {
+        deptNameById.set(teacher.department_id, teacher.department.name);
+      }
+    });
+
+    const teacherCounts: Record<string, number> = {};
+    displayedTeachers?.forEach((teacher) => {
+      const name = deptName(teacher.department_id, teacher.department?.name);
+      teacherCounts[name] = (teacherCounts[name] || 0) + 1;
+    });
+
+    const courseCounts: Record<string, number> = {};
+    courses?.forEach((course) => {
+      const name = course.department_id != null
+        ? (deptNameById.get(course.department_id) ?? `Dépt ${course.department_id}`)
+        : 'N/A';
+      courseCounts[name] = (courseCounts[name] || 0) + 1;
     });
 
     return {
       totalTeachers: displayedTeachers?.length,
       totalCourses: courses?.length,
-      departmentDistribution: Object.entries(deptCounts).map(([name, value]) => ({ name, value })),
+      departmentDistribution: Object.entries(teacherCounts).map(([name, value]) => ({ name, value })),
+      coursesPerDepartment: Object.entries(courseCounts).map(([name, value]) => ({ name, value })),
     };
   }, [displayedTeachers, courses]);
 
@@ -364,7 +385,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
           <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('coursesPerDept')}</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={stats.departmentDistribution}
+              data={stats.coursesPerDepartment}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -384,7 +405,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
 
       <div
         className="bg-linear-to-br from-indigo-50 to-white p-6 rounded-xl border border-indigo-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+        role="button"
+        tabIndex={0}
         onClick={handleGenerateInsights}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleGenerateInsights();
+          }
+        }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
