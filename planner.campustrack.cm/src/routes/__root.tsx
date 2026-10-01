@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createRootRoute, Outlet, Link, useNavigate, useLocation } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { Sidebar } from '@/src/components/Sidebar';
 import { Menu, Bell, Globe, LogOut } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
@@ -18,6 +18,7 @@ function RootComponent() {
   const { t, language, setLanguage } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const auth = useAuth();
+  const isDev = import.meta.env.DEV;
 
   const toggleLanguage = () => setLanguage(language === 'en' ? 'fr' : 'en');
 
@@ -47,7 +48,7 @@ function RootComponent() {
       <>
         <Outlet />
         <Toaster position="bottom-right" />
-        <TanStackRouterDevtools />
+        {isDev && <TanStackRouterDevtools />}
       </>
     );
   }
@@ -144,7 +145,7 @@ function RootComponent() {
         </main>
       </div>
 
-      <TanStackRouterDevtools />
+      {isDev && <TanStackRouterDevtools />}
     </div>
   );
 }

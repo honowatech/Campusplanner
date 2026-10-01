@@ -85,11 +85,4 @@ export const userService = {
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`${BASE}/${id}`);
   },
-
-  getByDepartment: async (departmentId: number): Promise<User[]> => {
-    const res = await apiClient.get<PaginatedResponse<User>>(`${BASE}`, {
-      params: { department_id: departmentId },
-    });
-    return res.data.data;
-  },
 };

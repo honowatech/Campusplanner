@@ -11,6 +11,7 @@ use App\Models\Teacher;
 use App\Models\TeacherBlocking;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +39,28 @@ class DashboardService
     public function clearCache(?string $pattern = null): void
     {
         try {
+            if ($pattern === null) {
+                Cache::flush();
+
+                return;
+            }
+
+            // Suppression ciblée des clés du dashboard (store « database »).
+            if (Cache::store()->getStore() instanceof DatabaseStore) {
+                $prefix = config('cache.prefix', '');
+                $table = config('cache.stores.database.table', 'cache');
+                $connection = config('cache.stores.database.connection') ?: config('database.default');
+                $like = $prefix.self::CACHE_PREFIX.str_replace('*', '%', $pattern).'%';
+
+                DB::connection($connection)
+                    ->table($table)
+                    ->where('key', 'like', $like)
+                    ->delete();
+
+                return;
+            }
+
+            // Store non « database » : repli sur un flush global.
             Cache::flush();
         } catch (\Exception $e) {
             logger()->error('Dashboard cache clear error: '.$e->getMessage());

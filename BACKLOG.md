@@ -53,9 +53,19 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 
 - [x] **Dette module Planning** — supprimé : vues Blade (`Resources/views`), traductions (`Resources/lang`), assets (`Resources/assets`), `Routes/web.php` (routes web mortes + middleware `TestConnexion` inexistant), `helper.php`, contrôleur `DashboardController` (mort + `doesntHave('employees')` cassé), `webpack.mix.js` + `package.json` (build Blade). Contrôleurs simplifiés (plus de retour de vue) et méthodes mortes retirées (`getForm`, `getList`, `roomsSelect`, `getSelectOptions`) ; façade `Planning` nettoyée (méthodes Workstation + helpers de vue + `Log::debug`). `RouteServiceProvider`/`PlanningServiceProvider` nettoyés.
 
+### P2 — traités en session (2e passe)
+
+- [x] `clearCache` : suppression ciblée par préfixe (store « database ») + repli `flush`.
+- [x] `TIMESTAMPDIFF` remplacé par `hours_diff_expr()` (portable MySQL/SQLite) dans `ResourceAvailabilityService`.
+- [x] Devtools router : import corrigé (`@tanstack/router-devtools`) + rendu conditionnel (`import.meta.env.DEV`).
+- [x] `ToggleSwitch` sorti du rendu (`SettingsManager`) + `type="button"`.
+- [x] Gestion d'erreur : `Login` (erreurs de champs 422), `Dashboard` (`try`/`finally`), `index` (toast).
+- [x] Dead code front supprimé : `RoleManager`, `useRbac`, `usePermissions`, `availabilityService`, `rbacService`, `Workstation`, `routeTree.gen.ts` racine, ré-exports `useRbac`.
+- [x] `params: any` typé ; méthodes mortes `getByDepartment`/`getUnassigned` supprimées.
+
 ### Reste à traiter (décisions / infra / profilage)
 
-- **P2 restant** : `clearCache` (pattern ignoré, `Cache::flush` global), `TIMESTAMPDIFF` non portable dans `ResourceAvailabilityService` (flag `check_hours`), casts `any[]` front (`planningService`/`userService`/`studentService`), devtools router importé via dépendance transitive, dead code front (`RoleManager`/`useRbac`/`availabilityService`/`usePermissions`/`Workstation`/`routeTree.gen.ts` racine), `ToggleSwitch` défini dans le rendu, gestion d'erreur silencieuse (`Login`/`Dashboard`/`index`).
+- **P2 restant** : casts `any[]` restants dans `planningService` (shapes de réponse à typer).
 - **P3 restant** : accessibilité (boutons `type`, labels, alt), graphes Dashboard incorrects.
 
 Validation : `tsc --noEmit` OK ; suite API **82 tests / 272 assertions** verte.

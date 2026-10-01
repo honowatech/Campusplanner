@@ -199,17 +199,6 @@ export type ShiftPlanning = {
   teacher?: Teacher;
 };
 
-export type Workstation = {
-  id: number;
-  name: string;
-  description?: string;
-  department: string;
-  max_teachers?: number;
-  working: boolean;
-  created_at?: string;
-  updated_at?: string;
-};
-
 // ============================================================
 // BLOCKING TYPES
 // ============================================================

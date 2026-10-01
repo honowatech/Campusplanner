@@ -14,6 +14,7 @@ export const Route = createFileRoute('/')({
       return await dashboardService.getOverview();
     } catch (error) {
       console.error('Failed to load dashboard:', error);
+      toast.error('Impossible de charger le tableau de bord. Veuillez réessayer.');
       return null;
     }
   },

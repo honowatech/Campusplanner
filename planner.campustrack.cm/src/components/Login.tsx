@@ -9,6 +9,7 @@ import {
   RegistrableRole,
 } from '@/src/schemas/auth';
 import { UserRole } from '@/src/lib/types';
+import type { AxiosError } from 'axios';
 import { useRegister } from '@/src/hooks/useUsers';
 import { UserPlus, CheckCircle2 } from 'lucide-react';
 
@@ -80,9 +81,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
       const data = result.data;
       if (!data) return;
       await onLoginWithApi(data.email, data.password);
-    } catch {
-      // Les erreurs API sont gérées par le contexte auth (apiError)
-      // Les erreurs de validation 422 pourraient être extraites ici si nécessaire
+    } catch (error) {
+      // Le message générique est affiché via le contexte auth (apiError) ;
+      // on extrait ici les erreurs de champs (422) pour les afficher sous les inputs.
+      const axiosError = error as AxiosError<{ data?: Record<string, string[]> }>;
+      const fieldErrors = axiosError.response?.data?.data;
+      if (fieldErrors && typeof fieldErrors === 'object' && !Array.isArray(fieldErrors)) {
+        setApiFieldErrors(fieldErrors);
+      }
     }
   };
 

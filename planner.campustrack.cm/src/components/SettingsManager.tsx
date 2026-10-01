@@ -9,6 +9,31 @@ interface SettingsManagerProps {
   onUpdateSettings: (settings: AppSettings) => void;
 }
 
+function ToggleSwitch({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
+      <span className="text-sm font-semibold text-gray-700">{label}</span>
+      <button
+        type="button"
+        onClick={onChange}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${checked ? 'bg-secondary' : 'bg-gray-200'}`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+        />
+      </button>
+    </div>
+  );
+}
+
 export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUpdateSettings }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'rules' | 'general' | 'api'>('rules');
@@ -39,28 +64,6 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
       },
     }));
   };
-
-  const ToggleSwitch = ({
-    label,
-    checked,
-    onChange,
-  }: {
-    label: string;
-    checked: boolean;
-    onChange: () => void;
-  }) => (
-    <div className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-      <span className="text-sm font-semibold text-gray-700">{label}</span>
-      <button
-        onClick={onChange}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${checked ? 'bg-secondary' : 'bg-gray-200'}`}
-      >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`}
-        />
-      </button>
-    </div>
-  );
 
   return (
     <div className="max-w-5xl mx-auto">

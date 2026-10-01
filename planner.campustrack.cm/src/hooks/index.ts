@@ -51,18 +51,6 @@ export {
   useApproveTeacherBlocking,
   useRejectTeacherBlocking,
 } from './useBlockings';
-export {
-  useRoles,
-  useRole,
-  useCreateRole,
-  useUpdateRole,
-  useDeleteRole,
-  useSyncPermissions,
-  usePermissions,
-  useCreatePermission,
-  useUpdatePermission,
-  useDeletePermission,
-} from './useRbac';
 export { useSettings, useUpdateSettings } from './useSettings';
 export {
   useShiftPlannings,

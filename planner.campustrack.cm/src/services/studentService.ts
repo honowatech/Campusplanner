@@ -78,9 +78,4 @@ export const studentService = {
     });
     return res.data.data;
   },
-
-  getUnassigned: async (params?: { page?: number }): Promise<Student[]> => {
-    const res = await apiClient.get<PaginatedResponse<Student>>(`${BASE}/unassigned`, { params });
-    return res.data.data;
-  },
 };

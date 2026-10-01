@@ -275,7 +275,7 @@ export const planningService = {
     planningId: number,
     minSameTimeSlot?: number,
   ): Promise<any[]> => {
-    const params: any = { planning_id: planningId };
+    const params: { planning_id: number; min_same_time_slot?: number } = { planning_id: planningId };
     if (minSameTimeSlot) params.min_same_time_slot = minSameTimeSlot;
     const res = await apiClient.get<ApiResponse<any[]>>(`${PLANNING_BASE}/doubleur-opportunities`, {
       params,

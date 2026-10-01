@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class ResourceAvailabilityService
@@ -153,7 +154,8 @@ class ResourceAvailabilityService
                 $query->where(function (Builder $q) use ($weekStart, $weekEnd, $requestedHours) {
                     $q->whereNull('max_hours_per_week')
                         ->orWhereHas('shiftPlannings', function (Builder $sq) use ($weekStart, $weekEnd, $requestedHours) {
-                            $sq->selectRaw('SUM(TIMESTAMPDIFF(HOUR, starting_hour, ending_hour)) as total_hours')
+                            $hoursExpr = hours_diff_expr()->getValue(DB::connection()->getQueryGrammar());
+                            $sq->selectRaw('SUM('.$hoursExpr.') as total_hours')
                                 ->whereBetween('date', [$weekStart->format('Y-m-d'), $weekEnd->format('Y-m-d')])
                                 ->havingRaw('total_hours + ? <= max_hours_per_week', [$requestedHours]);
                         }, '<=', 1);

@@ -119,11 +119,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(response.data.message);
       }
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
+      const axiosError = error as AxiosError<{ message?: string; data?: Record<string, string[]> }>;
       const errorMessage =
         axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
       setApiError(errorMessage);
-      throw new Error(errorMessage);
+      // On relance l'erreur axios pour permettre au formulaire d'extraire
+      // les erreurs de champs (422) de la réponse.
+      throw axiosError;
     } finally {
       setIsAuthenticating(false);
     }

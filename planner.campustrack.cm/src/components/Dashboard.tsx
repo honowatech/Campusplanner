@@ -121,13 +121,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
 
   const handleGenerateInsights = async () => {
     setLoadingAi(true);
-    const [analysis, optimization] = await Promise.all([
-      generateWorkloadAnalysis(displayedTeachers, courses),
-      suggestScheduleOptimization(displayedTeachers, courses),
-    ]);
-    setAiAnalysis(analysis);
-    setAiSuggestions(optimization.suggestions);
-    setLoadingAi(false);
+    try {
+      const [analysis, optimization] = await Promise.all([
+        generateWorkloadAnalysis(displayedTeachers, courses),
+        suggestScheduleOptimization(displayedTeachers, courses),
+      ]);
+      setAiAnalysis(analysis);
+      setAiSuggestions(optimization.suggestions);
+    } catch (error) {
+      console.error('Failed to generate insights:', error);
+    } finally {
+      setLoadingAi(false);
+    }
   };
 
   const realtimeStats = apiOverview?.realtime;
