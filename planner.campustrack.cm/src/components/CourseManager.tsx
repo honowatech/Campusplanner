@@ -90,6 +90,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
           />
         </div>
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -136,12 +137,14 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                     </td>
                     <td className="p-4 text-right space-x-2">
                       <button
+                        type="button"
                         onClick={() => handleOpenModal(course)}
                         className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg transition-colors"
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => onDeleteCourse(course.id)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -177,7 +180,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="course-code" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('courseCode')}
               </label>
               <div className="relative">
@@ -187,6 +190,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 />
                 <input
                   required
+                  id="course-code"
                   type="text"
                   placeholder="CS101"
                   className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none uppercase font-mono"
@@ -201,11 +205,12 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
               </div>
             </div>
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="course-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('courseName')}
               </label>
               <input
                 required
+                id="course-name"
                 type="text"
                 placeholder="e.g. Advanced Calculus"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"

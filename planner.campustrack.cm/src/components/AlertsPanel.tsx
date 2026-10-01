@@ -109,7 +109,7 @@ export const AlertsPanel: React.FC<AlertsPanelProps> = ({ alerts, onAlertClick }
       </div>
       {totalAlerts > 5 && (
         <div className="px-6 py-3 bg-gray-50 text-center">
-          <button className="text-sm text-secondary hover:text-primary font-medium">
+          <button type="button" className="text-sm text-secondary hover:text-primary font-medium">
             {t('viewAllAlerts')} ({totalAlerts})
           </button>
         </div>

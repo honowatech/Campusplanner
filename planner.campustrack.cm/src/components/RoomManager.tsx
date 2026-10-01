@@ -91,6 +91,7 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
           />
         </div>
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -112,12 +113,14 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
                 </div>
                 <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
+                    type="button"
                     onClick={() => handleOpenModal(room)}
                     className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button
+                    type="button"
                     onClick={() => onDeleteRoom(room.id)}
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
                   >
@@ -168,9 +171,10 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('roomName')}</label>
+            <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">{t('roomName')}</label>
             <input
               required
+              id="room-name"
               type="text"
               placeholder="e.g. Hall 101"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -179,9 +183,10 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('roomCode')}</label>
+            <label htmlFor="room-code" className="block text-sm font-medium text-gray-700 mb-1">{t('roomCode')}</label>
             <input
               required
+              id="room-code"
               type="text"
               placeholder="e.g. H101"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -191,11 +196,12 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="room-capacity" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('capacity')}
               </label>
               <input
                 required
+                id="room-capacity"
                 type="number"
                 min="1"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -209,8 +215,9 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('type')}</label>
+              <label htmlFor="room-type" className="block text-sm font-medium text-gray-700 mb-1">{t('type')}</label>
               <select
+                id="room-type"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.type}
                 onChange={(e) =>
@@ -230,9 +237,10 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('building')}</label>
+            <label htmlFor="room-building" className="block text-sm font-medium text-gray-700 mb-1">{t('building')}</label>
             <input
               required
+              id="room-building"
               type="text"
               placeholder="e.g. Main Block"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"

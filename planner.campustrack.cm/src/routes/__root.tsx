@@ -65,6 +65,7 @@ function RootComponent() {
         <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center">
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(true)}
               className="p-2 mr-4 text-gray-600 hover:bg-gray-100 rounded-lg lg:hidden"
             >
@@ -91,7 +92,7 @@ function RootComponent() {
             </button>
 
             <div className="flex items-center space-x-3 text-gray-400">
-              <button className="hover:text-secondary transition-colors relative">
+              <button type="button" className="hover:text-secondary transition-colors relative">
                 <Bell size={20} />
                 <span className="absolute top-0 right-0 block size-2 rounded-full ring-2 ring-white bg-red-400 transform translate-x-1/2 -translate-y-1/2"></span>
               </button>
@@ -126,6 +127,7 @@ function RootComponent() {
                   {t('settings')}
                 </Link>
                 <button
+                  type="button"
                   onClick={auth.logout}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
                 >

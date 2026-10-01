@@ -148,6 +148,7 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -173,12 +174,14 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
                   </div>
                   <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(blocking)}
                       className="p-1.5 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
                     >
                       <Edit2 size={14} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDelete(blocking.id)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                     >
@@ -234,9 +237,10 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
+            <label htmlFor="blocking-room" className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
             <select
               required
+              id="blocking-room"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.room_id}
               onChange={(e) => setFormData({ ...formData, room_id: Number(e.target.value) })}
@@ -254,11 +258,12 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="blocking-start-datetime" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('startDateTime')}
               </label>
               <input
                 required
+                id="blocking-start-datetime"
                 type="datetime-local"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.start_datetime}
@@ -266,11 +271,12 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="blocking-end-datetime" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('endDateTime')}
               </label>
               <input
                 required
+                id="blocking-end-datetime"
                 type="datetime-local"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.end_datetime}
@@ -280,10 +286,11 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="blocking-type" className="block text-sm font-medium text-gray-700 mb-1">
               {t('blockingType')}
             </label>
             <select
+              id="blocking-type"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.blocking_type}
               onChange={(e) =>
@@ -301,9 +308,10 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
+            <label htmlFor="blocking-reason" className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
             <textarea
               required
+              id="blocking-reason"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               rows={2}
               value={formData.reason}

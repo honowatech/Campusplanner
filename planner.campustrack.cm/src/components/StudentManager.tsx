@@ -210,6 +210,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -268,6 +269,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
                       <button
+                        type="button"
                         onClick={() => openMoveModal(student)}
                         className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
                         title={t('moveToClass')}
@@ -275,6 +277,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                         <ArrowRight size={16} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleOpenModal(student)}
                         className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
                         title={t('edit')}
@@ -282,6 +285,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                         <Edit2 size={16} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => onDeleteStudent(student.id)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                         title={t('delete')}
@@ -319,11 +323,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-first-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('firstName')}
               </label>
               <input
                 required
+                id="student-first-name"
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.first_name}
@@ -331,11 +336,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-last-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('lastName')}
               </label>
               <input
                 required
+                id="student-last-name"
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.last_name}
@@ -346,9 +352,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+              <label htmlFor="student-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
               <input
                 required
+                id="student-email"
                 type="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.email}
@@ -356,11 +363,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-matricule" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('matricule')}
               </label>
               <input
                 required
+                id="student-matricule"
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.matricule}
@@ -371,8 +379,9 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
+              <label htmlFor="student-phone" className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
               <input
+                id="student-phone"
                 type="tel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.phone}
@@ -380,8 +389,9 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('gender')}</label>
+              <label htmlFor="student-gender" className="block text-sm font-medium text-gray-700 mb-1">{t('gender')}</label>
               <select
+                id="student-gender"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.gender}
                 onChange={(e) =>
@@ -399,9 +409,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('class')}</label>
+            <label htmlFor="student-class" className="block text-sm font-medium text-gray-700 mb-1">{t('class')}</label>
             <select
               required
+              id="student-class"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.course_class_id}
               onChange={(e) =>
@@ -450,11 +461,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
             {t('movingStudent')}: <strong>{studentToMove?.full_name}</strong>
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="student-target-class" className="block text-sm font-medium text-gray-700 mb-1">
               {t('targetClass')}
             </label>
             <select
               required
+              id="student-target-class"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={targetClassId || ''}
               onChange={(e) => setTargetClassId(Number(e.target.value))}

@@ -181,6 +181,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
             <option value="30d">{t('last30d')}</option>
           </select>
           <button
+            type="button"
             onClick={fetchDashboardData}
             disabled={loadingApi}
             className="p-1.5 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg disabled:opacity-50"

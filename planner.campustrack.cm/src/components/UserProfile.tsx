@@ -122,10 +122,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, department }) =>
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h4 className="font-semibold text-gray-900 mb-4">{t('accountSettings')}</h4>
                 <div className="space-y-3">
-                  <button className="w-full text-left px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
+                  <button type="button" className="w-full text-left px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
                     Change Password
                   </button>
-                  <button className="w-full text-left px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
+                  <button type="button" className="w-full text-left px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
                     Notification Preferences
                   </button>
                 </div>

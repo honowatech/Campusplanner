@@ -67,11 +67,11 @@ Nouveaux constats (non couverts par le premier audit), vérifiés dans le code p
 
 - [x] **Graphes Dashboard** — `departmentDistribution` affiche le nom du département (plus l'ID) ; « coursesPerDept » utilise le vrai comptage de cours par département (`coursesPerDepartment`) ; `displayedTeachers` filtre réellement les enseignants du HOD.
 - [x] **Accessibilité** — `alt` sur le logo (Sidebar) ; `div onClick` accessibles au clavier (Dashboard, TeacherManager) via `role="button"` + `onKeyDown`.
+- [x] **Accessibilité fine** — `type="button"` sur 73 boutons d'action (`type="submit"` conservés), 81 paires `htmlFor`/`id` ajoutées (18 fichiers).
 
 ### Reste à traiter (décisions / infra / profilage)
 
 - **P2 restant** : casts `any[]` restants dans `planningService` (shapes de réponse à typer).
-- **P3 restant** : `type="button"` sur les boutons de formulaire et `<label htmlFor>`/`id` sur les champs (accessibilité fine).
 
 Validation : `tsc --noEmit` OK ; suite API **82 tests / 272 assertions** verte.
 

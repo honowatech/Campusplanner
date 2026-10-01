@@ -176,6 +176,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   </span>
                   {onApprove && (
                     <button
+                      type="button"
                       onClick={() => onApprove(pending.id)}
                       className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors"
                     >
@@ -185,6 +186,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   )}
                   {onReject && (
                     <button
+                      type="button"
                       onClick={() => onReject(pending.id)}
                       className="flex items-center space-x-1 px-3 py-1.5 bg-red-50 text-red-600 text-xs font-medium rounded-lg hover:bg-red-100 transition-colors"
                     >
@@ -214,6 +216,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
           />
         </div>
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -284,6 +287,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   <td className="p-4 text-right space-x-2">
                     {user.is_approved === false && onApprove ? (
                       <button
+                        type="button"
                         onClick={() => onApprove(user.id)}
                         title={t('reactivateUser')}
                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -292,6 +296,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
                       </button>
                     ) : onDeactivate ? (
                       <button
+                        type="button"
                         onClick={() => onDeactivate(user.id)}
                         title={t('deactivateUser')}
                         className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
@@ -300,12 +305,14 @@ export const UserManager: React.FC<UserManagerProps> = ({
                       </button>
                     ) : null}
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(user)}
                       className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg transition-colors"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDelete(user.id)}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
@@ -332,9 +339,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('fullName')}</label>
+            <label htmlFor="user-name" className="block text-sm font-medium text-gray-700 mb-1">{t('fullName')}</label>
             <input
               required
+              id="user-name"
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.name}
@@ -342,9 +350,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+            <label htmlFor="user-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
             <input
               required
+              id="user-email"
               type="email"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.email}
@@ -354,9 +363,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('role')}</label>
+              <label htmlFor="user-role" className="block text-sm font-medium text-gray-700 mb-1">{t('role')}</label>
               <select
                 required
+                id="user-role"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
@@ -369,10 +379,11 @@ export const UserManager: React.FC<UserManagerProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="user-department" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('department')}
               </label>
               <select
+                id="user-department"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.department_id}
                 onChange={(e) =>
@@ -395,11 +406,12 @@ export const UserManager: React.FC<UserManagerProps> = ({
           {!editingUser && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="user-password" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('password')}
                 </label>
                 <input
                   required
+                  id="user-password"
                   minLength={8}
                   type="password"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -409,11 +421,12 @@ export const UserManager: React.FC<UserManagerProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="user-password-confirmation" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('confirmPassword')}
                 </label>
                 <input
                   required
+                  id="user-password-confirmation"
                   minLength={8}
                   type="password"
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${

@@ -204,6 +204,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         {/* Header / Back Button */}
         <div className="flex items-center space-x-4 mb-2">
           <button
+            type="button"
             onClick={() => setSelectedTeacherId(null)}
             className="p-2 rounded-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors"
           >
@@ -231,6 +232,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               </div>
               <div className="flex space-x-2">
                 <button
+                  type="button"
                   onClick={() => handleOpenModal(teacher)}
                   className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center"
                 >
@@ -380,10 +382,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-detail-first-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('firstName')}
               </label>
               <input
+                id="teacher-detail-first-name"
                 required
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -392,10 +395,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-detail-last-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('lastName')}
               </label>
               <input
+                id="teacher-detail-last-name"
                 required
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -405,8 +409,9 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label htmlFor="teacher-detail-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                 <input
+                  id="teacher-detail-email"
                   required
                   type="email"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -415,10 +420,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="teacher-detail-phone" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('phoneNumber')}
                 </label>
                 <input
+                  id="teacher-detail-phone"
                   type="tel"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                   value={formData.phone}
@@ -429,11 +435,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="teacher-detail-department" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('department')}
                 </label>
                 <div className="relative">
                   <select
+                    id="teacher-detail-department"
                     className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                     value={formData.department_id}
                     onChange={(e) =>
@@ -459,11 +466,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="teacher-detail-color" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('colorTag')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
+                    id="teacher-detail-color"
                     type="color"
                     className="h-9 w-full rounded cursor-pointer border border-gray-300"
                     value={formData.color}
@@ -473,10 +481,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-detail-speciality" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('speciality')}
               </label>
               <input
+                id="teacher-detail-speciality"
                 required
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -576,6 +585,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -609,6 +619,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 </div>
                 <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleOpenModal(teacher);
@@ -618,6 +629,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                     <Edit2 size={16} />
                   </button>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       requestDelete(teacher.id);
@@ -666,8 +678,9 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('firstName')}</label>
+            <label htmlFor="teacher-first-name" className="block text-sm font-medium text-gray-700 mb-1">{t('firstName')}</label>
             <input
+              id="teacher-first-name"
               required
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -676,8 +689,9 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('lastName')}</label>
+            <label htmlFor="teacher-last-name" className="block text-sm font-medium text-gray-700 mb-1">{t('lastName')}</label>
             <input
+              id="teacher-last-name"
               required
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -687,8 +701,9 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+              <label htmlFor="teacher-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
               <input
+                id="teacher-email"
                 required
                 type="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -697,10 +712,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-phone" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('phoneNumber')}
               </label>
               <input
+                id="teacher-phone"
                 type="tel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.phone}
@@ -711,11 +727,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-department" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('department')}
               </label>
               <div className="relative">
                 <select
+                  id="teacher-department"
                   className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                   value={formData.department_id}
                   onChange={(e) =>
@@ -741,11 +758,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-color" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('colorTag')}
               </label>
               <div className="flex items-center space-x-2">
                 <input
+                  id="teacher-color"
                   type="color"
                   className="h-9 w-full rounded cursor-pointer border border-gray-300"
                   value={formData.color}
@@ -755,10 +773,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="teacher-speciality" className="block text-sm font-medium text-gray-700 mb-1">
               {t('speciality')}
             </label>
             <input
+              id="teacher-speciality"
               required
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -820,12 +839,14 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           <p className="text-gray-700 mb-6">{t('confirmDeleteTeacher')}</p>
           <div className="flex justify-end space-x-2">
             <button
+              type="button"
               onClick={() => setIsDeleteModalOpen(false)}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >

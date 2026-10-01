@@ -82,6 +82,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
         <div className="w-full lg:w-64 shrink-0">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <button
+              type="button"
               onClick={() => setActiveTab('rules')}
               className={`w-full flex items-center space-x-3 px-4 py-4 text-sm font-medium transition-colors border-l-4 ${
                 activeTab === 'rules'
@@ -93,6 +94,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
               <span>{t('managementRules')}</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('general')}
               className={`w-full flex items-center space-x-3 px-4 py-4 text-sm font-medium transition-colors border-l-4 ${
                 activeTab === 'general'
@@ -104,6 +106,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
               <span>{t('generalSettings')}</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('api')}
               className={`w-full flex items-center space-x-3 px-4 py-4 text-sm font-medium transition-colors border-l-4 ${
                 activeTab === 'api'
@@ -130,10 +133,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Max Hours Per Week */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="max-weekly-hours" className="block text-sm font-semibold text-gray-700 mb-2">
                         {t('maxWeeklyHours')}
                       </label>
                       <input
+                        id="max-weekly-hours"
                         type="number"
                         min="0"
                         max="100"
@@ -150,10 +154,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     {/* Max Consecutive Hours */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="max-consecutive-hours" className="block text-sm font-semibold text-gray-700 mb-2">
                         {t('maxConsecutiveHours')}
                       </label>
                       <input
+                        id="max-consecutive-hours"
                         type="number"
                         min="0"
                         max="10"
@@ -168,10 +173,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     {/* Max Daily Hours (Teacher) */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="max-daily-hours-teacher" className="block text-sm font-semibold text-gray-700 mb-2">
                         {t('maxDailyHoursTeacher')}
                       </label>
                       <input
+                        id="max-daily-hours-teacher"
                         type="number"
                         min="0"
                         max="12"
@@ -185,10 +191,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     {/* Max Daily Hours (Class) */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="max-daily-hours-class" className="block text-sm font-semibold text-gray-700 mb-2">
                         {t('maxDailyHoursClass')}
                       </label>
                       <input
+                        id="max-daily-hours-class"
                         type="number"
                         min="0"
                         max="12"
@@ -255,11 +262,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                   <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="sms-api-key" className="block text-sm font-semibold text-gray-700 mb-2">
                         {t('apiKey')}
                       </label>
                       <div className="relative">
                         <input
+                          id="sms-api-key"
                           type="password"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm bg-white"
                           placeholder="Enter your API Key"
@@ -271,10 +279,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="sms-sender-id" className="block text-sm font-semibold text-gray-700 mb-2">
                           {t('senderId')}
                         </label>
                         <input
+                          id="sms-sender-id"
                           type="text"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white"
                           placeholder="CAMPUS PLANNER"
@@ -286,11 +295,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="sms-balance" className="block text-sm font-semibold text-gray-700 mb-2">
                           {t('smsBalance')}
                         </label>
                         <div className="relative">
                           <input
+                            id="sms-balance"
                             type="number"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 bg-white"
                             value={localSettings?.smsConfig?.balance || 0}
@@ -320,6 +330,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                 )}
               </div>
               <button
+                type="button"
                 onClick={handleSave}
                 className="flex items-center justify-center space-x-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-secondary transition-colors shadow-sm font-medium"
               >

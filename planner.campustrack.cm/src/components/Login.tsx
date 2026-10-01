@@ -174,12 +174,13 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
           {mode === 'login' ? (
             <form onSubmit={handleSubmit} className="space-y-6 mb-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail size={18} className="text-gray-400" />
                   </div>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={handleEmailChange}
@@ -199,7 +200,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('password')}
                 </label>
                 <div className="relative">
@@ -207,6 +208,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                     <Lock size={18} className="text-gray-400" />
                   </div>
                   <input
+                    id="login-password"
                     type="password"
                     value={password}
                     onChange={handlePasswordChange}
@@ -244,7 +246,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('fullName')}
                 </label>
                 <div className="relative">
@@ -252,6 +254,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                     <UserPlus size={18} className="text-gray-400" />
                   </div>
                   <input
+                    id="register-name"
                     type="text"
                     value={regName}
                     onChange={(e) => {
@@ -273,12 +276,13 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail size={18} className="text-gray-400" />
                   </div>
                   <input
+                    id="register-email"
                     type="email"
                     value={regEmail}
                     onChange={(e) => {
@@ -300,10 +304,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="register-role" className="block text-sm font-medium text-gray-700 mb-1">
                   {t('requestedRole')}
                 </label>
                 <select
+                  id="register-role"
                   value={regRole}
                   onChange={(e) => {
                     setRegRole(e.target.value as RegistrableRole);
@@ -330,7 +335,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">
                     {t('password')}
                   </label>
                   <div className="relative">
@@ -338,6 +343,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                       <Lock size={18} className="text-gray-400" />
                     </div>
                     <input
+                      id="register-password"
                       type="password"
                       value={regPassword}
                       onChange={(e) => {
@@ -358,10 +364,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="register-password-confirmation" className="block text-sm font-medium text-gray-700 mb-1">
                     {t('confirmPassword')}
                   </label>
                   <input
+                    id="register-password-confirmation"
                     type="password"
                     value={regPasswordConfirmation}
                     onChange={(e) => {

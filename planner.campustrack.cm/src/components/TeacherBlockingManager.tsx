@@ -178,6 +178,7 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
                 </div>
                 <div className="flex space-x-2">
                   <button
+                    type="button"
                     onClick={() => onApprove?.(b.id)}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
                     title={t('approve')}
@@ -185,6 +186,7 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
                     <CheckCircle size={18} />
                   </button>
                   <button
+                    type="button"
                     onClick={() => openRejectModal(b)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                     title={t('reject')}
@@ -247,6 +249,7 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -311,12 +314,14 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
                 {blocking.status === 'pending' && showApprovals && (
                   <div className="mt-3 pt-3 border-t border-gray-50 flex justify-end space-x-2">
                     <button
+                      type="button"
                       onClick={() => onApprove?.(blocking.id)}
                       className="px-3 py-1.5 text-sm text-green-600 hover:bg-green-50 rounded-lg font-medium"
                     >
                       {t('approve')}
                     </button>
                     <button
+                      type="button"
                       onClick={() => openRejectModal(blocking)}
                       className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg font-medium"
                     >
@@ -328,12 +333,14 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
                 {blocking.status !== 'pending' && (
                   <div className="mt-3 pt-3 border-t border-gray-50 flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(blocking)}
                       className="p-1.5 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
                     >
                       <Edit2 size={14} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDelete(blocking.id)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                     >
@@ -361,9 +368,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('teacher')}</label>
+            <label htmlFor="teacher-blocking-teacher" className="block text-sm font-medium text-gray-700 mb-1">{t('teacher')}</label>
             <select
               required
+              id="teacher-blocking-teacher"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.teacher_id}
               onChange={(e) => setFormData({ ...formData, teacher_id: Number(e.target.value) })}
@@ -379,11 +387,12 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-blocking-start-datetime" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('startDateTime')}
               </label>
               <input
                 required
+                id="teacher-blocking-start-datetime"
                 type="datetime-local"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.start_datetime}
@@ -391,11 +400,12 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="teacher-blocking-end-datetime" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('endDateTime')}
               </label>
               <input
                 required
+                id="teacher-blocking-end-datetime"
                 type="datetime-local"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.end_datetime}
@@ -405,10 +415,11 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="teacher-blocking-type" className="block text-sm font-medium text-gray-700 mb-1">
               {t('blockingType')}
             </label>
             <select
+              id="teacher-blocking-type"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.blocking_type}
               onChange={(e) =>
@@ -427,9 +438,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
+            <label htmlFor="teacher-blocking-reason" className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
             <textarea
               required
+              id="teacher-blocking-reason"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               rows={2}
               value={formData.reason}
@@ -466,10 +478,11 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
             <strong>{blockingToReject && getTeacherName(blockingToReject.teacher_id)}</strong>
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="teacher-blocking-rejection-reason" className="block text-sm font-medium text-gray-700 mb-1">
               {t('rejectionReason')}
             </label>
             <textarea
+              id="teacher-blocking-rejection-reason"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               rows={3}
               value={rejectionReason}

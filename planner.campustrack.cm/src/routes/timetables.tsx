@@ -66,6 +66,7 @@ function TimetablesPage() {
         <h1 className="font-bold text-xl text-gray-900">{t('plannings')}</h1>
         <span className="ml-3 text-sm text-gray-500">({plannings?.length || 0})</span>
         <button
+          type="button"
           onClick={handleCreatePeriod}
           className="flex items-center space-x-1 p-3 bg-indigo-50 text-primary rounded-md hover:bg-indigo-100 transition-colors text-sm font-medium ml-auto"
         >
@@ -123,11 +124,12 @@ function TimetablesPage() {
       >
         <form onSubmit={handlePeriodSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="period-name" className="block text-sm font-medium text-gray-700 mb-1">
               {t('periodName')}
             </label>
             <input
               required
+              id="period-name"
               type="text"
               placeholder="Week 1"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -137,11 +139,12 @@ function TimetablesPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="period-start-date" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('startDate')}
               </label>
               <input
                 required
+                id="period-start-date"
                 type="date"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={periodFormData.startDate}
@@ -154,9 +157,10 @@ function TimetablesPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('endDate')}</label>
+              <label htmlFor="period-end-date" className="block text-sm font-medium text-gray-700 mb-1">{t('endDate')}</label>
               <input
                 required
+                id="period-end-date"
                 type="date"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={periodFormData.endDate}

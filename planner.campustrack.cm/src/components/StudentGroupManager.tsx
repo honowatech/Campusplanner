@@ -141,6 +141,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
           />
         </div>
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -162,12 +163,14 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
                 </div>
                 <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
+                    type="button"
                     onClick={() => handleOpenModal(classItem)}
                     className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button
+                    type="button"
                     onClick={() => requestDelete(classItem.id)}
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
                   >
@@ -231,11 +234,12 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="class-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('classDisplayName')}
               </label>
               <input
                 required
+                id="class-name"
                 type="text"
                 placeholder="e.g. Génie Logiciel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -244,7 +248,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
               />
             </div>
             <div className="col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="class-code" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('classCode')}
               </label>
               <div className="relative">
@@ -254,6 +258,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
                 />
                 <input
                   required
+                  id="class-code"
                   type="text"
                   placeholder="GL1"
                   className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none uppercase font-mono"
@@ -270,12 +275,13 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="class-department" className="block text-sm font-medium text-gray-700 mb-1">
               {t('department')}
             </label>
             <div className="relative">
               <select
                 required
+                id="class-department"
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                 value={formData.department_id}
                 onChange={(e) =>
@@ -306,9 +312,10 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('level')}</label>
+              <label htmlFor="class-level" className="block text-sm font-medium text-gray-700 mb-1">{t('level')}</label>
               <input
                 required
+                id="class-level"
                 type="text"
                 placeholder="e.g. L1, M2"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -317,11 +324,12 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="class-capacity" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('numStudents')}
               </label>
               <input
                 required
+                id="class-capacity"
                 type="number"
                 min="1"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -363,12 +371,14 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
           <p className="text-gray-700 mb-6">{t('confirmDeleteClass')}</p>
           <div className="flex justify-end space-x-2">
             <button
+              type="button"
               onClick={() => setIsDeleteModalOpen(false)}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >

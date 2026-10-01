@@ -307,6 +307,7 @@ export const Timetable: React.FC<TimetableProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <button
+              type="button"
               onClick={() => handleAddSchedule()}
               className="flex items-center space-x-1 p-3 bg-secondary text-white rounded-md hover:bg-primary transition-colors text-sm font-medium"
             >
@@ -319,12 +320,14 @@ export const Timetable: React.FC<TimetableProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <div className="bg-gray-100 p-1 rounded-lg flex items-center border border-gray-200">
             <button
+              type="button"
               onClick={() => setViewMode('standard')}
               className={`p-1.5 rounded-md transition-all ${viewMode === 'standard' ? 'bg-white shadow-sm text-secondary' : 'text-gray-500 hover:text-gray-700'}`}
             >
               <LayoutGrid size={18} />
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('global')}
               className={`p-1.5 rounded-md transition-all ${viewMode === 'global' ? 'bg-white shadow-sm text-secondary' : 'text-gray-500 hover:text-gray-700'}`}
             >
@@ -386,6 +389,7 @@ export const Timetable: React.FC<TimetableProps> = ({
 
           <div className="relative">
             <button
+              type="button"
               onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
               className="flex items-center justify-center p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors border border-gray-200"
             >
@@ -393,11 +397,11 @@ export const Timetable: React.FC<TimetableProps> = ({
             </button>
             {isExportMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 z-50">
-                <button className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                <button type="button" className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
                   <FileText size={16} className="mr-2 text-red-500" />
                   {t('exportPDF')}
                 </button>
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
                   <FileSpreadsheet size={16} className="mr-2 text-green-600" />
                   {t('exportExcel')}
                 </button>
@@ -413,6 +417,7 @@ export const Timetable: React.FC<TimetableProps> = ({
             <Calendar size={64} className="mb-4 opacity-20" />
             <p className="text-lg font-medium">{t('noShifts')}</p>
             <button
+              type="button"
               onClick={() => handleAddSchedule()}
               className="mt-4 text-secondary hover:underline"
             >
@@ -461,6 +466,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                         )}
                                       </div>
                                       <button
+                                        type="button"
                                         onClick={() => requestDelete(shift.id)}
                                         className="p-1 text-gray-400 hover:text-red-600"
                                       >
@@ -484,6 +490,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                             </div>
                           ) : (
                             <button
+                              type="button"
                               onClick={() => handleAddSchedule(date, slot.start, slot.end)}
                               className="text-xs text-gray-400 hover:text-secondary font-medium size-full"
                             >
@@ -556,6 +563,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                       {course?.code || course?.name || `Course ${shift.course_id}`}
                                     </span>
                                     <button
+                                      type="button"
                                       onClick={() => requestDelete(shift.id)}
                                       className="text-gray-400 hover:text-red-600"
                                     >
@@ -574,6 +582,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                 </div>
                               ) : (
                                 <button
+                                  type="button"
                                   onClick={() =>
                                     handleAddSchedule(date, slot.start, slot.end, classItem.id)
                                   }
@@ -608,9 +617,10 @@ export const Timetable: React.FC<TimetableProps> = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('course')}</label>
+            <label htmlFor="shift-course" className="block text-sm font-medium text-gray-700 mb-1">{t('course')}</label>
             <select
               required
+              id="shift-course"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.course_id}
               onChange={(e) => setFormData({ ...formData, course_id: Number(e.target.value) })}
@@ -627,9 +637,10 @@ export const Timetable: React.FC<TimetableProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('classes')}</label>
+            <label htmlFor="shift-class" className="block text-sm font-medium text-gray-700 mb-1">{t('classes')}</label>
             <select
               required
+              id="shift-class"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.course_class_id}
               onChange={(e) =>
@@ -652,9 +663,10 @@ export const Timetable: React.FC<TimetableProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('date')}</label>
+              <label htmlFor="shift-date" className="block text-sm font-medium text-gray-700 mb-1">{t('date')}</label>
               <input
                 required
+                id="shift-date"
                 type="date"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={(formData.date ?? '').slice(0, 10)}
@@ -662,10 +674,11 @@ export const Timetable: React.FC<TimetableProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="shift-teacher" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('teachers')}
               </label>
               <select
+                id="shift-teacher"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.teacher_id || ''}
                 onChange={(e) =>
@@ -687,11 +700,12 @@ export const Timetable: React.FC<TimetableProps> = ({
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="shift-start-time" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('startTime')}
               </label>
               <select
                 required
+                id="shift-start-time"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.starting_hour}
                 onChange={(e) => setFormData({ ...formData, starting_hour: e.target.value })}
@@ -709,9 +723,10 @@ export const Timetable: React.FC<TimetableProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('endTime')}</label>
+              <label htmlFor="shift-end-time" className="block text-sm font-medium text-gray-700 mb-1">{t('endTime')}</label>
               <select
                 required
+                id="shift-end-time"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.ending_hour}
                 onChange={(e) => setFormData({ ...formData, ending_hour: e.target.value })}
@@ -728,8 +743,9 @@ export const Timetable: React.FC<TimetableProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
+              <label htmlFor="shift-room" className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
               <select
+                id="shift-room"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.room_id || ''}
                 onChange={(e) =>
@@ -776,12 +792,14 @@ export const Timetable: React.FC<TimetableProps> = ({
           <p className="text-gray-700 mb-6">{t('confirmDeleteShift')}</p>
           <div className="flex justify-end space-x-2">
             <button
+              type="button"
               onClick={() => setIsDeleteModalOpen(false)}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >

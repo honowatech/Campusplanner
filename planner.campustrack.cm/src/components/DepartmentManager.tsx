@@ -145,6 +145,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
+                type="button"
                 onClick={() => setSelectedDeptId(null)}
                 className="p-2 rounded-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors"
               >
@@ -171,6 +172,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
 
             <div className="flex space-x-2">
               <button
+                type="button"
                 onClick={() => handleOpenModal(selectedDept)}
                 className="px-4 py-2 text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors text-sm font-medium"
               >
@@ -234,6 +236,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
                         </td>
                         <td className="p-4 text-right">
                           <button
+                            type="button"
                             onClick={() => onDeleteCourse(course.id)}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title={t('delete')}
@@ -263,10 +266,11 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="department-detail-name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('deptName')}
               </label>
               <input
+                id="department-detail-name"
                 required
                 type="text"
                 placeholder="e.g. Computer Science"
@@ -276,10 +280,11 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="department-detail-code" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('deptCode')}
               </label>
               <input
+                id="department-detail-code"
                 required
                 type="text"
                 placeholder="e.g. CS"
@@ -294,10 +299,11 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="department-detail-head" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('headOfDept')}
               </label>
               <select
+                id="department-detail-head"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 value={formData.head_of_department_id || ''}
                 onChange={(e) =>
@@ -354,6 +360,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
           />
         </div>
         <button
+          type="button"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
         >
@@ -376,6 +383,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
                 </div>
                 <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleOpenModal(dept);
@@ -385,6 +393,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
                     <Edit2 size={16} />
                   </button>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       requestDelete(dept.id);
@@ -434,8 +443,9 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('deptName')}</label>
+            <label htmlFor="department-name" className="block text-sm font-medium text-gray-700 mb-1">{t('deptName')}</label>
             <input
+              id="department-name"
               required
               type="text"
               placeholder="e.g. Computer Science"
@@ -445,8 +455,9 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('deptCode')}</label>
+            <label htmlFor="department-code" className="block text-sm font-medium text-gray-700 mb-1">{t('deptCode')}</label>
             <input
+              id="department-code"
               required
               type="text"
               placeholder="e.g. CS"
@@ -456,10 +467,11 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="department-head" className="block text-sm font-medium text-gray-700 mb-1">
               {t('headOfDept')}
             </label>
             <select
+              id="department-head"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.head_of_department_id || ''}
               onChange={(e) =>
@@ -504,12 +516,14 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
           <p className="text-gray-700 mb-6">{t('confirmDeleteDepartment')}</p>
           <div className="flex justify-end space-x-2">
             <button
+              type="button"
               onClick={() => setIsDeleteModalOpen(false)}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
