@@ -39,6 +39,14 @@ class RoomBlocking extends Model
     }
 
     /**
+     * Get the user who created this blocking.
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
      * Scope for rejected blockings.
      */
     public function scopeRejected($query)

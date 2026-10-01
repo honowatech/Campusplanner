@@ -4,6 +4,46 @@
 > Effort : XS < 1 h · S < 1 jour · M = quelques jours.
 > Critères de priorisation : risque sécurité réel → bugs fonctionnels actuels → intégrité des données → dette technique.
 
+## Audit n°2 — 2026-10-01 (nouvelle passe approfondie)
+
+Nouveaux constats (non couverts par le premier audit), vérifiés dans le code puis corrigés en session.
+
+### P0 — Critique / sécurité
+
+- [x] **Fuite de secrets** — `planner-api.campustrack.cm/session-ses_3953.md` (transcript d'agent, ~5 800 lignes, commité) contenait `APP_KEY` + `.env` complet (`DB_USERNAME=root`, `DB_PASSWORD=`). ✅ Fichier supprimé + `session-*.md` ajouté au `.gitignore`. ⚠️ **Reste** : purger l'historique git (filter-branch/filter-repo) et **faire tourner `APP_KEY`** si elle a pu être réutilisée en prod.
+- [x] **Élévation de privilèges** — `UserRoleController` (assign/sync/remove roles) et `RoleController::assignUsers` laissaient un `administrateur` s'attribuer `super-admin`. ✅ Garde ajoutée : seul un super-admin gère `super-admin`/`administrateur`.
+- [x] **XSS réfléchi** — `echo <script>…alert(input)…</script>` dans `Planning::createPlanning` (entrée utilisateur `shift_plannings`). ✅ Echo supprimé.
+- [x] **Importmap CDN tiers** — `index.html` référençait `react`/`recharts`/`lucide-react`/`@google/genai`/`jspdf`/`xlsx` depuis des CDN (`aistudiocdn.com`, `esm.sh`) + `/index.css` inexistant. ✅ Importmap et lien mort supprimés.
+
+### P1 — Bugs actifs corrigés (API)
+
+- [x] **CRUD `room-blockings` → 500** : relation `createdBy` absente du modèle. ✅ `RoomBlocking::createdBy()` ajoutée.
+- [x] **`students/{id}/move-to-class` cassé** : validation `class_id` mais lecture `course_class_id`. ✅ Clé unifiée.
+- [x] **Route `enseignants/shift-plannings`** pointait vers `enseignantsSelect` (méthode absente). ✅ Renommée `teachersSelect`.
+- [x] **`RoleController` colonnes `level`/`description` inexistantes** → 500 sur store/update/index?level=. ✅ Colonnes retirées du code/validation.
+- [x] **Génération auto : enseignant occupé sélectionné** (négation `!` sur `findAvailableTeachers`). ✅ Logique corrigée.
+- [x] **`teacher-blockings/check-availability` → 500** : `with(['class','subject'])` sur `ShiftPlanning`. ✅ Remplacé par `courseClass`/`course`.
+- [x] **Scoping planning inopérant** : `department_id` inexistant sur `planning_plannings`. ✅ Accesseur `getDepartmentIdAttribute()` déduit le département via `shiftPlannings.courseClass`. ⚠️ **Reste** : `plannings.edit.class`/`.subject` retournent encore `true` inconditionnellement — exige un modèle de périmètre classe/matière (décision produit).
+
+### P1 — Bugs actifs corrigés (Frontend)
+
+- [x] **Mapping de rôles** — `convertApiUserToUser` ne produisait jamais `'admin'`/`'hod'` et ignorait `responsable-departement`/`personnel-administratif` ; `defaultRole='admin'` dangereux. ✅ Normalisé (`administrateur`→`admin`, `responsable-departement`→`hod`) et défaut passé à `'etudiant'`.
+- [x] **`RoleManager` sélection aléatoire destructive** (`Math.random()`). ✅ Remplacée par sélection vide + TODO (charger les permissions réelles).
+- [x] **Clé SMS affichée en clair** (`type="text"` + label « AES-256 » trompeur). ✅ `type="password"`, label supprimé.
+- [x] **`checkRoomAvailability` sans préfixe `/api`**. ✅ URL corrigée.
+- [x] **Sidebar sans garde de rôle** — `users`/`settings` visibles par tous. ✅ Masqués pour les non-admins. ⚠️ **Reste** : gardes de routes (`__root.tsx`) et filtrage fin par rôle (un étudiant voit encore `departments`/`courses`/`rooms`…).
+
+### Reste à traiter (décisions / infra / profilage)
+
+- **P1-7 (suite)** : périmètre classe/matière pour `plannings.edit.class`/`.subject` — décision produit sur le modèle de scoping.
+- **P1-13 (suite)** : garde de routes complète par rôle côté client.
+- **P2** : FormRequests module Planning `authorize(){return true;}`, `applyProposal` sans validation, `room_id` sans `exists`, `clearCache` flushe tout, `DashboardPermission` redondant/non normalisé, `UpdateUserRequest` mort, casts `any[]` front, `teacher_id`/`room_id` forcés à 0, devtools router importé via dépendance transitive, dead code (`RoleManager`/`useRbac`/`availabilityService`/`usePermissions`/`Workstation`/`routeTree.gen.ts` racine).
+- **P3** : accessibilité (boutons `type`, labels, alt), graphes Dashboard incorrects, dette module Planning (Blade/`lang/fr.json`), `TestConnexion` inexistant (routes web mortes).
+
+Validation : `tsc --noEmit` OK ; suite API **81 tests / 266 assertions** verte.
+
+---
+
 ## Déjà résolu dans les commits précédents
 
 - Bugs 500 des relations renommées (`matieres`, `classe`, `subject`…), `POST /users` restauré

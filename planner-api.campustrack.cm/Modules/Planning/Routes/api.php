@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->prefix('plannings')->name('planning.')->group
     Route::delete('shift-plannings/{id}', [ShiftPlanningController::class, 'destroy'])->name('shift-plannings.destroy');
 
     // Route utilitaire pour sélection des enseignants
-    Route::get('enseignants/shift-plannings', [ShiftPlanningController::class, 'enseignantsSelect'])->name('enseignants.select');
+    Route::get('enseignants/shift-plannings', [ShiftPlanningController::class, 'teachersSelect'])->name('enseignants.select');
 
     // Routes pour la génération automatique et gestion des conflits
     Route::post('generate', [SchedulingController::class, 'generate'])->name('generate');

@@ -200,7 +200,7 @@ class StudentController extends Controller
             'class_id' => 'required|exists:classes,id',
         ]);
 
-        $newClass = CourseClass::findOrFail($validated['course_class_id']);
+        $newClass = CourseClass::findOrFail($validated['class_id']);
 
         // Check if new class has available spots
         if (! $newClass->hasAvailableSpace()) {
@@ -212,7 +212,7 @@ class StudentController extends Controller
         }
 
         $oldClass = $student->class;
-        $student->update(['course_class_id' => $validated['course_class_id']]);
+        $student->update(['course_class_id' => $validated['class_id']]);
 
         return $this->success(
             [

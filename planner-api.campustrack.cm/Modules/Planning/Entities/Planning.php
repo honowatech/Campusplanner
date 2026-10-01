@@ -31,4 +31,13 @@ class Planning extends Model
     {
         return $this->hasMany(ShiftPlanning::class, 'planning_id');
     }
+
+    /**
+     * Déduit le département du planning depuis son premier shift planning :
+     * la table planning_plannings ne porte pas de colonne department_id.
+     */
+    public function getDepartmentIdAttribute(): ?int
+    {
+        return $this->shiftPlannings()->first()?->courseClass?->department_id;
+    }
 }

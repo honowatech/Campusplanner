@@ -455,7 +455,13 @@ export type ApiErrorResponse = {
 // ============================================================
 
 export type UserRole =
-  'super-admin' | 'administrateur' | 'professeur' | 'etudiant' | 'admin' | 'hod';
+  | 'super-admin'
+  | 'administrateur'
+  | 'professeur'
+  | 'etudiant'
+  | 'admin'
+  | 'hod'
+  | 'personnel-administratif';
 
 export type DashboardStats = {
   totalTeachers: number;

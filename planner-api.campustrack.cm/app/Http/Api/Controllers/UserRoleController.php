@@ -13,6 +13,12 @@ class UserRoleController extends Controller
     use HttpResponses;
 
     /**
+     * Rôles d'administration : seul un super-admin peut les attribuer/retirer,
+     * sinon un administrateur pourrait s'auto-promouvoir super-admin.
+     */
+    private const RESTRICTED_ROLES = ['super-admin', 'administrateur'];
+
+    /**
      * Get user's roles.
      */
     public function getRoles(int $userId): JsonResponse
@@ -39,6 +45,15 @@ class UserRoleController extends Controller
             'roles.*' => 'exists:roles,name',
             'mode' => 'in:add,sync',
         ]);
+
+        if (array_intersect($validated['roles'], self::RESTRICTED_ROLES)
+            && ! $request->user()->hasRole('super-admin')) {
+            return $this->error(
+                null,
+                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                403
+            );
+        }
 
         $mode = $validated['mode'] ?? 'add';
 
@@ -69,6 +84,15 @@ class UserRoleController extends Controller
             'roles.*' => 'exists:roles,name',
         ]);
 
+        if (array_intersect($validated['roles'], self::RESTRICTED_ROLES)
+            && ! $request->user()->hasRole('super-admin')) {
+            return $this->error(
+                null,
+                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                403
+            );
+        }
+
         $user->removeRole($validated['roles']);
 
         return $this->success(
@@ -89,6 +113,15 @@ class UserRoleController extends Controller
             'roles' => 'required|array',
             'roles.*' => 'exists:roles,name',
         ]);
+
+        if (array_intersect($validated['roles'], self::RESTRICTED_ROLES)
+            && ! $request->user()->hasRole('super-admin')) {
+            return $this->error(
+                null,
+                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                403
+            );
+        }
 
         $user->syncRoles($validated['roles']);
 

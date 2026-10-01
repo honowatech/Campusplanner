@@ -13,7 +13,7 @@ type ApiUserWithRoles = {
   permissions?: Permission[];
 };
 
-function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole = 'admin'): User {
+function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole = 'etudiant'): User {
   const roles = apiUser.roles || [];
   const permissions = apiUser.permissions || [];
 
@@ -21,9 +21,11 @@ function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole =
   if (roles.length > 0) {
     const roleNames = roles.map((r) => r.name);
     if (roleNames.includes('super-admin')) primaryRole = 'super-admin';
-    else if (roleNames.includes('administrateur')) primaryRole = 'administrateur';
+    else if (roleNames.includes('administrateur')) primaryRole = 'admin';
+    else if (roleNames.includes('responsable-departement')) primaryRole = 'hod';
     else if (roleNames.includes('professeur')) primaryRole = 'professeur';
     else if (roleNames.includes('etudiant')) primaryRole = 'etudiant';
+    else if (roleNames.includes('personnel-administratif')) primaryRole = 'personnel-administratif';
   }
 
   return {
@@ -94,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithApi = async (
     email: string,
     password: string,
-    role: UserRole = 'admin',
+    role: UserRole = 'etudiant',
   ): Promise<void> => {
     setIsAuthenticating(true);
     setApiError(null);

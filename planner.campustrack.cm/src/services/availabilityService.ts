@@ -16,7 +16,7 @@ export const availabilityService = {
 
   checkRoomAvailability: (roomId: number, data: { start_datetime: string; end_datetime: string }) =>
     apiClient.post<ApiResponse<{ available: boolean; reason?: string }>>(
-      `/rooms/${roomId}/check-availability`,
+      `/api/rooms/${roomId}/check-availability`,
       data,
     ),
 

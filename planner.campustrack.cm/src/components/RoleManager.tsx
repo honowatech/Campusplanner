@@ -74,8 +74,9 @@ export const RoleManager: React.FC<RoleManagerProps> = ({
 
   const openPermissionsModal = (role: Role) => {
     setSelectedRoleId(role.id);
-    const rolePerms = permissions.filter((_) => Math.random() > 0.5).map((p) => p.id);
-    setSelectedPermissions(new Set(rolePerms));
+    // TODO: charger les permissions réelles du rôle (roleService.getPermissions(role.id))
+    // au lieu d'une sélection aléatoire destructive.
+    setSelectedPermissions(new Set());
     setIsPermissionsModalOpen(true);
   };
 

@@ -24,10 +24,6 @@ class RoleController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        if ($request->has('level')) {
-            $query->where('level', $request->level);
-        }
-
         $roles = $query->withCount('users')->paginate($request->per_page ?? 9);
 
         return $this->success(['roles' => $roles], 'Liste des rôles récupérée', 200);
@@ -40,8 +36,6 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
-            'description' => 'nullable|string',
-            'level' => 'required|integer|min:1|max:10',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
@@ -50,11 +44,6 @@ class RoleController extends Controller
             'name' => $validated['name'],
             'guard_name' => 'web',
         ]);
-
-        // Store level in custom attribute (you may need to add this column to roles table)
-        $role->level = $validated['level'];
-        $role->description = $validated['description'] ?? null;
-        $role->save();
 
         if (! empty($validated['permissions'])) {
             $role->syncPermissions($validated['permissions']);
@@ -91,22 +80,12 @@ class RoleController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255|unique:roles,name,'.$id,
-            'description' => 'nullable|string',
-            'level' => 'sometimes|integer|min:1|max:10',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
 
         if (isset($validated['name'])) {
             $role->name = $validated['name'];
-        }
-
-        if (isset($validated['level'])) {
-            $role->level = $validated['level'];
-        }
-
-        if (isset($validated['description'])) {
-            $role->description = $validated['description'];
         }
 
         $role->save();
@@ -205,6 +184,11 @@ class RoleController extends Controller
     public function assignUsers(Request $request, int $id): JsonResponse
     {
         $role = Role::findOrFail($id);
+
+        if (in_array($role->name, ['super-admin', 'administrateur'], true)
+            && ! $request->user()->hasRole('super-admin')) {
+            return $this->error(null, 'Seul un super-admin peut attribuer ce rôle.', 403);
+        }
 
         $validated = $request->validate([
             'user_ids' => 'required|array',

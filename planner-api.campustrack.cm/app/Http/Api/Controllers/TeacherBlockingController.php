@@ -363,7 +363,7 @@ class TeacherBlockingController extends Controller
                         date('H:i:s', strtotime($validated['end_datetime'])),
                     ]);
                 })
-                ->with(['class', 'subject'])
+                ->with(['courseClass', 'course'])
                 ->get();
         }
 

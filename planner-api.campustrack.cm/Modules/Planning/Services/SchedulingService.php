@@ -242,11 +242,12 @@ class SchedulingService
     {
         $dateStr = $date->format('Y-m-d');
 
-        foreach ($teachers as $teacher) {
-            $isAvailable = ! $this->conflictService->findAvailableTeachers($dateStr, $startTime, $endTime)
-                ->contains('id', $teacher->id);
+        $availableTeacherIds = $this->conflictService
+            ->findAvailableTeachers($dateStr, $startTime, $endTime)
+            ->pluck('id');
 
-            if ($isAvailable) {
+        foreach ($teachers as $teacher) {
+            if ($availableTeacherIds->contains($teacher->id)) {
                 return $teacher;
             }
         }

@@ -50,7 +50,6 @@ class Planning extends Facade
     {
         $planning = PlanningEntity::create($data->all());
         if ($data->input('shift_plannings')) {
-            echo `<script>console.log(alert(`.($data->input('shift_plannings')).`));</script>`;
             foreach (explode(',', $data->input('shift_plannings')) as $shift_planning) {
                 $shiftPlanning = ShiftPlanning::findOrFail($shift_planning);
                 $newShiftPlanning = $shiftPlanning->replicate();

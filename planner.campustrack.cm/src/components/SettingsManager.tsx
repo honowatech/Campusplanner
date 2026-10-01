@@ -257,15 +257,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                       </label>
                       <div className="relative">
                         <input
-                          type="text"
+                          type="password"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm bg-white"
                           placeholder="Enter your API Key"
                           value={localSettings?.smsConfig?.apiKey || ''}
                           onChange={(e) => handleSmsConfigChange('apiKey', e.target.value)}
                         />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
-                          AES-256 Encrypted
-                        </div>
                       </div>
                     </div>
 

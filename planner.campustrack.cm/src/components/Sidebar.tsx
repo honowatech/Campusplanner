@@ -13,6 +13,7 @@ import {
   UserCog,
 } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
+import { useAuth } from '@/src/auth';
 import logoURL from '../public/campus track logo icon.png';
 
 interface SidebarProps {
@@ -22,9 +23,12 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const location = useLocation();
 
-  const menuItems = [
+  const isAdmin = user?.role === 'admin' || user?.role === 'super-admin';
+
+  const allMenuItems = [
     {
       id: 'dashboard',
       path: '/',
@@ -52,6 +56,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
     { id: 'settings', path: '/settings', label: t('settings'), icon: Settings },
     { id: 'profile', path: '/profile', label: t('profile'), icon: UserCircle },
   ];
+
+  // Les pages de gestion (utilisateurs, paramètres) sont réservées aux admins
+  const adminOnlyIds = ['users', 'settings'];
+  const menuItems = allMenuItems.filter((item) => !adminOnlyIds.includes(item.id) || isAdmin);
 
   const isActive = (path: string) => {
     if (path === '/') {
