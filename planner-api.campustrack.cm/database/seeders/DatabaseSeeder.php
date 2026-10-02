@@ -15,7 +15,9 @@ class DatabaseSeeder extends Seeder
         $this->command->newLine();
 
         $seeders = [
-            RolesAndPermissionsSeeder::class => 'Departments, Roles, Permissions, Super Admin',
+            RolesAndPermissionsSeeder::class => 'Departments, Roles, Permissions',
+            SuperAdminSeeder::class => 'Super Admin + permission demo-mode',
+            DemoAccountSeeder::class => 'Demo accounts (1 per role, 5)',
             CourseSeeder::class => 'Courses (18)',
             RoomSeeder::class => 'Rooms (20)',
             TeacherSeeder::class => 'Teachers (11) + Course assignments',
@@ -38,6 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('   - 5 Departments');
         $this->command->info('   - 6 Roles + ~70 Permissions');
         $this->command->info('   - 1 Super Admin (superadmin@campustrack.com / password)');
+        $this->command->info('   - 5 Demo Accounts (1 per role, mode démo désactivé par défaut)');
         $this->command->info('   - 18 Courses');
         $this->command->info('   - 20 Rooms');
         $this->command->info('   - 11 Teachers');

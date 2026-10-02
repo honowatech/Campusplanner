@@ -29,6 +29,7 @@ class User extends Authenticatable
         'department_id',
         'requested_role',
         'is_approved',
+        'is_demo',
         'approved_by',
         'approved_at',
     ];
@@ -54,6 +55,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_approved' => 'boolean',
+            'is_demo' => 'boolean',
             'approved_at' => 'datetime',
         ];
     }

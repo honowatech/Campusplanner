@@ -5,6 +5,7 @@ use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\CourseClassController;
 use App\Http\Api\Controllers\CourseController;
 use App\Http\Api\Controllers\DashboardController;
+use App\Http\Api\Controllers\DemoModeController;
 use App\Http\Api\Controllers\DepartmentController;
 use App\Http\Api\Controllers\PermissionController;
 use App\Http\Api\Controllers\RoleController;
@@ -42,12 +43,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
+// Mode démo : état + connexion sans mot de passe (public, nécessaire pour la
+// page de connexion non authentifiée). L'activation/désactivation est réservée
+// au super-admin (route protégée plus bas).
+Route::get('/demo-mode', [DemoModeController::class, 'index']);
+Route::post('/demo-login', [DemoModeController::class, 'login'])->middleware('throttle:10,1');
+
 // Protected API routes
 Route::middleware(['auth:sanctum'])->group(function () {
 
     // === PROXY IA (la clé Gemini reste côté serveur) ===
     Route::post('/ai/generate', [AiController::class, 'generate'])
         ->middleware('throttle:10,1');
+
+    // === MODE DÉMO (Super Admin uniquement) ===
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::put('/demo-mode', [DemoModeController::class, 'update']);
+    });
 
     // === GESTION DES RÔLES (Super Admin & Admin uniquement) ===
     Route::middleware(['role:super-admin|administrateur'])->group(function () {

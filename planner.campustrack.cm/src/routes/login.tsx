@@ -12,6 +12,7 @@ function LoginPage() {
   return (
     <Login
       onLoginWithApi={auth.loginWithApi}
+      onDemoLogin={auth.demoLogin}
       apiError={auth.apiError}
       isLoading={auth.isAuthenticating}
     />

@@ -52,6 +52,17 @@ const translations = {
     adminRole: 'Administrator',
     hodRole: 'Head of Department',
 
+    // Demo mode
+    demoMode: 'Demo Mode',
+    demoModeDescription: 'Control passwordless demo login for each role.',
+    demoModeTitle: 'Demo access',
+    enableDemoMode: 'Enable demo mode',
+    demoModeHint:
+      'When enabled, users can sign in without a password using the accounts below.',
+    demoAccounts: 'Demo accounts',
+    demoAccountsDescription: 'One account per role is offered on the login page.',
+    demoAccountsEmpty: 'No demo account available.',
+
     // Profile
     profileDetails: 'Profile Details',
     role: 'Role',
@@ -347,6 +358,17 @@ const translations = {
     loginAsHod: 'Chef de Dépt.',
     adminRole: 'Administrateur',
     hodRole: 'Chef de Département',
+
+    // Mode démo
+    demoMode: 'Mode Démo',
+    demoModeDescription: 'Contrôle la connexion démo sans mot de passe pour chaque rôle.',
+    demoModeTitle: 'Accès démo',
+    enableDemoMode: 'Activer le mode démo',
+    demoModeHint:
+      "Lorsqu'il est activé, les utilisateurs peuvent se connecter sans mot de passe via les comptes ci-dessous.",
+    demoAccounts: 'Comptes démo',
+    demoAccountsDescription: 'Un compte par rôle est proposé sur la page de connexion.',
+    demoAccountsEmpty: 'Aucun compte démo disponible.',
 
     // Profile
     profileDetails: 'Détails du Profil',

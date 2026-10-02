@@ -473,3 +473,14 @@ export type AppSettings = {
     balance: number;
   };
 };
+
+export type DemoAccount = {
+  role: string;
+  name: string;
+  email: string;
+};
+
+export type DemoModeStatus = {
+  enabled: boolean;
+  accounts: DemoAccount[];
+};

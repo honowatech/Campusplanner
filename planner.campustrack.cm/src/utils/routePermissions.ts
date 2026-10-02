@@ -13,6 +13,7 @@ type RoutePermissionRule = {
 export const routePermissions: RoutePermissionRule[] = [
   { match: (p) => p === '/users', permissions: ['users.view.all', 'users.view.department'] },
   { match: (p) => p === '/settings', permissions: ['settings.view'] },
+  { match: (p) => p === '/demo-mode', permissions: ['demo-mode.manage'] },
   { match: (p) => p === '/departments', permissions: ['departments.view'] },
   {
     match: (p) => p === '/teachers',

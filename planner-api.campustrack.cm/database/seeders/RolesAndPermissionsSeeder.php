@@ -3,10 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -32,8 +30,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Create roles
         $this->createRoles();
 
-        // Create super admin user
-        $this->createSuperAdmin();
+        // Le super administrateur est créé par le seeder dédié SuperAdminSeeder.
     }
 
     /**
@@ -206,6 +203,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'settings.view',
             'settings.edit',
 
+            // Demo mode (super-admin uniquement)
+            'demo-mode.manage',
+
             // History
             'history.view',
 
@@ -318,26 +318,4 @@ class RolesAndPermissionsSeeder extends Seeder
         $this->command->info('Roles created and permissions assigned successfully!');
     }
 
-    /**
-     * Create super admin user
-     */
-    private function createSuperAdmin(): void
-    {
-        $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@campustrack.com'],
-            [
-                'name' => 'Super Administrator',
-                'email' => 'superadmin@campustrack.com',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        // Assign super-admin role
-        $superAdmin->assignRole('super-admin');
-
-        $this->command->info('Super Admin created successfully!');
-        $this->command->info('Email: superadmin@campustrack.com');
-        $this->command->info('Password: password');
-    }
 }

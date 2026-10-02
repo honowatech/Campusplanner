@@ -46,6 +46,7 @@ export type AuthState = {
   isAuthenticating: boolean;
   apiError: string | null;
   loginWithApi: (email: string, password: string, role?: UserRole) => Promise<void>;
+  demoLogin: (role: string) => Promise<void>;
   logout: () => Promise<void>;
   clearApiError: () => void;
   refreshUser: () => Promise<void>;
@@ -131,6 +132,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Connexion démo : choisit un compte par rôle (sans mot de passe),
+  // uniquement lorsque le mode démo est activé côté API.
+  const demoLogin = async (role: string): Promise<void> => {
+    setIsAuthenticating(true);
+    setApiError(null);
+
+    try {
+      const response = await apiClient.post('/api/demo-login', { role });
+
+      if (response.data.status === 'success') {
+        const apiUser = response.data.data;
+        setUser(convertApiUserToUser(apiUser));
+        setIsAuthenticated(true);
+        localStorage.setItem('show-login-toast', 'true');
+      } else {
+        setApiError(response.data.message || 'Erreur de connexion');
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
+      setApiError(errorMessage);
+      throw axiosError;
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       await apiClient.post('/api/logout', {});
@@ -170,6 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticating,
         apiError,
         loginWithApi,
+        demoLogin,
         logout,
         clearApiError,
         refreshUser,

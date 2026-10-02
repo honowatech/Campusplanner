@@ -11,10 +11,13 @@ import {
 import { UserRole } from '@/src/lib/types';
 import type { AxiosError } from 'axios';
 import { useRegister } from '@/src/hooks/useUsers';
+import { useDemoMode } from '@/src/hooks/useDemoMode';
 import { UserPlus, CheckCircle2 } from 'lucide-react';
 
 function roleLabel(role: string, t: (key: string) => string): string {
   switch (role) {
+    case 'administrateur':
+      return t('adminRole');
     case 'professeur':
       return t('roleProfesseur');
     case 'etudiant':
@@ -30,12 +33,14 @@ function roleLabel(role: string, t: (key: string) => string): string {
 
 interface LoginProps {
   onLoginWithApi: (email: string, password: string, role?: UserRole) => Promise<void>;
+  onDemoLogin: (role: string) => Promise<void>;
   apiError: string | null;
   isLoading: boolean;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoading }) => {
+export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiError, isLoading }) => {
   const { t } = useTranslation();
+  const { data: demoMode } = useDemoMode();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -419,6 +424,33 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, apiError, isLoadin
                 </button>
               </div>
             </form>
+          )}
+
+          {/* Mode démo : connexion sans mot de passe (visible uniquement si activé) */}
+          {mode === 'login' && demoMode?.enabled && demoMode.accounts.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {t('demoModeTitle')}
+                </span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {demoMode.accounts.map((account) => (
+                  <button
+                    key={account.role}
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => onDemoLogin(account.role)}
+                    className="flex items-center gap-2 justify-between w-full px-4 py-2.5 rounded-lg border border-dashed border-indigo-300 text-sm text-indigo-700 hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="font-medium text-left">{roleLabel(account.role, t)}</span>
+                    <span className="text-xs text-gray-500">{account.email}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {mode === 'login' && (

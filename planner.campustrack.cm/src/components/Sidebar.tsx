@@ -11,6 +11,7 @@ import {
   UserCircle,
   Settings,
   UserCog,
+  FlaskConical,
 } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
 import { useAuth } from '@/src/auth';
@@ -53,6 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
       icon: Calendar,
     },
     { id: 'settings', path: '/settings', label: t('settings'), icon: Settings },
+    { id: 'demo-mode', path: '/demo-mode', label: t('demoMode'), icon: FlaskConical },
     { id: 'profile', path: '/profile', label: t('profile'), icon: UserCircle },
   ];
 

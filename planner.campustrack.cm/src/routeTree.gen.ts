@@ -18,6 +18,7 @@ import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DepartmentsRouteImport } from './routes/departments'
+import { Route as DemoModeRouteImport } from './routes/demo-mode'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ClassesRouteImport } from './routes/classes'
 import { Route as IndexRouteImport } from './routes/index'
@@ -68,6 +69,11 @@ const DepartmentsRoute = DepartmentsRouteImport.update({
   path: '/departments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoModeRoute = DemoModeRouteImport.update({
+  id: '/demo-mode',
+  path: '/demo-mode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoursesRoute = CoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
+  '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
+  '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
+  '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/classes'
     | '/courses'
+    | '/demo-mode'
     | '/departments'
     | '/login'
     | '/profile'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/classes'
     | '/courses'
+    | '/demo-mode'
     | '/departments'
     | '/login'
     | '/profile'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/classes'
     | '/courses'
+    | '/demo-mode'
     | '/departments'
     | '/login'
     | '/profile'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClassesRoute: typeof ClassesRoute
   CoursesRoute: typeof CoursesRoute
+  DemoModeRoute: typeof DemoModeRoute
   DepartmentsRoute: typeof DepartmentsRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DepartmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo-mode': {
+      id: '/demo-mode'
+      path: '/demo-mode'
+      fullPath: '/demo-mode'
+      preLoaderRoute: typeof DemoModeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/courses': {
       id: '/courses'
       path: '/courses'
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClassesRoute: ClassesRoute,
   CoursesRoute: CoursesRoute,
+  DemoModeRoute: DemoModeRoute,
   DepartmentsRoute: DepartmentsRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
