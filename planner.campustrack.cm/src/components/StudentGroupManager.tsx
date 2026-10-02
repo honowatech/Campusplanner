@@ -151,7 +151,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
-        {classes?.map((classItem) => (
+        {filtered?.map((classItem) => (
           <div
             key={classItem.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group"

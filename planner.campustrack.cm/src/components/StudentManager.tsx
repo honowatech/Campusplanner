@@ -233,7 +233,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {students.map((student) => (
+              {filteredStudents.map((student) => (
                 <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center space-x-3">

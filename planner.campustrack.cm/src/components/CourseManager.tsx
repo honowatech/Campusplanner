@@ -113,7 +113,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {courses?.map((course) => {
+              {filteredCourses?.map((course) => {
                 const courseShifts = shiftPlannings?.filter((s) => s.course_id === course.id) || [];
                 return (
                   <tr key={course.id} className="hover:bg-gray-50 transition-colors">
