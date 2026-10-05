@@ -13,7 +13,9 @@ import { useAuth } from '@/src/auth';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Course, ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/courses')({
   component: CoursesPage,
@@ -21,9 +23,14 @@ export const Route = createFileRoute('/courses')({
 
 function CoursesPage() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const { user } = useAuth();
   const readOnly = !hasAnyPermission(user?.permissions, ['courses.manage']);
-  const { data: courses, isLoading: coursesLoading } = useCourses({ page });
+  const { data: courses, isLoading: coursesLoading, isError: coursesError, refetch: refetchCourses } = useCourses({
+    page,
+    search: debouncedSearch || undefined,
+  });
   const { data: teachers, isLoading: teachersLoading } = useTeachers();
   const { data: classes, isLoading: groupsLoading } = useClasses();
   const { data: plannings } = usePlannings();
@@ -66,8 +73,17 @@ function CoursesPage() {
     deleteCourse.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   if (coursesLoading || teachersLoading || groupsLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (coursesError) {
+    return <ErrorState onRetry={() => refetchCourses()} />;
   }
 
   return (
@@ -80,6 +96,8 @@ function CoursesPage() {
       classes={classes?.data ?? []}
       shiftPlannings={shiftPlannings}
       readOnly={readOnly}
+      searchTerm={search}
+      onSearchChange={handleSearchChange}
       onAddCourse={handleAddCourse}
       onUpdateCourse={handleUpdateCourse}
       onDeleteCourse={handleDeleteCourse}

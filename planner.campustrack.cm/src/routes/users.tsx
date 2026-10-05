@@ -15,6 +15,8 @@ import { User } from '@/src/lib/types';
 import type { CreateUserData } from '@/src/services/userService';
 import { useState } from 'react';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/users')({
   component: UsersPage,
@@ -22,7 +24,12 @@ export const Route = createFileRoute('/users')({
 
 function UsersPage() {
   const [page, setPage] = useState(1);
-  const { data: appUsers, isLoading: usersLoading } = useUsers({ page });
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
+  const { data: appUsers, isLoading: usersLoading, isError: usersError, refetch: refetchUsers } = useUsers({
+    page,
+    search: debouncedSearch || undefined,
+  });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
   const createUser = useCreateUser();
@@ -64,8 +71,17 @@ function UsersPage() {
     deactivateUser.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   if (usersLoading || departmentsLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (usersError) {
+    return <ErrorState onRetry={() => refetchUsers()} />;
   }
 
   return (
@@ -75,6 +91,8 @@ function UsersPage() {
       currentPage={appUsers?.current_page || 1}
       totalPages={appUsers?.last_page || 1}
       onPageChange={setPage}
+      searchTerm={search}
+      onSearchChange={handleSearchChange}
       onAdd={handleAdd}
       onUpdate={handleUpdate}
       onDelete={handleDelete}

@@ -13,7 +13,9 @@ import { useAuth } from '@/src/auth';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Teacher, ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/teachers')({
   component: TeachersPage,
@@ -21,12 +23,19 @@ export const Route = createFileRoute('/teachers')({
 
 function TeachersPage() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [filterDept, setFilterDept] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const auth = useAuth();
   const readOnly = !hasAnyPermission(auth.user?.permissions, [
     'teachers.view.all',
     'teachers.manage.department',
   ]);
-  const { data: teachers, isLoading: teachersLoading } = useTeachers({ page });
+  const { data: teachers, isLoading: teachersLoading, isError: teachersError, refetch: refetchTeachers } = useTeachers({
+    page,
+    search: debouncedSearch || undefined,
+    department_id: filterDept ? Number(filterDept) : undefined,
+  });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const { data: classes } = useClasses();
   const { data: plannings } = usePlannings();
@@ -71,8 +80,22 @@ function TeachersPage() {
     deleteTeacher.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleFilterDeptChange = (value: string) => {
+    setFilterDept(value);
+    setPage(1);
+  };
+
   if (teachersLoading || departmentsLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (teachersError) {
+    return <ErrorState onRetry={() => refetchTeachers()} />;
   }
 
   return (
@@ -86,6 +109,10 @@ function TeachersPage() {
       shiftPlannings={shiftPlannings}
       user={auth.user!}
       readOnly={readOnly}
+      searchTerm={search}
+      filterDept={filterDept}
+      onSearchChange={handleSearchChange}
+      onFilterDeptChange={handleFilterDeptChange}
       onAddTeacher={handleAddTeacher}
       onUpdateTeacher={handleUpdateTeacher}
       onDeleteTeacher={handleDeleteTeacher}

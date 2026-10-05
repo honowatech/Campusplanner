@@ -10,6 +10,8 @@ interface RoomManagerProps {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   readOnly?: boolean;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onAddRoom: (room: Room) => void;
   onUpdateRoom: (room: Room) => void;
   onDeleteRoom: (id: number) => void;
@@ -21,13 +23,14 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
   totalPages = 1,
   onPageChange,
   readOnly = false,
+  searchTerm,
+  onSearchChange,
   onAddRoom,
   onUpdateRoom,
   onDeleteRoom,
 }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
   const [formData, setFormData] = useState<Partial<Room>>({
@@ -37,13 +40,6 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
     type: 'classroom',
     building: 'Main Block',
   });
-
-  const filteredRooms = rooms?.filter(
-    (room) =>
-      room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (room.building ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   const handleOpenModal = (room?: Room) => {
     if (room) {
@@ -89,7 +85,7 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             placeholder={t('searchRooms')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         {!readOnly && (
@@ -105,7 +101,7 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
-        {filteredRooms?.map((room) => (
+        {rooms?.map((room) => (
           <div
             key={room.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group flex flex-col"
@@ -156,10 +152,10 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             <div className="h-1 w-full bg-orange-400 rounded-b-xl opacity-50" />
           </div>
         ))}
-        {filteredRooms?.length === 0 && (
+        {rooms?.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-400">
             <Building size={48} className="mb-4 opacity-20" />
-            <p>No rooms found matching your criteria.</p>
+            <p>{t('noResults')}</p>
           </div>
         )}
 

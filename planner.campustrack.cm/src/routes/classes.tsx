@@ -6,7 +6,9 @@ import { useAuth } from '@/src/auth';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { CourseClass } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/classes')({
   component: ClassesPage,
@@ -15,8 +17,13 @@ export const Route = createFileRoute('/classes')({
 function ClassesPage() {
   const auth = useAuth();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const readOnly = !hasAnyPermission(auth.user?.permissions, ['classes.manage']);
-  const { data: classes, isLoading: groupsLoading } = useClasses({ page });
+  const { data: classes, isLoading: groupsLoading, isError: classesError, refetch: refetchClasses } = useClasses({
+    page,
+    search: debouncedSearch || undefined,
+  });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
   const createClass = useCreateClass();
@@ -52,8 +59,17 @@ function ClassesPage() {
     deleteClass.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   if (groupsLoading || departmentsLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (classesError) {
+    return <ErrorState onRetry={() => refetchClasses()} />;
   }
 
   return (
@@ -65,6 +81,8 @@ function ClassesPage() {
       totalPages={classes?.last_page || 1}
       onPageChange={setPage}
       readOnly={readOnly}
+      searchTerm={search}
+      onSearchChange={handleSearchChange}
       onAdd={handleAdd}
       onUpdate={handleUpdate}
       onDelete={handleDelete}

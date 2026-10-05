@@ -14,6 +14,8 @@ interface CourseManagerProps {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   readOnly?: boolean;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onAddCourse: (course: Course) => void;
   onUpdateCourse: (course: Course) => void;
   onDeleteCourse: (id: number) => void;
@@ -26,25 +28,20 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   totalPages = 1,
   onPageChange,
   readOnly = false,
+  searchTerm,
+  onSearchChange,
   onAddCourse,
   onUpdateCourse,
   onDeleteCourse,
 }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const [formData, setFormData] = useState<Partial<Course>>({
     code: '',
     name: '',
   });
-
-  const filteredCourses = courses?.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.code?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   const handleOpenModal = (course?: Course) => {
     if (course) {
@@ -88,7 +85,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             placeholder={t('searchCourses')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         {!readOnly && (
@@ -119,7 +116,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredCourses?.map((course) => {
+              {courses?.map((course) => {
                 const courseShifts = shiftPlannings?.filter((s) => s.course_id === course.id) || [];
                 return (
                   <tr key={course.id} className="hover:bg-gray-50 transition-colors">
@@ -162,10 +159,10 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                   </tr>
                 );
               })}
-              {filteredCourses?.length === 0 && (
+              {courses?.length === 0 && (
                 <tr>
                   <td colSpan={readOnly ? 3 : 4} className="p-8 text-center text-gray-500">
-                    {t('noClassesAssigned')}
+                    {t('noResults')}
                   </td>
                 </tr>
               )}

@@ -6,7 +6,7 @@ const BASE = '/api/students';
 export type StudentParams = {
   page?: number;
   per_page?: number;
-  class_id?: number;
+  course_class_id?: number;
   department_id?: number;
   search?: string;
   is_active?: boolean;

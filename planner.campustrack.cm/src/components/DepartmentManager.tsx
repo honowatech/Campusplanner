@@ -25,6 +25,8 @@ type DepartmentManagerProps = {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onAdd: (department: Department) => void;
   onUpdate: (department: Department) => void;
   onDelete: (id: number) => void;
@@ -39,6 +41,8 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  searchTerm,
+  onSearchChange,
   onAdd,
   onUpdate,
   onDelete,
@@ -47,7 +51,6 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   // const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedDeptId, setSelectedDeptId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -58,21 +61,6 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
     name: '',
     code: '',
   });
-
-  // Filtered Lists
-  const filteredDepartments = departments?.filter(
-    (department) =>
-      department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.code.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
-  const itemsPerPage = 12;
-  const effectiveCurrentPage = currentPage && currentPage > 0 ? currentPage : 1;
-
-  const paginatedDepartments = filteredDepartments?.slice(
-    (effectiveCurrentPage - 1) * itemsPerPage,
-    effectiveCurrentPage * itemsPerPage,
-  );
 
   const selectedDept = useMemo(
     () => departments?.find((department) => department.id === Number(selectedDeptId)),
@@ -356,7 +344,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             placeholder={t('searchDepartments')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         <button
@@ -370,7 +358,7 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
-        {paginatedDepartments?.map((dept) => (
+        {departments?.map((dept) => (
           <div
             key={dept.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group cursor-pointer flex flex-col"
@@ -428,6 +416,12 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             <div className="h-1 w-full bg-purple-500 rounded-b-xl opacity-80" />
           </div>
         ))}
+        {departments?.length === 0 && (
+          <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-400">
+            <Building2 size={48} className="mb-4 opacity-20" />
+            <p>{t('noResults')}</p>
+          </div>
+        )}
       </div>
 
       <SmartPagination

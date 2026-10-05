@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
 import type { AxiosError } from 'axios';
@@ -43,6 +43,9 @@ export function createCrudHooks<T, Params, CreateData, UpdateData>(
     useQuery<PaginatedResponse<T>>({
       queryKey: [queryKey, params],
       queryFn: () => service.getAll(params),
+      // Garde la page précédente visible pendant le fetch (pagination / recherche)
+      // afin de ne pas démonter la liste ni perdre le focus des champs.
+      placeholderData: keepPreviousData,
     });
 
   const useGet = (id: number) =>

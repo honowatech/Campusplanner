@@ -25,6 +25,8 @@ type StudentGroupManagerProps = {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   readOnly?: boolean;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onAdd: (courseClass: CourseClass) => void;
   onUpdate: (courseClass: CourseClass) => void;
   onDelete: (id: number) => void;
@@ -38,13 +40,14 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
   totalPages = 1,
   onPageChange,
   readOnly = false,
+  searchTerm,
+  onSearchChange,
   onAdd,
   onUpdate,
   onDelete,
 }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState<number | null>(null);
@@ -55,19 +58,6 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
     department_id: undefined,
     level: '',
     capacity: 30,
-  });
-
-  const filtered = classes?.filter((course_class) => {
-    const matchesSearch =
-      course_class.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course_class.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course_class.level?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    if (user.role === 'hod' && user.department_id) {
-      return matchesSearch && course_class.department_id === user.department_id;
-    }
-
-    return matchesSearch;
   });
 
   const getDepartmentName = (id: number) => {
@@ -139,7 +129,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
             placeholder={t('searchClasses')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         {!readOnly && (
@@ -155,7 +145,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
-        {filtered?.map((classItem) => (
+        {classes?.map((classItem) => (
           <div
             key={classItem.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group"
@@ -213,15 +203,10 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
             <div className="h-1 w-full bg-emerald-500 rounded-b-xl opacity-80" />
           </div>
         ))}
-        {filtered?.length === 0 && (
+        {classes?.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-400">
             <Shapes size={48} className="mb-4 opacity-20" />
-            <p>
-              No filières found.
-              {user.role === 'hod'
-                ? ' Add one to your department.'
-                : ' Add one linked to a department.'}
-            </p>
+            <p>{t('noResults')}</p>
           </div>
         )}
       </div>

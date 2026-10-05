@@ -30,6 +30,10 @@ type TeacherManagerProps = {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   readOnly?: boolean;
+  searchTerm: string;
+  filterDept: string;
+  onSearchChange: (value: string) => void;
+  onFilterDeptChange: (value: string) => void;
   onAddTeacher: (teacher: Teacher) => void;
   onUpdateTeacher: (teacher: Teacher) => void;
   onDeleteTeacher: (id: number) => void;
@@ -45,28 +49,22 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
   totalPages = 1,
   onPageChange,
   readOnly = false,
+  searchTerm,
+  filterDept,
+  onSearchChange,
+  onFilterDeptChange,
   onAddTeacher,
   onUpdateTeacher,
   onDeleteTeacher,
 }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDept, setFilterDept] = useState('');
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [selectedTeacherId, setSelectedTeacherId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [teacherToDelete, setTeacherToDelete] = useState<number | null>(null);
   const [shiftCurrentPage, setShiftCurrentPage] = useState(1);
   const SHIFT_ITEMS_PER_PAGE = 10;
-
-  // Determine the HOD's department name if applicable
-  const hodDepartmentName = useMemo(() => {
-    if (user.role === 'hod' && user.department_id) {
-      return departments?.find((department) => department.id === user.department_id)?.name || '';
-    }
-    return '';
-  }, [user, departments]);
 
   const [formData, setFormData] = useState<Partial<Teacher>>({
     first_name: '',
@@ -79,28 +77,6 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
     // address: "",
     // bio: "",
   });
-
-  // Filter Logic
-  const filteredTeachers = useMemo(() => {
-    return teachers?.filter((teacher) => {
-      // Text Search
-      const matchesSearch =
-        teacher.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.department?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      // Role-based Filtering
-      if (user.role === 'hod') {
-        // HOD sees only their department
-        if (hodDepartmentName && teacher.department?.name !== hodDepartmentName) return false;
-      } else {
-        // Admin sees all, but can filter by dropdown
-        if (filterDept && teacher.department?.name !== filterDept) return false;
-      }
-
-      return matchesSearch;
-    });
-  }, [teachers, searchTerm, filterDept, user, hodDepartmentName]);
 
   // Calculations for Detail View
   const selectedTeacherStats = useMemo(() => {
@@ -565,7 +541,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               placeholder={t('searchTeachers')}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
 
@@ -579,11 +555,11 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               <select
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none appearance-none bg-white"
                 value={filterDept}
-                onChange={(e) => setFilterDept(e.target.value)}
+                onChange={(e) => onFilterDeptChange(e.target.value)}
               >
                 <option value="">{t('allDepts')}</option>
                 {departments?.map((d) => (
-                  <option key={d.id} value={d.name}>
+                  <option key={d.id} value={d.id}>
                     {d.name}
                   </option>
                 ))}
@@ -605,7 +581,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
-        {filteredTeachers?.map((teacher) => (
+        {teachers?.map((teacher) => (
           <div
             key={teacher.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group cursor-pointer"
@@ -670,9 +646,9 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             <div className="h-1 w-full rounded-b-xl" style={{ backgroundColor: teacher.color }} />
           </div>
         ))}
-        {filteredTeachers && filteredTeachers.length === 0 && (
+        {teachers && teachers.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-400">
-            <p>{t('searchTeachers')}: No results found.</p>
+            <p>{t('noResults')}</p>
           </div>
         )}
       </div>

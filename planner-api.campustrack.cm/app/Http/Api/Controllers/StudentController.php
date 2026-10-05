@@ -42,6 +42,12 @@ class StudentController extends Controller
             $query->where('course_class_id', $request->course_class_id);
         }
 
+        if ($request->has('department_id')) {
+            $query->whereHas('class', function ($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
+        }
+
         if ($request->has('gender')) {
             $query->where('gender', $request->gender);
         }

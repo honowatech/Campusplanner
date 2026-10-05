@@ -24,6 +24,12 @@ interface StudentManagerProps {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   readOnly?: boolean;
+  searchTerm: string;
+  filterClass: string;
+  filterDepartment: string;
+  onSearchChange: (value: string) => void;
+  onFilterClassChange: (value: string) => void;
+  onFilterDepartmentChange: (value: string) => void;
   onAddStudent: (student: Student) => void;
   onUpdateStudent: (student: Student) => void;
   onDeleteStudent: (id: number) => void;
@@ -38,6 +44,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   totalPages = 1,
   onPageChange,
   readOnly = false,
+  searchTerm,
+  filterClass,
+  filterDepartment,
+  onSearchChange,
+  onFilterClassChange,
+  onFilterDepartmentChange,
   onAddStudent,
   onUpdateStudent,
   onDeleteStudent,
@@ -46,9 +58,6 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterClass, setFilterClass] = useState<string>('');
-  const [filterDepartment, setFilterDepartment] = useState<string>('');
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [studentToMove, setStudentToMove] = useState<Student | null>(null);
   const [targetClassId, setTargetClassId] = useState<number | null>(null);
@@ -67,21 +76,6 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
     admission_date: '',
     course_class_id: undefined,
     is_active: true,
-  });
-
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch =
-      `${student.full_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesClass = !filterClass || student.course_class_id === Number(filterClass);
-    const matchesDept =
-      !filterDepartment ||
-      classes.find((course_class) => course_class.id === student.course_class_id)?.department_id ===
-        Number(filterDepartment);
-
-    return matchesSearch && matchesClass && matchesDept;
   });
 
   const getClassName = (classId: number | undefined) => {
@@ -160,7 +154,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               placeholder={t('searchStudents')}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
 
@@ -172,10 +166,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
             <select
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none appearance-none bg-white"
               value={filterDepartment}
-              onChange={(e) => {
-                setFilterDepartment(e.target.value);
-                setFilterClass('');
-              }}
+              onChange={(e) => onFilterDepartmentChange(e.target.value)}
             >
               <option value="">{t('allDepts')}</option>
               {departments.map((department) => (
@@ -194,7 +185,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
             <select
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none appearance-none bg-white"
               value={filterClass}
-              onChange={(e) => setFilterClass(e.target.value)}
+              onChange={(e) => onFilterClassChange(e.target.value)}
             >
               <option value="">{t('allClasses')}</option>
               {classes
@@ -237,7 +228,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredStudents.map((student) => (
+              {students.map((student) => (
                 <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center space-x-3">
@@ -302,11 +293,11 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                   )}
                 </tr>
               ))}
-              {filteredStudents.length === 0 && (
+              {students.length === 0 && (
                 <tr>
                   <td colSpan={readOnly ? 5 : 6} className="p-8 text-center text-gray-500">
                     <UserX size={48} className="mx-auto mb-4 opacity-20" />
-                    {t('noStudentsFound')}
+                    {t('noResults')}
                   </td>
                 </tr>
               )}

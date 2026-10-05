@@ -31,6 +31,8 @@ type UserManagerProps = {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onAdd: (user: CreateUserData) => void;
   onUpdate: (user: User) => void;
   onDelete: (id: number) => void;
@@ -46,6 +48,8 @@ export const UserManager: React.FC<UserManagerProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  searchTerm,
+  onSearchChange,
   onAdd,
   onUpdate,
   onDelete,
@@ -56,7 +60,6 @@ export const UserManager: React.FC<UserManagerProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const [formData, setFormData] = useState<Partial<User>>({
@@ -68,12 +71,6 @@ export const UserManager: React.FC<UserManagerProps> = ({
   const [selectedRole, setSelectedRole] = useState<string>('professeur');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
-
-  const filteredUsers = users?.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   const handleOpenModal = (user?: User) => {
     if (user) {
@@ -212,7 +209,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
             placeholder={t('searchUsers')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         <button
@@ -240,7 +237,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredUsers?.map((user) => (
+              {users?.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center">
@@ -321,6 +318,13 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   </td>
                 </tr>
               ))}
+              {users?.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-gray-500">
+                    {t('noResults')}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

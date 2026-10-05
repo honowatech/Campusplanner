@@ -5,7 +5,9 @@ import { useAuth } from '@/src/auth';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Room } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/rooms')({
   component: RoomsPage,
@@ -13,9 +15,14 @@ export const Route = createFileRoute('/rooms')({
 
 function RoomsPage() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const { user } = useAuth();
   const readOnly = !hasAnyPermission(user?.permissions, ['rooms.manage']);
-  const { data: rooms, isLoading } = useRooms({ page });
+  const { data: rooms, isLoading, isError, refetch } = useRooms({
+    page,
+    search: debouncedSearch || undefined,
+  });
   const createRoom = useCreateRoom();
   const updateRoom = useUpdateRoom();
   const deleteRoom = useDeleteRoom();
@@ -61,8 +68,17 @@ function RoomsPage() {
     deleteRoom.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={() => refetch()} />;
   }
 
   return (
@@ -72,6 +88,8 @@ function RoomsPage() {
       totalPages={rooms?.last_page || 1}
       onPageChange={setPage}
       readOnly={readOnly}
+      searchTerm={search}
+      onSearchChange={handleSearchChange}
       onAddRoom={handleAddRoom}
       onUpdateRoom={handleUpdateRoom}
       onDeleteRoom={handleDeleteRoom}

@@ -104,11 +104,11 @@ function RootComponent() {
               <div className="text-right hidden md:block">
                 <p className="text-sm font-bold text-gray-900">{auth.user?.name}</p>
                 <p className="text-xs text-gray-500">
-                  {auth.user?.role === 'admin' ? t('adminRole') : t('hodRole')}
+                  {auth.user?.role === 'super-admin' ? t('adminRole') : t('hodRole')}
                 </p>
               </div>
               <div
-                className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'admin' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
+                className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'super-admin' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
               >
                 {auth.user?.name ? auth.user?.name.charAt(0) : "U"}
               </div>

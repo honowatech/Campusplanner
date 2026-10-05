@@ -13,7 +13,9 @@ import { useAuth } from '@/src/auth';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Student } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/students')({
   component: StudentsPage,
@@ -21,8 +23,18 @@ export const Route = createFileRoute('/students')({
 
 function StudentsPage() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [filterClass, setFilterClass] = useState('');
+  const [filterDepartment, setFilterDepartment] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
+
   const { user } = useAuth();
-  const { data: students, isLoading: studentsLoading } = useStudents({ page });
+  const { data: students, isLoading: studentsLoading, isError: studentsError, refetch: refetchStudents } = useStudents({
+    page,
+    search: debouncedSearch || undefined,
+    course_class_id: filterClass ? Number(filterClass) : undefined,
+    department_id: filterDepartment ? Number(filterDepartment) : undefined,
+  });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const { data: classes, isLoading: classesLoading } = useClasses();
 
@@ -84,8 +96,28 @@ function StudentsPage() {
     moveStudent.mutate({ id, classId });
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleFilterClassChange = (value: string) => {
+    setFilterClass(value);
+    setPage(1);
+  };
+
+  const handleFilterDepartmentChange = (value: string) => {
+    setFilterDepartment(value);
+    setFilterClass('');
+    setPage(1);
+  };
+
   if (studentsLoading || departmentsLoading || classesLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (studentsError) {
+    return <ErrorState onRetry={() => refetchStudents()} />;
   }
 
   return (
@@ -97,6 +129,12 @@ function StudentsPage() {
       totalPages={students?.last_page || 1}
       onPageChange={setPage}
       readOnly={readOnly}
+      searchTerm={search}
+      filterClass={filterClass}
+      filterDepartment={filterDepartment}
+      onSearchChange={handleSearchChange}
+      onFilterClassChange={handleFilterClassChange}
+      onFilterDepartmentChange={handleFilterDepartmentChange}
       onAddStudent={handleAddStudent}
       onUpdateStudent={handleUpdateStudent}
       onDeleteStudent={handleDeleteStudent}

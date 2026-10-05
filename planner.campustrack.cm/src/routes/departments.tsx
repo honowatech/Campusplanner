@@ -12,7 +12,9 @@ import { usePlannings } from '@/src/hooks/usePlannings';
 import { useDeleteCourse } from '@/src/hooks/useCourses';
 import { Department, ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { ErrorState } from '@/src/components/ErrorState';
 import { useState } from 'react';
+import { useDebouncedValue } from '@/src/hooks/useDebouncedValue';
 
 export const Route = createFileRoute('/departments')({
   component: DepartmentsPage,
@@ -20,8 +22,11 @@ export const Route = createFileRoute('/departments')({
 
 function DepartmentsPage() {
   const [page, setPage] = useState(1);
-  const { data: departments, isLoading: departmentsLoading } = useDepartments({
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
+  const { data: departments, isLoading: departmentsLoading, isError: departmentsError, refetch: refetchDepartments } = useDepartments({
     page,
+    search: debouncedSearch || undefined,
   });
   const { data: teachers, isLoading: teachersLoading } = useTeachers();
   const { data: classes, isLoading: groupsLoading } = useClasses();
@@ -66,8 +71,17 @@ function DepartmentsPage() {
     deleteCourse.mutate(id);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   if (departmentsLoading || teachersLoading || groupsLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (departmentsError) {
+    return <ErrorState onRetry={() => refetchDepartments()} />;
   }
 
   return (
@@ -79,6 +93,8 @@ function DepartmentsPage() {
       totalPages={departments?.last_page || 1}
       onPageChange={setPage}
       shiftPlannings={shiftPlannings}
+      searchTerm={search}
+      onSearchChange={handleSearchChange}
       onAdd={handleAdd}
       onUpdate={handleUpdate}
       onDelete={handleDelete}

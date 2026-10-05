@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import {
   studentService,
   StudentParams,
@@ -14,6 +14,7 @@ export function useStudents(params?: StudentParams) {
   return useQuery<PaginatedResponse<Student>>({
     queryKey: ['students', params],
     queryFn: () => studentService.getAll(params),
+    placeholderData: keepPreviousData,
   });
 }
 
