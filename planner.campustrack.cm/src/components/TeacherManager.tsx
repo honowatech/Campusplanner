@@ -29,6 +29,7 @@ type TeacherManagerProps = {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  readOnly?: boolean;
   onAddTeacher: (teacher: Teacher) => void;
   onUpdateTeacher: (teacher: Teacher) => void;
   onDeleteTeacher: (id: number) => void;
@@ -43,6 +44,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  readOnly = false,
   onAddTeacher,
   onUpdateTeacher,
   onDeleteTeacher,
@@ -70,7 +72,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
     first_name: '',
     last_name: '',
     email: '',
-    department_id: undefined,
+    department_id: user.department_id,
     speciality: '',
     color: '#3b82f6',
     phone: '',
@@ -137,10 +139,14 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         first_name: '',
         last_name: '',
         email: '',
-        // If HOD, default to their department, otherwise first available
-        // department:
-        //   hodDepartmentName ||
-        //   (departments.length > 0 ? departments[0].name : ""),
+        // Pour un responsable, force son département ; sinon le premier
+        // département disponible (l'admin pourra le modifier dans le formulaire).
+        department_id:
+          user.role === 'hod'
+            ? user.department_id
+            : departments.length > 0
+              ? departments[0].id
+              : undefined,
         speciality: '',
         color: '#3b82f6',
         phone: '',
@@ -231,14 +237,16 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 <p className="text-secondary font-medium">{teacher.speciality}</p>
               </div>
               <div className="flex space-x-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenModal(teacher)}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center"
-                >
-                  <Edit2 size={14} className="mr-1.5" />
-                  {t('edit')}
-                </button>
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenModal(teacher)}
+                    className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center"
+                  >
+                    <Edit2 size={14} className="mr-1.5" />
+                    {t('edit')}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -584,14 +592,16 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
-        >
-          <Plus size={20} />
-          <span>{t('addTeacher')}</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
+          >
+            <Plus size={20} />
+            <span>{t('addTeacher')}</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
@@ -617,28 +627,30 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 >
                   {`${teacher.first_name.charAt(0)}${teacher.last_name.charAt(0)}`}
                 </div>
-                <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenModal(teacher);
-                    }}
-                    className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      requestDelete(teacher.id);
-                    }}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                {!readOnly && (
+                  <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenModal(teacher);
+                      }}
+                      className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        requestDelete(teacher.id);
+                      }}
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <h3 className="text-lg font-bold text-gray-900 mb-1">{`${teacher.full_name}`}</h3>

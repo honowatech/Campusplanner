@@ -11,6 +11,7 @@ use App\Http\Api\Controllers\PermissionController;
 use App\Http\Api\Controllers\RoleController;
 use App\Http\Api\Controllers\RoomBlockingController;
 use App\Http\Api\Controllers\RoomController;
+use App\Http\Api\Controllers\SettingsController;
 use App\Http\Api\Controllers\StudentController;
 use App\Http\Api\Controllers\TeacherBlockingController;
 use App\Http\Api\Controllers\TeacherController;
@@ -60,6 +61,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:super-admin'])->group(function () {
         Route::put('/demo-mode', [DemoModeController::class, 'update']);
     });
+
+    // === RÉGLAGES (Super Admin & Admin) ===
+    Route::get('settings', [SettingsController::class, 'index'])
+        ->middleware('permission:settings.view');
+    Route::put('settings', [SettingsController::class, 'update'])
+        ->middleware('permission:settings.edit');
 
     // === GESTION DES RÔLES (Super Admin & Admin uniquement) ===
     Route::middleware(['role:super-admin|administrateur'])->group(function () {

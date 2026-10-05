@@ -24,6 +24,7 @@ type StudentGroupManagerProps = {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  readOnly?: boolean;
   onAdd: (courseClass: CourseClass) => void;
   onUpdate: (courseClass: CourseClass) => void;
   onDelete: (id: number) => void;
@@ -36,6 +37,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  readOnly = false,
   onAdd,
   onUpdate,
   onDelete,
@@ -140,14 +142,16 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
-        >
-          <Plus size={20} />
-          <span>{t('addClass')}</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
+          >
+            <Plus size={20} />
+            <span>{t('addClass')}</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
@@ -161,22 +165,24 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
                 <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
                   <Shapes size={24} />
                 </div>
-                <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenModal(classItem)}
-                    className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => requestDelete(classItem.id)}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                {!readOnly && (
+                  <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenModal(classItem)}
+                      className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => requestDelete(classItem.id)}
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between items-center mb-2">

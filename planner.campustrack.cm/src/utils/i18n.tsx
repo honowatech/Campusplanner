@@ -231,6 +231,11 @@ const translations = {
     viewStandard: 'Standard View',
     viewGlobal: 'Global View',
     shifts: 'Shifts',
+    generate: 'Generate',
+    detectConflicts: 'Detect Conflicts',
+    optimize: 'Optimize',
+    dailyHours: 'Daily Hours',
+    noConflicts: 'No conflicts detected',
 
     // Students
     addStudent: 'Add Student',
@@ -539,6 +544,11 @@ const translations = {
     viewStandard: 'Vue Standard',
     viewGlobal: 'Vue Globale (Filières)',
     shifts: 'Créneaux',
+    generate: 'Générer',
+    detectConflicts: 'Détecter les conflits',
+    optimize: 'Optimiser',
+    dailyHours: 'Heures par jour',
+    noConflicts: 'Aucun conflit détecté',
 
     // Days & Times
     Morning_1: '08:00 - 10:00',

@@ -4,12 +4,14 @@ namespace App\Http\Api\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Traits\AppliesDataScope;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    use AppliesDataScope;
     use HttpResponses;
 
     /**
@@ -18,7 +20,7 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Course::class);
-        $query = Course::query();
+        $query = $this->scopeCourses(Course::query(), $request->user());
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -57,6 +59,12 @@ class CourseController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        // Borne le département au périmètre de l'utilisateur (responsable).
+        $departmentScope = $this->departmentScope($request->user());
+        if ($departmentScope !== null) {
+            $validated['department_id'] = $departmentScope;
+        }
+
         $course = Course::create($validated);
 
         return $this->success(
@@ -94,6 +102,12 @@ class CourseController extends Controller
             'hours_per_week' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
         ]);
+
+        // Borne le département au périmètre de l'utilisateur (responsable).
+        $departmentScope = $this->departmentScope($request->user());
+        if ($departmentScope !== null) {
+            $validated['department_id'] = $departmentScope;
+        }
 
         $course->update($validated);
 

@@ -1,15 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Dashboard } from '@/src/components/Dashboard';
 import { dashboardService } from '@/src/services/dashboardService';
-import { useAuth } from '@/src/auth';
 import { useTeachers } from '@/src/hooks/useTeachers';
 import { useCourses } from '@/src/hooks/useCourses';
+import { canViewDashboardOverview } from '@/src/utils/routePermissions';
+import type { AuthState } from '@/src/auth';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
-  loader: async () => {
+  loader: async ({ context }) => {
+    const { auth } = context as { auth: AuthState };
+    if (!canViewDashboardOverview(auth.user)) return null;
+
     try {
       return await dashboardService.getOverview();
     } catch (error) {
@@ -22,7 +26,6 @@ export const Route = createFileRoute('/')({
 
 function DashboardPage() {
   const data = Route.useLoaderData();
-  const auth = useAuth();
   const { data: teachers } = useTeachers();
   const { data: courses } = useCourses();
 
@@ -39,7 +42,6 @@ function DashboardPage() {
       initialData={data ?? undefined}
       teachers={teachers?.data ?? []}
       courses={courses?.data ?? []}
-      user={auth.user}
     />
   );
 }

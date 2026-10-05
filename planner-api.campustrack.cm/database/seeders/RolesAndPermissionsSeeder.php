@@ -244,14 +244,24 @@ class RolesAndPermissionsSeeder extends Seeder
         $responsable = Role::firstOrCreate(['name' => 'responsable-departement', 'guard_name' => 'web']);
         $responsablePermissions = [
             'users.view.department',
+            // Filtres/listes de référence : départements
+            'departments.view',
             'plannings.view.department',
             'plannings.create.department',
             'plannings.edit.department',
             'plannings.delete.department',
+            'plannings.generate.auto',
+            'plannings.detect.conflicts',
             'teachers.view.department',
             'teachers.manage.department',
             'students.view.department',
             'classes.view',
+            // Gestion des matières de son département
+            'courses.view',
+            'courses.manage',
+            // Filtres/listes de référence : salles
+            'rooms.view',
+            'rooms.search',
             'grades.view.department',
             'bulletins.view',
             'events.view',
@@ -271,8 +281,12 @@ class RolesAndPermissionsSeeder extends Seeder
         $personnel = Role::firstOrCreate(['name' => 'personnel-administratif', 'guard_name' => 'web']);
         $personnelPermissions = [
             'users.view.department',
+            // Filtres/listes de référence : départements
+            'departments.view',
             'plannings.view.department',
             'students.view.department',
+            // Filtres/listes de référence : enseignants
+            'teachers.view.department',
             'classes.view',
             'rooms.view',
             'rooms.search',
@@ -288,7 +302,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $professeur = Role::firstOrCreate(['name' => 'professeur', 'guard_name' => 'web']);
         $professeurPermissions = [
             'courses.view',
-            'plannings.view.class',
+            'plannings.view.subject',
             'plannings.create.class',
             'plannings.edit.class',
             'students.view.class',

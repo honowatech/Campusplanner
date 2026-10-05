@@ -23,6 +23,7 @@ interface StudentManagerProps {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  readOnly?: boolean;
   onAddStudent: (student: Student) => void;
   onUpdateStudent: (student: Student) => void;
   onDeleteStudent: (id: number) => void;
@@ -36,6 +37,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  readOnly = false,
   onAddStudent,
   onUpdateStudent,
   onDeleteStudent,
@@ -209,14 +211,16 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
-        >
-          <Plus size={20} />
-          <span>{t('addStudent')}</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
+          >
+            <Plus size={20} />
+            <span>{t('addStudent')}</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex-1">
@@ -229,7 +233,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                 <th className="p-4">{t('email')}</th>
                 <th className="p-4">{t('class')}</th>
                 <th className="p-4">{t('status')}</th>
-                <th className="p-4 text-right">{t('actions')}</th>
+                {!readOnly && <th className="p-4 text-right">{t('actions')}</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -266,39 +270,41 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
                       {student.is_active ? t('active') : t('inactive')}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => openMoveModal(student)}
-                        className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
-                        title={t('moveToClass')}
-                      >
-                        <ArrowRight size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenModal(student)}
-                        className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
-                        title={t('edit')}
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteStudent(student.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                        title={t('delete')}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
+                  {!readOnly && (
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => openMoveModal(student)}
+                          className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
+                          title={t('moveToClass')}
+                        >
+                          <ArrowRight size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenModal(student)}
+                          className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg"
+                          title={t('edit')}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteStudent(student.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          title={t('delete')}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {filteredStudents.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">
+                  <td colSpan={readOnly ? 5 : 6} className="p-8 text-center text-gray-500">
                     <UserX size={48} className="mx-auto mb-4 opacity-20" />
                     {t('noStudentsFound')}
                   </td>

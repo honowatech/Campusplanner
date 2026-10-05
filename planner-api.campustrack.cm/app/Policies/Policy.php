@@ -41,21 +41,7 @@ abstract class Policy
      */
     protected function userClassIds(User $user): array
     {
-        $ids = [];
-
-        if ($user->student?->course_class_id) {
-            $ids[] = $user->student->course_class_id;
-        }
-
-        if ($user->teacher) {
-            $ids = array_merge($ids, $user->teacher->shiftPlannings()
-                ->pluck('course_class_id')
-                ->unique()
-                ->filter()
-                ->all());
-        }
-
-        return array_values(array_unique(array_filter($ids)));
+        return $user->classIds();
     }
 
     /**
@@ -65,10 +51,6 @@ abstract class Policy
      */
     protected function userCourseIds(User $user): array
     {
-        if (! $user->teacher) {
-            return [];
-        }
-
-        return $user->teacher->courses()->pluck('courses.id')->all();
+        return $user->courseIds();
     }
 }

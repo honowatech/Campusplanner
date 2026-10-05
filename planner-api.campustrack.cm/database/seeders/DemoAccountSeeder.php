@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,8 @@ class DemoAccountSeeder extends Seeder
      */
     public function run(): void
     {
+        $departmentId = Department::query()->orderBy('id')->value('id');
+
         foreach (self::DEMO_ACCOUNTS as $role => $account) {
             $user = User::firstOrCreate(
                 ['email' => $account['email']],
@@ -33,12 +36,13 @@ class DemoAccountSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                     'is_approved' => true,
+                    'department_id' => $departmentId,
                 ]
             );
 
             // Maintient le rôle et l'approbation, même si le compte existait déjà.
             $user->assignRole($role);
-            $user->update(['is_approved' => true, 'is_demo' => true]);
+            $user->update(['is_approved' => true, 'is_demo' => true, 'department_id' => $departmentId]);
 
             $this->command->info("Demo account [{$role}] ready: {$account['email']}");
         }

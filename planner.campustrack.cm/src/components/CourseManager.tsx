@@ -13,6 +13,7 @@ interface CourseManagerProps {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  readOnly?: boolean;
   onAddCourse: (course: Course) => void;
   onUpdateCourse: (course: Course) => void;
   onDeleteCourse: (id: number) => void;
@@ -24,6 +25,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  readOnly = false,
   onAddCourse,
   onUpdateCourse,
   onDeleteCourse,
@@ -89,14 +91,16 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
-        >
-          <Plus size={20} />
-          <span>{t('addCourse')}</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
+          >
+            <Plus size={20} />
+            <span>{t('addCourse')}</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -107,9 +111,11 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 <th className="p-4 font-semibold text-gray-600 text-sm">{t('courseCode')}</th>
                 <th className="p-4 font-semibold text-gray-600 text-sm">{t('courseName')}</th>
                 <th className="p-4 font-semibold text-gray-600 text-sm">{t('shifts')}</th>
-                <th className="p-4 font-semibold text-gray-600 text-sm text-right">
-                  {t('actions')}
-                </th>
+                {!readOnly && (
+                  <th className="p-4 font-semibold text-gray-600 text-sm text-right">
+                    {t('actions')}
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -135,28 +141,30 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                         {courseShifts.length} {t('shifts')}
                       </span>
                     </td>
-                    <td className="p-4 text-right space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenModal(course)}
-                        className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg transition-colors"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteCourse(course.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
+                    {!readOnly && (
+                      <td className="p-4 text-right space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenModal(course)}
+                          className="p-2 text-gray-400 hover:text-secondary hover:bg-indigo-50 rounded-lg transition-colors"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteCourse(course.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
               {filteredCourses?.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-gray-500">
+                  <td colSpan={readOnly ? 3 : 4} className="p-8 text-center text-gray-500">
                     {t('noClassesAssigned')}
                   </td>
                 </tr>

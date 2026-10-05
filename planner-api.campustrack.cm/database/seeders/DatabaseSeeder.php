@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Modules\Planning\Database\Seeders\DatabaseSeeder as PlanningDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,7 +18,8 @@ class DatabaseSeeder extends Seeder
         $seeders = [
             RolesAndPermissionsSeeder::class => 'Departments, Roles, Permissions',
             SuperAdminSeeder::class => 'Super Admin + permission demo-mode',
-            DemoAccountSeeder::class => 'Demo accounts (1 per role, 5)',
+            DemoAccountSeeder::class => 'Demo accounts (1 per role, 4)',
+            AppSettingSeeder::class => 'Application settings (singleton)',
             CourseSeeder::class => 'Courses (18)',
             RoomSeeder::class => 'Rooms (20)',
             TeacherSeeder::class => 'Teachers (11) + Course assignments',
@@ -26,6 +28,7 @@ class DatabaseSeeder extends Seeder
             StudentSeeder::class => 'Students (~200) + User accounts',
             TeacherBlockingSeeder::class => 'Teacher Blockings (5)',
             RoomBlockingSeeder::class => 'Room Blockings (7)',
+            PlanningDatabaseSeeder::class => 'Planning module (Plannings, Shift plannings on classes)',
         ];
 
         foreach ($seeders as $seeder => $description) {
@@ -40,7 +43,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('   - 5 Departments');
         $this->command->info('   - 6 Roles + ~70 Permissions');
         $this->command->info('   - 1 Super Admin (superadmin@campustrack.com / password)');
-        $this->command->info('   - 5 Demo Accounts (1 per role, mode démo désactivé par défaut)');
+        $this->command->info('   - 4 Demo Accounts (1 per role, mode démo désactivé par défaut)');
+        $this->command->info('   - 1 App Settings (singleton)');
         $this->command->info('   - 18 Courses');
         $this->command->info('   - 20 Rooms');
         $this->command->info('   - 11 Teachers');
@@ -49,5 +53,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('   - ~200 Students');
         $this->command->info('   - 5 Teacher Blockings');
         $this->command->info('   - 7 Room Blockings');
+        $this->command->info('   - 4 Plannings');
+        $this->command->info('   - Shift plannings (generated from classes)');
     }
 }

@@ -3,6 +3,8 @@ import { useCreatePlanning, usePlannings } from '@/src/hooks/usePlannings';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { Calendar, ChevronRight, Clock, FileText, Plus } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
+import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { formatDateTime } from '@/src/lib/helpers';
 import React, { useState } from 'react';
 import { Modal } from '../components/Modal';
@@ -15,10 +17,18 @@ export const Route = createFileRoute('/timetables')({
 
 function TimetablesPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: plannings, isLoading } = usePlannings();
   const [isPeriodModalOpen, setIsPeriodModalOpen] = useState(false);
 
   const createPlanning = useCreatePlanning();
+
+  const canCreatePlanning = hasAnyPermission(user?.permissions, [
+    'plannings.create.all',
+    'plannings.create.department',
+    'plannings.create.class',
+    'plannings.create.subject',
+  ]);
 
   const [periodFormData, setPeriodFormData] = useState<{
     name: string;
@@ -65,14 +75,16 @@ function TimetablesPage() {
         <Calendar size={20} className="text-secondary mr-2" />
         <h1 className="font-bold text-xl text-gray-900">{t('plannings')}</h1>
         <span className="ml-3 text-sm text-gray-500">({plannings?.length || 0})</span>
-        <button
-          type="button"
-          onClick={handleCreatePeriod}
-          className="flex items-center space-x-1 p-3 bg-indigo-50 text-primary rounded-md hover:bg-indigo-100 transition-colors text-sm font-medium ml-auto"
-        >
-          <Plus size={14} />
-          <span>{t('newPeriod')}</span>
-        </button>
+        {canCreatePlanning && (
+          <button
+            type="button"
+            onClick={handleCreatePeriod}
+            className="flex items-center space-x-1 p-3 bg-indigo-50 text-primary rounded-md hover:bg-indigo-100 transition-colors text-sm font-medium ml-auto"
+          >
+            <Plus size={14} />
+            <span>{t('newPeriod')}</span>
+          </button>
+        )}
       </div>
 
       {!plannings || plannings.length === 0 ? (

@@ -9,6 +9,8 @@ import {
 import { useTeachers } from '@/src/hooks/useTeachers';
 import { useClasses } from '@/src/hooks/useClasses';
 import { usePlannings } from '@/src/hooks/usePlannings';
+import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Course, ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useState } from 'react';
@@ -19,6 +21,8 @@ export const Route = createFileRoute('/courses')({
 
 function CoursesPage() {
   const [page, setPage] = useState(1);
+  const { user } = useAuth();
+  const readOnly = !hasAnyPermission(user?.permissions, ['courses.manage']);
   const { data: courses, isLoading: coursesLoading } = useCourses({ page });
   const { data: teachers, isLoading: teachersLoading } = useTeachers();
   const { data: classes, isLoading: groupsLoading } = useClasses();
@@ -75,6 +79,7 @@ function CoursesPage() {
       teachers={teachers?.data ?? []}
       classes={classes?.data ?? []}
       shiftPlannings={shiftPlannings}
+      readOnly={readOnly}
       onAddCourse={handleAddCourse}
       onUpdateCourse={handleUpdateCourse}
       onDeleteCourse={handleDeleteCourse}

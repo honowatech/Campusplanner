@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { RoomManager } from '@/src/components/RoomManager';
 import { useRooms, useCreateRoom, useUpdateRoom, useDeleteRoom } from '@/src/hooks/useRooms';
+import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Room } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useState } from 'react';
@@ -11,6 +13,8 @@ export const Route = createFileRoute('/rooms')({
 
 function RoomsPage() {
   const [page, setPage] = useState(1);
+  const { user } = useAuth();
+  const readOnly = !hasAnyPermission(user?.permissions, ['rooms.manage']);
   const { data: rooms, isLoading } = useRooms({ page });
   const createRoom = useCreateRoom();
   const updateRoom = useUpdateRoom();
@@ -67,6 +71,7 @@ function RoomsPage() {
       currentPage={rooms?.current_page || 1}
       totalPages={rooms?.last_page || 1}
       onPageChange={setPage}
+      readOnly={readOnly}
       onAddRoom={handleAddRoom}
       onUpdateRoom={handleUpdateRoom}
       onDeleteRoom={handleDeleteRoom}

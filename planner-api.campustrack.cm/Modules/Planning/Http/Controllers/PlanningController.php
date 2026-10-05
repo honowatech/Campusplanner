@@ -21,7 +21,28 @@ class PlanningController extends Controller
     {
         $this->authorize('viewAny', PlanningEntity::class);
 
-        $plannings = Planning::getAllPlannings();
+        $user = $request->user();
+
+        $query = PlanningEntity::query()
+            ->with(['shiftPlannings.room', 'shiftPlannings.course'])
+            ->latest();
+
+        // Périmètre de consultation : global > département > matière > classe.
+        if (! $user->hasPermissionTo('plannings.view.all')) {
+            if ($user->hasPermissionTo('plannings.view.department')) {
+                $query->where('department_id', $user->department_id);
+            } elseif ($user->hasPermissionTo('plannings.view.subject')) {
+                $query->whereHas('shiftPlannings', function ($q) use ($user) {
+                    $q->whereIn('course_id', $user->courseIds());
+                });
+            } elseif ($user->hasPermissionTo('plannings.view.class')) {
+                $query->whereHas('shiftPlannings', function ($q) use ($user) {
+                    $q->whereIn('course_class_id', $user->classIds());
+                });
+            }
+        }
+
+        $plannings = $query->get();
 
         return $this->success(['plannings' => $plannings], 'Plannings récupérés');
     }
@@ -30,7 +51,15 @@ class PlanningController extends Controller
     {
         $this->authorize('create', PlanningEntity::class);
 
-        $planning = Planning::createPlanning($request);
+        $data = $request->validated();
+
+        // Borne le département au périmètre de l'utilisateur (responsable).
+        $user = $request->user();
+        if (! $user->hasRole('super-admin') && ! $user->hasPermissionTo('plannings.edit.all')) {
+            $data['department_id'] = $user->department_id;
+        }
+
+        $planning = PlanningEntity::create($data);
 
         return $this->success(
             ['planning' => $planning],

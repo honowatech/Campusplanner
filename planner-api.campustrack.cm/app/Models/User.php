@@ -83,4 +83,43 @@ class User extends Authenticatable
     {
         return $this->hasOne(Student::class);
     }
+
+    /**
+     * Identifiants des classes visibles par l'utilisateur (scope « classe ») :
+     * la classe de l'étudiant + les classes où il enseigne (professeur).
+     *
+     * @return list<int>
+     */
+    public function classIds(): array
+    {
+        $ids = [];
+
+        if ($this->student?->course_class_id) {
+            $ids[] = $this->student->course_class_id;
+        }
+
+        if ($this->teacher) {
+            $ids = array_merge($ids, $this->teacher->shiftPlannings()
+                ->pluck('course_class_id')
+                ->unique()
+                ->filter()
+                ->all());
+        }
+
+        return array_values(array_unique(array_filter($ids)));
+    }
+
+    /**
+     * Identifiants des matières (cours) visibles par l'utilisateur (scope « matière »).
+     *
+     * @return list<int>
+     */
+    public function courseIds(): array
+    {
+        if (! $this->teacher) {
+            return [];
+        }
+
+        return $this->teacher->courses()->pluck('courses.id')->all();
+    }
 }

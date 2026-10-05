@@ -4,6 +4,8 @@ import {
   PlanningParams,
   CreatePlanningData,
   UpdatePlanningData,
+  GeneratePlanningData,
+  DetectConflictsData,
 } from '@/src/services/planningService';
 import { Planning } from '@/src/lib/types';
 import { toast } from 'sonner';
@@ -64,6 +66,47 @@ export function useDeletePlanning() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
       toast.success('Planning deleted successfully!');
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error as unknown as AxiosError));
+    },
+  });
+}
+
+export function useGeneratePlanning() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: GeneratePlanningData) => planningService.generate(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['plannings'] });
+      queryClient.invalidateQueries({ queryKey: ['planning'] });
+      toast.success(`${data.total_generated} shifts generated.`);
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error as unknown as AxiosError));
+    },
+  });
+}
+
+export function useDetectConflicts() {
+  return useMutation({
+    mutationFn: (data: DetectConflictsData) => planningService.detectConflicts(data),
+    onError: (error) => {
+      toast.error(getErrorMessage(error as unknown as AxiosError));
+    },
+  });
+}
+
+export function useOptimizePlanning() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (planningId: number) => planningService.optimize(planningId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannings'] });
+      queryClient.invalidateQueries({ queryKey: ['planning'] });
+      toast.success('Timetable optimized.');
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

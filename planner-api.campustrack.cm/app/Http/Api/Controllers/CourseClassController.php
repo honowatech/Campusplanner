@@ -5,12 +5,14 @@ namespace App\Http\Api\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\CourseClass;
 use App\Models\Student;
+use App\Traits\AppliesDataScope;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CourseClassController extends Controller
 {
+    use AppliesDataScope;
     use HttpResponses;
 
     /**
@@ -20,7 +22,7 @@ class CourseClassController extends Controller
     {
         $this->authorize('viewAny', CourseClass::class);
 
-        $query = CourseClass::query();
+        $query = $this->scopeClasses(CourseClass::query(), $request->user());
 
         if ($request->has('search')) {
             $search = $request->search;

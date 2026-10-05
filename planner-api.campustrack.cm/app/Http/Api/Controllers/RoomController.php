@@ -7,12 +7,14 @@ use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use App\Models\Room;
 use App\Services\ResourceAvailabilityService;
+use App\Traits\AppliesDataScope;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
+    use AppliesDataScope;
     use HttpResponses;
 
     private ResourceAvailabilityService $availabilityService;
@@ -277,6 +279,13 @@ class RoomController extends Controller
             'has_computers' => $request->boolean('has_computers'),
             'has_whiteboard' => $request->boolean('has_whiteboard'),
         ];
+
+        // Restreint la recherche au département de l'utilisateur pour les rôles
+        // à périmètre département (super-admin / administrateur voient tout).
+        $departmentScope = $this->departmentScope($request->user());
+        if ($departmentScope !== null) {
+            $filters['department_id'] = $departmentScope;
+        }
 
         $rooms = $this->availabilityService->findAvailableRooms(
             $validated['start_datetime'],

@@ -9,6 +9,7 @@ interface RoomManagerProps {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  readOnly?: boolean;
   onAddRoom: (room: Room) => void;
   onUpdateRoom: (room: Room) => void;
   onDeleteRoom: (id: number) => void;
@@ -19,6 +20,7 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  readOnly = false,
   onAddRoom,
   onUpdateRoom,
   onDeleteRoom,
@@ -90,14 +92,16 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
-        >
-          <Plus size={20} />
-          <span>{t('addRoom')}</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => handleOpenModal()}
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors w-full sm:w-auto font-medium"
+          >
+            <Plus size={20} />
+            <span>{t('addRoom')}</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-4">
@@ -111,22 +115,24 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
                 <div className="p-3 bg-orange-50 text-orange-600 rounded-lg">
                   <Building size={24} />
                 </div>
-                <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenModal(room)}
-                    className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteRoom(room.id)}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                {!readOnly && (
+                  <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenModal(room)}
+                      className="p-2 text-gray-500 hover:text-secondary hover:bg-indigo-50 rounded-full"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteRoom(room.id)}
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <h3 className="text-lg font-bold text-gray-900 mb-1">{room.name}</h3>

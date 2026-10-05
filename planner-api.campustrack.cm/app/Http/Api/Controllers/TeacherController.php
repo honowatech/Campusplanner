@@ -7,6 +7,7 @@ use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\UpdateTeacherRequest;
 use App\Models\Teacher;
 use App\Services\ResourceAvailabilityService;
+use App\Traits\AppliesDataScope;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
+    use AppliesDataScope;
     use HttpResponses;
 
     private ResourceAvailabilityService $availabilityService;
@@ -30,7 +32,7 @@ class TeacherController extends Controller
     {
         $this->authorize('viewAny', Teacher::class);
 
-        $query = Teacher::query();
+        $query = $this->scopeTeachers(Teacher::query(), $request->user());
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -70,6 +72,13 @@ class TeacherController extends Controller
         $this->authorize('create', Teacher::class);
 
         $validated = $request->validated();
+
+        // Borne le département au périmètre de l'utilisateur : un responsable
+        // ne peut créer un enseignant que dans son propre département.
+        $departmentScope = $this->departmentScope($request->user());
+        if ($departmentScope !== null) {
+            $validated['department_id'] = $departmentScope;
+        }
 
         $courseIds = $validated['course_ids'] ?? [];
         unset($validated['course_ids']);
@@ -257,6 +266,13 @@ class TeacherController extends Controller
             'speciality' => $validated['speciality'] ?? null,
             'check_hours' => $request->boolean('check_hours'),
         ];
+
+        // Restreint la recherche au département de l'utilisateur pour les rôles
+        // à périmètre département (super-admin / administrateur voient tout).
+        $departmentScope = $this->departmentScope($request->user());
+        if ($departmentScope !== null) {
+            $filters['department_id'] = $departmentScope;
+        }
 
         $teachers = $this->availabilityService->findAvailableTeachers(
             $validated['start_datetime'],

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateStudentRequest;
 use App\Models\CourseClass;
 use App\Models\Student;
 use App\Models\User;
+use App\Traits\AppliesDataScope;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
+    use AppliesDataScope;
     use HttpResponses;
 
     /**
@@ -24,7 +26,7 @@ class StudentController extends Controller
     {
         $this->authorize('viewAny', Student::class);
 
-        $query = Student::query();
+        $query = $this->scopeStudents(Student::query(), $request->user());
 
         if ($request->has('search')) {
             $search = $request->search;

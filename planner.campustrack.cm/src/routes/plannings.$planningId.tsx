@@ -4,10 +4,11 @@ import { useTeachers } from '@/src/hooks/useTeachers';
 import { useRooms } from '@/src/hooks/useRooms';
 import { useDepartments } from '@/src/hooks/useDepartments';
 import { useClasses } from '@/src/hooks/useClasses';
+import { useAuth } from '@/src/auth';
 import { usePlanning } from '@/src/hooks/usePlannings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useCreateShiftPlanning, useDeleteShiftPlanning } from '@/src/hooks/useShiftPlannings';
-import { ShiftPlanning } from '@/src/lib/types';
+import type { ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useCourses } from '@/src/hooks/useCourses';
 import { ArrowLeftCircle } from 'lucide-react';
@@ -18,6 +19,7 @@ export const Route = createFileRoute('/plannings/$planningId')({
 
 function TimetableDetailPage() {
   const { planningId } = Route.useParams();
+  const { user } = useAuth();
 
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const { data: teachers, isLoading: teachersLoading } = useTeachers();
@@ -80,6 +82,7 @@ function TimetableDetailPage() {
         classes={classes?.data ?? []}
         shiftPlannings={shiftPlannings}
         planning={planning!}
+        user={user}
         onDeleteShift={handleDeleteShift}
         onAddShift={handleAddShift}
         settings={appSettings}

@@ -2,6 +2,7 @@
 
 namespace Modules\Planning\Entities;
 
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,14 +13,17 @@ class Planning extends Model
     protected $table = 'planning_plannings';
 
     protected $fillable = [
+        'type',
         'starting_date',
         'ending_date',
         'description',
+        'department_id',
     ];
 
     protected $casts = [
         'starting_date' => 'date',
         'ending_date' => 'date',
+        'department_id' => 'integer',
     ];
 
     public function getPeriodAttribute()
@@ -33,11 +37,10 @@ class Planning extends Model
     }
 
     /**
-     * Déduit le département du planning depuis son premier shift planning :
-     * la table planning_plannings ne porte pas de colonne department_id.
+     * Département propriétaire du planning.
      */
-    public function getDepartmentIdAttribute(): ?int
+    public function department()
     {
-        return $this->shiftPlannings()->first()?->courseClass?->department_id;
+        return $this->belongsTo(Department::class);
     }
 }

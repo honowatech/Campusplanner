@@ -8,6 +8,7 @@ import {
   AppSettings,
   ShiftPlanning,
   Planning,
+  User,
 } from '@/src/lib/types';
 import {
   MapPin,
@@ -25,11 +26,20 @@ import {
   Calendar,
   Clock,
   Trash2,
+  Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { Modal } from './Modal';
 import { useTranslation } from '@/src/utils/i18n';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { formatDateTime } from '@/src/lib/helpers';
 import { TIME_SLOTS } from '../lib/constants';
+import {
+  useGeneratePlanning,
+  useDetectConflicts,
+  useOptimizePlanning,
+} from '@/src/hooks/usePlannings';
+import type { PlanningConflict } from '@/src/services/planningService';
 
 export type TimetableProps = {
   courses: Course[];
@@ -39,6 +49,7 @@ export type TimetableProps = {
   classes: CourseClass[];
   shiftPlannings: ShiftPlanning[];
   planning: Planning;
+  user?: User | null;
   onAddShift: (shift: Omit<ShiftPlanning, 'id' | 'created_at' | 'updated_at'>) => void;
   onDeleteShift: (id: number) => void;
   settings: AppSettings;
@@ -54,11 +65,29 @@ export const Timetable: React.FC<TimetableProps> = ({
   classes,
   shiftPlannings,
   planning,
+  user,
   onDeleteShift,
   onAddShift,
   settings,
 }) => {
   const { t } = useTranslation();
+
+  const canCreateShift = hasAnyPermission(user?.permissions, [
+    'plannings.create.all',
+    'plannings.create.department',
+    'plannings.create.class',
+    'plannings.create.subject',
+  ]);
+  const canDeleteShift = hasAnyPermission(user?.permissions, [
+    'plannings.delete.all',
+    'plannings.delete.department',
+  ]);
+  const canGenerate = hasAnyPermission(user?.permissions, ['plannings.generate.auto']);
+  const canDetectConflicts = hasAnyPermission(user?.permissions, [
+    'plannings.detect.conflicts',
+    'plannings.generate.auto',
+  ]);
+
   const [viewMode, setViewMode] = useState<ViewMode>('standard');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
@@ -66,9 +95,18 @@ export const Timetable: React.FC<TimetableProps> = ({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [shiftToDelete, setShiftToDelete] = useState<number | null>(null);
 
-  const [selectedDeptId, setSelectedDeptId] = useState<number | ''>('');
+  const [selectedDeptId, setSelectedDeptId] = useState<number | ''>(() =>
+    user?.role === 'hod' && user.department_id ? user.department_id : '',
+  );
   const [selectedMajor, setSelectedMajor] = useState<string>('');
   const [selectedGroupId, setSelectedGroupId] = useState<number | ''>('');
+
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [dailyHours, setDailyHours] = useState(6);
+  const [generateClassIds, setGenerateClassIds] = useState<number[]>([]);
+  const [generateCourseIds, setGenerateCourseIds] = useState<number[]>([]);
+  const [conflicts, setConflicts] = useState<PlanningConflict[]>([]);
+  const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<Partial<ShiftPlanning>>({
     course_id: undefined,
@@ -81,6 +119,10 @@ export const Timetable: React.FC<TimetableProps> = ({
     number_teachers: 1,
     status: 'pending',
   });
+
+  const generatePlanning = useGeneratePlanning();
+  const detectConflicts = useDetectConflicts();
+  const optimizePlanning = useOptimizePlanning();
 
   const filteredShiftPlannings = useMemo(() => {
     return shiftPlannings?.filter((shift) => {
@@ -280,6 +322,44 @@ export const Timetable: React.FC<TimetableProps> = ({
     }
   };
 
+  const toggleClass = (id: number) => {
+    setGenerateClassIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const toggleCourse = (id: number) => {
+    setGenerateCourseIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const handleGenerate = () => {
+    generatePlanning.mutate({
+      planning_id: planning.id,
+      courses: generateCourseIds,
+      classes: generateClassIds,
+      daily_hours: dailyHours,
+    });
+    setIsGenerateModalOpen(false);
+  };
+
+  const handleDetectConflicts = () => {
+    detectConflicts.mutate(
+      { planning_id: planning.id },
+      {
+        onSuccess: (data) => {
+          setConflicts(data.conflicts);
+          setIsConflictsModalOpen(true);
+        },
+      },
+    );
+  };
+
+  const handleOptimize = () => {
+    optimizePlanning.mutate(planning.id);
+  };
+
   const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDeptId(Number(e.target.value));
     setSelectedMajor('');
@@ -290,7 +370,6 @@ export const Timetable: React.FC<TimetableProps> = ({
     setSelectedMajor(e.target.value);
     setSelectedGroupId('');
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
       <div className="p-6 border-b border-gray-100">
@@ -306,14 +385,50 @@ export const Timetable: React.FC<TimetableProps> = ({
             {`From ${formatDateTime(planning?.starting_date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} to ${formatDateTime(planning?.ending_date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}`}
           </div>
           <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => handleAddSchedule()}
-              className="flex items-center space-x-1 p-3 bg-secondary text-white rounded-md hover:bg-primary transition-colors text-sm font-medium"
-            >
-              <Plus size={14} />
-              <span>{t('addShift')}</span>
-            </button>
+            {canCreateShift && (
+              <button
+                type="button"
+                onClick={() => handleAddSchedule()}
+                className="flex items-center space-x-1 p-3 bg-secondary text-white rounded-md hover:bg-primary transition-colors text-sm font-medium"
+              >
+                <Plus size={14} />
+                <span>{t('addShift')}</span>
+              </button>
+            )}
+            {canGenerate && (
+              <button
+                type="button"
+                onClick={() => {
+                  setGenerateClassIds(classes.map((course_class) => course_class.id));
+                  setGenerateCourseIds(courses.map((course) => course.id));
+                  setIsGenerateModalOpen(true);
+                }}
+                className="flex items-center space-x-1 p-3 bg-indigo-50 text-primary rounded-md hover:bg-indigo-100 transition-colors text-sm font-medium"
+              >
+                <Sparkles size={14} />
+                <span>{t('generate')}</span>
+              </button>
+            )}
+            {canDetectConflicts && (
+              <button
+                type="button"
+                onClick={handleDetectConflicts}
+                className="flex items-center space-x-1 p-3 bg-amber-50 text-amber-700 rounded-md hover:bg-amber-100 transition-colors text-sm font-medium"
+              >
+                <AlertTriangle size={14} />
+                <span>{t('detectConflicts')}</span>
+              </button>
+            )}
+            {canGenerate && (
+              <button
+                type="button"
+                onClick={handleOptimize}
+                className="flex items-center space-x-1 p-3 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 transition-colors text-sm font-medium"
+              >
+                <RefreshCw size={14} />
+                <span>{t('optimize')}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -340,11 +455,12 @@ export const Timetable: React.FC<TimetableProps> = ({
           <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
             <Filter size={16} className="text-gray-400 ml-2" />
             <select
-              className="bg-transparent border-none text-sm focus:ring-0 text-gray-700 py-1"
+              className="bg-transparent border-none text-sm focus:ring-0 text-gray-700 py-1 disabled:cursor-not-allowed disabled:opacity-70"
               value={selectedDeptId}
               onChange={handleDeptChange}
+              disabled={user?.role === 'hod'}
             >
-              <option value="">{t('allDepts')}</option>
+              {user?.role !== 'hod' && <option value="">{t('allDepts')}</option>}
               {departments?.map((department) => (
                 <option key={department.id} value={department.id}>
                   {department.name}
@@ -416,13 +532,15 @@ export const Timetable: React.FC<TimetableProps> = ({
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <Calendar size={64} className="mb-4 opacity-20" />
             <p className="text-lg font-medium">{t('noShifts')}</p>
-            <button
-              type="button"
-              onClick={() => handleAddSchedule()}
-              className="mt-4 text-secondary hover:underline"
-            >
-              {t('createShift')}
-            </button>
+            {canCreateShift && (
+              <button
+                type="button"
+                onClick={() => handleAddSchedule()}
+                className="mt-4 text-secondary hover:underline"
+              >
+                {t('createShift')}
+              </button>
+            )}
           </div>
         ) : viewMode === 'standard' ? (
           <div className="space-y-6">
@@ -465,13 +583,15 @@ export const Timetable: React.FC<TimetableProps> = ({
                                           </span>
                                         )}
                                       </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => requestDelete(shift.id)}
-                                        className="p-1 text-gray-400 hover:text-red-600"
-                                      >
-                                        <Trash2 size={12} />
-                                      </button>
+                                      {canDeleteShift && (
+                                        <button
+                                          type="button"
+                                          onClick={() => requestDelete(shift.id)}
+                                          className="p-1 text-gray-400 hover:text-red-600"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      )}
                                     </div>
                                     {teacher && (
                                       <div className="text-[10px] text-gray-600 mt-1">
@@ -488,7 +608,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                 );
                               })}
                             </div>
-                          ) : (
+                          ) : canCreateShift ? (
                             <button
                               type="button"
                               onClick={() => handleAddSchedule(date, slot.start, slot.end)}
@@ -496,7 +616,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                             >
                               + {t('add')}
                             </button>
-                          )}
+                          ) : null}
                         </div>
                       </div>
                     );
@@ -562,13 +682,15 @@ export const Timetable: React.FC<TimetableProps> = ({
                                     <span className="font-bold text-gray-900">
                                       {course?.code || course?.name || `Course ${shift.course_id}`}
                                     </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => requestDelete(shift.id)}
-                                      className="text-gray-400 hover:text-red-600"
-                                    >
-                                      <X size={12} />
-                                    </button>
+                                    {canDeleteShift && (
+                                      <button
+                                        type="button"
+                                        onClick={() => requestDelete(shift.id)}
+                                        className="text-gray-400 hover:text-red-600"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    )}
                                   </div>
                                   {teacher && (
                                     <div className="text-gray-600 mt-1">{teacher.full_name}</div>
@@ -580,7 +702,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                     </div>
                                   )}
                                 </div>
-                              ) : (
+                              ) : canCreateShift ? (
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -590,7 +712,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                                 >
                                   + {t('add')}
                                 </button>
-                              )}
+                              ) : null}
                             </td>
                           );
                         })}
@@ -806,6 +928,123 @@ export const Timetable: React.FC<TimetableProps> = ({
               {t('delete')}
             </button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isGenerateModalOpen}
+        onClose={() => setIsGenerateModalOpen(false)}
+        title={t('generate')}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleGenerate();
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label
+              htmlFor="generate-daily-hours"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('dailyHours')}
+            </label>
+            <input
+              id="generate-daily-hours"
+              type="number"
+              min="1"
+              max="10"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              value={dailyHours}
+              onChange={(e) => setDailyHours(parseInt(e.target.value) || 6)}
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">{t('classes')}</p>
+            <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+              {classes.map((course_class) => (
+                <label
+                  key={course_class.id}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={generateClassIds.includes(course_class.id)}
+                    onChange={() => toggleClass(course_class.id)}
+                    className="rounded border-gray-300"
+                  />
+                  <span>
+                    {course_class.name} ({course_class.code})
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">{t('courses')}</p>
+            <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+              {courses.map((course) => (
+                <label
+                  key={course.id}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={generateCourseIds.includes(course.id)}
+                    onChange={() => toggleCourse(course.id)}
+                    className="rounded border-gray-300"
+                  />
+                  <span>
+                    {course.code} - {course.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsGenerateModalOpen(false)}
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {t('cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={generateClassIds.length === 0 || generateCourseIds.length === 0}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t('generate')}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={isConflictsModalOpen}
+        onClose={() => setIsConflictsModalOpen(false)}
+        title={t('detectConflicts')}
+      >
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {conflicts.length === 0 ? (
+            <p className="text-gray-500">{t('noConflicts')}</p>
+          ) : (
+            conflicts.map((conflict, idx) => (
+              <div
+                key={idx}
+                className="flex items-start space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg"
+              >
+                <AlertTriangle size={18} className="text-red-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-red-700">
+                  <p className="font-bold capitalize">{conflict.type.replace(/_/g, ' ')}</p>
+                  <p>{conflict.message}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </Modal>
     </div>

@@ -2,6 +2,7 @@
 
 namespace Modules\Planning\Http\Controllers;
 
+use App\Models\CourseClass;
 use App\Traits\HttpResponses;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -38,6 +39,49 @@ class SchedulingController extends Controller
         $this->doubleurService = new DoubleurService;
     }
 
+    /**
+     * Borne l'accès au planning au périmètre de l'utilisateur : un responsable
+     * ne peut générer/détecter/résoudre/optimiser que dans son département.
+     * Pour un planning vide (sans département déduit), on se rabat sur les
+     * classes fournies (cas de la génération automatique).
+     */
+    private function authorizePlanningScope(Planning $planning, ?array $classIds = null): void
+    {
+        $user = request()->user();
+
+        if ($user->hasRole('super-admin') || $user->hasPermissionTo('plannings.edit.all')) {
+            return;
+        }
+
+        $planningDepartmentId = $planning->department_id;
+
+        if ($planningDepartmentId !== null) {
+            if ($user->department_id === null
+                || (int) $user->department_id !== (int) $planningDepartmentId) {
+                abort(403, 'Ce planning n\'appartient pas à votre département.');
+            }
+
+            return;
+        }
+
+        // Planning vide : on borne par les classes fournies.
+        if (! empty($classIds)) {
+            $departments = CourseClass::whereIn('id', $classIds)
+                ->pluck('department_id')
+                ->unique();
+
+            if ($departments->count() !== 1
+                || $user->department_id === null
+                || (int) $departments->first() !== (int) $user->department_id) {
+                abort(403, 'Ces classes n\'appartiennent pas à votre département.');
+            }
+
+            return;
+        }
+
+        abort(403, 'Ce planning n\'appartient pas à votre département.');
+    }
+
     public function generate(Request $request)
     {
         $this->authorize('generate', Planning::class);
@@ -57,6 +101,7 @@ class SchedulingController extends Controller
         $planning = Planning::findOrFail($request->input('planning_id'));
         $courses = $request->input('courses');
         $classes = $request->input('classes');
+        $this->authorizePlanningScope($planning, $classes);
 
         $options = [
             'daily_hours' => $request->input('daily_hours', 6),
@@ -83,6 +128,7 @@ class SchedulingController extends Controller
         ]);
 
         $planning = Planning::findOrFail($request->input('planning_id'));
+        $this->authorizePlanningScope($planning);
         $conflicts = $this->conflictService->detectAllConflictsForPlanning($planning);
 
         return $this->success([
@@ -101,6 +147,7 @@ class SchedulingController extends Controller
         ]);
 
         $shiftPlanning = ShiftPlanning::findOrFail($request->input('shift_planning_id'));
+        $this->authorizePlanningScope($shiftPlanning->planning);
 
         if ($request->input('auto_resolve', true)) {
             $result = $this->resolutionService->autoResolve($shiftPlanning);
@@ -138,6 +185,7 @@ class SchedulingController extends Controller
         $this->authorize('optimize', Planning::class);
 
         $planning = Planning::findOrFail($planningId);
+        $this->authorizePlanningScope($planning);
         $result = $this->schedulingService->optimizeSchedule($planning);
 
         return $this->success($result, 'Optimisation terminée');

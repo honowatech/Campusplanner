@@ -26,6 +26,7 @@ class StorePlanningRequest extends FormRequest
                 }
             }],
             'description' => ['nullable', 'string'],
+            'department_id' => ['nullable', 'exists:departments,id'],
         ];
     }
 

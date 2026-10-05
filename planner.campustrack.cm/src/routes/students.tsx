@@ -9,6 +9,8 @@ import {
 } from '@/src/hooks/useStudents';
 import { useDepartments } from '@/src/hooks/useDepartments';
 import { useClasses } from '@/src/hooks/useClasses';
+import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Student } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useState } from 'react';
@@ -19,9 +21,16 @@ export const Route = createFileRoute('/students')({
 
 function StudentsPage() {
   const [page, setPage] = useState(1);
+  const { user } = useAuth();
   const { data: students, isLoading: studentsLoading } = useStudents({ page });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const { data: classes, isLoading: classesLoading } = useClasses();
+
+  const readOnly = !hasAnyPermission(user?.permissions, [
+    'students.create',
+    'students.edit',
+    'students.delete',
+  ]);
 
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
@@ -87,6 +96,7 @@ function StudentsPage() {
       currentPage={students?.current_page || 1}
       totalPages={students?.last_page || 1}
       onPageChange={setPage}
+      readOnly={readOnly}
       onAddStudent={handleAddStudent}
       onUpdateStudent={handleUpdateStudent}
       onDeleteStudent={handleDeleteStudent}

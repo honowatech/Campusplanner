@@ -3,6 +3,7 @@ import { StudentGroupManager } from '@/src/components/StudentGroupManager';
 import { useClasses, useCreateClass, useUpdateClass, useDeleteClass } from '@/src/hooks/useClasses';
 import { useDepartments } from '@/src/hooks/useDepartments';
 import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { CourseClass } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useState } from 'react';
@@ -14,6 +15,7 @@ export const Route = createFileRoute('/classes')({
 function ClassesPage() {
   const auth = useAuth();
   const [page, setPage] = useState(1);
+  const readOnly = !hasAnyPermission(auth.user?.permissions, ['classes.manage']);
   const { data: classes, isLoading: groupsLoading } = useClasses({ page });
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
@@ -62,6 +64,7 @@ function ClassesPage() {
       currentPage={page}
       totalPages={classes?.last_page || 1}
       onPageChange={setPage}
+      readOnly={readOnly}
       onAdd={handleAdd}
       onUpdate={handleUpdate}
       onDelete={handleDelete}
