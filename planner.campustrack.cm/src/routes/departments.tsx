@@ -10,6 +10,8 @@ import { useTeachers } from '@/src/hooks/useTeachers';
 import { useClasses } from '@/src/hooks/useClasses';
 import { usePlannings } from '@/src/hooks/usePlannings';
 import { useDeleteCourse } from '@/src/hooks/useCourses';
+import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { Department, ShiftPlanning } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { ErrorState } from '@/src/components/ErrorState';
@@ -24,6 +26,12 @@ function DepartmentsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
+  const { user } = useAuth();
+  const readOnly = !hasAnyPermission(user?.permissions, [
+    'departments.create',
+    'departments.edit',
+    'departments.delete',
+  ]);
   const { data: departments, isLoading: departmentsLoading, isError: departmentsError, refetch: refetchDepartments } = useDepartments({
     page,
     search: debouncedSearch || undefined,
@@ -93,6 +101,7 @@ function DepartmentsPage() {
       totalPages={departments?.last_page || 1}
       onPageChange={setPage}
       shiftPlannings={shiftPlannings}
+      readOnly={readOnly}
       searchTerm={search}
       onSearchChange={handleSearchChange}
       onAdd={handleAdd}
