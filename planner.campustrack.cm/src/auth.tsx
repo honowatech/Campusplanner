@@ -1,4 +1,4 @@
-import { User, UserRole, Role, Permission } from '@/src/lib/types';
+import { User, UserRole, Role, Permission, SubscriptionSummary } from '@/src/lib/types';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '@/src/services/api';
 import { AxiosError } from 'axios';
@@ -11,6 +11,8 @@ type ApiUserWithRoles = {
   department_id?: number;
   roles?: Role[];
   permissions?: Permission[];
+  features?: string[];
+  subscription?: SubscriptionSummary | null;
 };
 
 function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole = 'etudiant'): User {
@@ -21,8 +23,8 @@ function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole =
   if (roles.length > 0) {
     const roleNames = roles.map((r) => r.name);
     if (roleNames.includes('super-admin')) primaryRole = 'super-admin';
-    else if (roleNames.includes('administrateur')) primaryRole = 'admin';
-    else if (roleNames.includes('responsable-departement')) primaryRole = 'hod';
+    else if (roleNames.includes('administrateur')) primaryRole = 'administrateur';
+    else if (roleNames.includes('responsable-departement')) primaryRole = 'responsable-departement';
     else if (roleNames.includes('professeur')) primaryRole = 'professeur';
     else if (roleNames.includes('etudiant')) primaryRole = 'etudiant';
     else if (roleNames.includes('personnel-administratif')) primaryRole = 'personnel-administratif';
@@ -35,6 +37,8 @@ function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole =
     role: primaryRole,
     roles: roles,
     permissions: permissions.map((permission) => permission.name),
+    features: apiUser.features ?? [],
+    subscription: apiUser.subscription ?? null,
     department_id: apiUser.department_id,
   };
 }

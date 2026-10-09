@@ -2,18 +2,23 @@
 
 namespace Tests;
 
+use App\Models\Tenant;
 use App\Models\User;
+use App\Support\RoleCatalog;
+use App\Support\TenantContext;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
-use Spatie\Permission\Models\Role;
 
 abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
+
+    /** Identifiant du tenant de test (contexte par défaut des tests). */
+    protected int $defaultTenantId;
 
     protected function setUp(): void
     {
@@ -142,11 +147,32 @@ abstract class TestCase extends BaseTestCase
 
     protected function createDefaultRoles(): void
     {
-        // Create roles if they don't exist
-        $roles = ['super-admin', 'administrateur', 'enseignant', 'etudiant'];
+        // Permissions globales + rôle global + rôles des tenants.
+        RoleCatalog::seedPermissions();
+        RoleCatalog::seedGlobalRole();
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
-        }
+        // Tenant démo persistant (pour les tests du mode démo).
+        $demo = Tenant::firstOrCreate(
+            ['slug' => 'demo'],
+            ['name' => 'Démo CampusTrack', 'status' => 'active', 'is_demo' => true]
+        );
+
+        // Contexte par défaut des tests : un tenant NON démo, pour que les
+        // protections du tenant démo (blocage des DELETE) ne s'appliquent pas
+        // aux données de test créées par les factories.
+        $test = Tenant::firstOrCreate(
+            ['slug' => 'test'],
+            ['name' => 'Test CampusTrack', 'status' => 'active', 'is_demo' => false]
+        );
+
+        $this->defaultTenantId = $test->id;
+        RoleCatalog::seedTenantRoles($test->id);
+        RoleCatalog::seedTenantRoles($demo->id);
+
+        // Contexte par défaut des tests : le tenant de test. Les modèles créés
+        // par factory héritent ainsi de tenant_id = test, et les assignations
+        // de rôle sont scopées au tenant de test (spatie teams).
+        TenantContext::set($test->id);
+        setPermissionsTeamId($test->id);
     }
 }

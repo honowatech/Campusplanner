@@ -1,20 +1,33 @@
 <?php
 
 use App\Http\Api\Controllers\AiController;
+use App\Http\Api\Controllers\AdminFeatureController;
+use App\Http\Api\Controllers\AdminImpersonationController;
+use App\Http\Api\Controllers\AdminPackController;
+use App\Http\Api\Controllers\AdminPaymentController;
+use App\Http\Api\Controllers\AuditLogController;
 use App\Http\Api\Controllers\AuthController;
+use App\Http\Api\Controllers\BillingController;
 use App\Http\Api\Controllers\CourseClassController;
 use App\Http\Api\Controllers\CourseController;
 use App\Http\Api\Controllers\DashboardController;
 use App\Http\Api\Controllers\DemoModeController;
 use App\Http\Api\Controllers\DepartmentController;
+use App\Http\Api\Controllers\FeatureController;
+use App\Http\Api\Controllers\OnboardingController;
+use App\Http\Api\Controllers\PaymentController;
+use App\Http\Api\Controllers\PaymentGatewayController;
+use App\Http\Api\Controllers\PaymeWebhookController;
 use App\Http\Api\Controllers\PermissionController;
 use App\Http\Api\Controllers\RoleController;
 use App\Http\Api\Controllers\RoomBlockingController;
 use App\Http\Api\Controllers\RoomController;
 use App\Http\Api\Controllers\SettingsController;
+use App\Http\Api\Controllers\SmsController;
 use App\Http\Api\Controllers\StudentController;
 use App\Http\Api\Controllers\TeacherBlockingController;
 use App\Http\Api\Controllers\TeacherController;
+use App\Http\Api\Controllers\TenantController;
 use App\Http\Api\Controllers\UserController;
 use App\Http\Api\Controllers\UserRoleController;
 use App\Http\Middleware\DashboardPermission;
@@ -44,11 +57,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
+// Onboarding public : inscription d'une école (tenant + admin initial).
+Route::post('/onboarding', [OnboardingController::class, 'register'])->middleware('throttle:5,1');
+
 // Mode démo : état + connexion sans mot de passe (public, nécessaire pour la
 // page de connexion non authentifiée). L'activation/désactivation est réservée
 // au super-admin (route protégée plus bas).
 Route::get('/demo-mode', [DemoModeController::class, 'index']);
 Route::post('/demo-login', [DemoModeController::class, 'login'])->middleware('throttle:10,1');
+
+// Webhook PayMe : public (hors auth), idempotent par hash.
+Route::post('/payments/payme/callback', [PaymeWebhookController::class, 'callback']);
 
 // Protected API routes
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -67,6 +86,65 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('permission:settings.view');
     Route::put('settings', [SettingsController::class, 'update'])
         ->middleware('permission:settings.edit');
+
+    // === FONCTIONNALITÉS & FACTURATION (abonnement) ===
+    Route::get('features', [FeatureController::class, 'index']);
+    Route::get('packs', [BillingController::class, 'packs']);
+    Route::get('billing/subscription', [BillingController::class, 'subscription']);
+
+    // === JOURNAL D'AUDIT (admin tenant & super-admin) ===
+    Route::get('audit-logs', [AuditLogController::class, 'index'])
+        ->middleware('role:super-admin|administrateur');
+
+    // === PAIEMENT (PayMe) — admin tenant ===
+    Route::middleware(['role:super-admin|administrateur'])->group(function () {
+        Route::post('billing/checkout', [PaymentController::class, 'checkout']);
+        Route::get('billing/payments', [PaymentController::class, 'payments']);
+    });
+
+    // === PAIEMENTS (super-admin, agrégé) ===
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::get('admin/payments', [AdminPaymentController::class, 'index']);
+    });
+
+    // === CONSOLE SUPER-ADMIN (tenants, packs, features, PayMe, impersonation) ===
+    Route::middleware(['role:super-admin'])->prefix('admin')->group(function () {
+        Route::get('tenants', [TenantController::class, 'index']);
+        Route::post('tenants', [TenantController::class, 'store']);
+        Route::get('tenants/{id}', [TenantController::class, 'show']);
+        Route::put('tenants/{id}', [TenantController::class, 'update']);
+        Route::delete('tenants/{id}', [TenantController::class, 'destroy']);
+        Route::post('tenants/{id}/suspend', [TenantController::class, 'suspend']);
+        Route::post('tenants/{id}/reactivate', [TenantController::class, 'reactivate']);
+
+        Route::get('payment-gateway', [PaymentGatewayController::class, 'show']);
+        Route::put('payment-gateway', [PaymentGatewayController::class, 'update']);
+
+        Route::get('packs', [AdminPackController::class, 'index']);
+        Route::post('packs', [AdminPackController::class, 'store']);
+        Route::put('packs/{id}', [AdminPackController::class, 'update']);
+        Route::delete('packs/{id}', [AdminPackController::class, 'destroy']);
+
+        Route::get('features', [AdminFeatureController::class, 'index']);
+        Route::put('features/{id}', [AdminFeatureController::class, 'update']);
+
+        Route::post('impersonate', [AdminImpersonationController::class, 'impersonate']);
+        Route::post('impersonate/stop', [AdminImpersonationController::class, 'stop']);
+    });
+
+    // === SMS (Nexah, par tenant) ===
+    Route::middleware(['feature:sms'])->group(function () {
+        Route::get('sms/settings', [SmsController::class, 'settings'])
+            ->middleware('permission:notifications.configure');
+        Route::put('sms/settings', [SmsController::class, 'updateSettings'])
+            ->middleware('permission:notifications.configure');
+        Route::post('sms/send', [SmsController::class, 'send'])
+            ->middleware('permission:sms.send');
+        Route::post('sms/test', [SmsController::class, 'test'])
+            ->middleware('permission:sms.send');
+        Route::get('sms/logs', [SmsController::class, 'logs'])
+            ->middleware('permission:notifications.configure');
+    });
 
     // === GESTION DES RÔLES (Super Admin & Admin uniquement) ===
     Route::middleware(['role:super-admin|administrateur'])->group(function () {

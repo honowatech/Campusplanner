@@ -19,7 +19,10 @@ class SuperAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $role = Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
+        // Le rôle super-admin est GLOBAL (tenant_id NULL).
+        setPermissionsTeamId(null);
+
+        $role = Role::findOrCreate('super-admin', 'web');
 
         // Le super-admin est le seul à pouvoir activer/désactiver le mode démo.
         $role->givePermissionTo('demo-mode.manage');
@@ -35,6 +38,7 @@ class SuperAdminSeeder extends Seeder
         );
 
         $superAdmin->assignRole('super-admin');
+        $superAdmin->forceFill(['tenant_id' => null])->save();
 
         $this->command->info('Super Admin created successfully!');
         $this->command->info('Email: superadmin@campustrack.com');

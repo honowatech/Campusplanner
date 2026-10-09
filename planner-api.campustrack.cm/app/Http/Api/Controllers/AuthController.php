@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
+use App\Support\AuthPayload;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -84,15 +85,11 @@ class AuthController extends Controller
     }
 
     /**
-     * Serialise l'utilisateur authentifié avec ses rôles et ses permissions
-     * effectives (directes + héritées des rôles), nécessaires au front pour
-     * déterminer le rôle primaire et les gardes d'accès.
+     * Serialise l'utilisateur authentifié avec ses rôles, ses permissions
+     * effectives, les fonctionnalités de son tenant et son abonnement courant.
      */
     private function authUserPayload(User $user): User
     {
-        $user->load('roles');
-        $user->setRelation('permissions', $user->getAllPermissions());
-
-        return $user;
+        return AuthPayload::for($user);
     }
 }

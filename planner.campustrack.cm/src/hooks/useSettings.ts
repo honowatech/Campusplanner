@@ -20,12 +20,13 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
 };
 
-export function useSettings() {
+export function useSettings(enabled = true) {
   return useQuery<AppSettings>({
     queryKey: ['settings'],
     queryFn: settingsService.get,
     staleTime: Infinity,
     initialData: DEFAULT_SETTINGS,
+    enabled,
   });
 }
 

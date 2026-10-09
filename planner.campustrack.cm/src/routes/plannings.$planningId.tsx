@@ -5,6 +5,7 @@ import { useRooms } from '@/src/hooks/useRooms';
 import { useDepartments } from '@/src/hooks/useDepartments';
 import { useClasses } from '@/src/hooks/useClasses';
 import { useAuth } from '@/src/auth';
+import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { usePlanning } from '@/src/hooks/usePlannings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useCreateShiftPlanning, useDeleteShiftPlanning } from '@/src/hooks/useShiftPlannings';
@@ -21,13 +22,35 @@ function TimetableDetailPage() {
   const { planningId } = Route.useParams();
   const { user } = useAuth();
 
+  // Les ressources annexes (enseignants, salles, départements, classes,
+  // réglages) ne sont chargées que si l'utilisateur a la permission de les
+  // consulter. Les rôles en lecture seule (professeur, étudiant) n'y ont pas
+  // accès : on évite ainsi les 403, et le Timetable lit les noms directement
+  // depuis les relations embarquées dans chaque shift (cf. PlanningController).
+  const canViewTeachers = hasAnyPermission(user?.permissions, [
+    'teachers.view.all',
+    'teachers.view.department',
+  ]);
+  const canViewRooms = hasAnyPermission(user?.permissions, ['rooms.view']);
+  const canViewDepartments = hasAnyPermission(user?.permissions, ['departments.view']);
+  const canViewClasses = hasAnyPermission(user?.permissions, ['classes.view']);
+  const canViewSettings = hasAnyPermission(user?.permissions, ['settings.view']);
+
   const { data: courses, isLoading: coursesLoading } = useCourses();
-  const { data: teachers, isLoading: teachersLoading } = useTeachers();
-  const { data: rooms, isLoading: roomsLoading } = useRooms();
-  const { data: departments, isLoading: departmentsLoading } = useDepartments();
-  const { data: classes, isLoading: classesLoading } = useClasses();
+  const { data: teachers, isLoading: teachersLoading } = useTeachers(undefined, {
+    enabled: canViewTeachers,
+  });
+  const { data: rooms, isLoading: roomsLoading } = useRooms(undefined, {
+    enabled: canViewRooms,
+  });
+  const { data: departments, isLoading: departmentsLoading } = useDepartments(undefined, {
+    enabled: canViewDepartments,
+  });
+  const { data: classes, isLoading: classesLoading } = useClasses(undefined, {
+    enabled: canViewClasses,
+  });
   const { data: planning, isLoading: planningLoading } = usePlanning(Number(planningId));
-  const { data: appSettings, isLoading: settingsLoading } = useSettings();
+  const { data: appSettings, isLoading: settingsLoading } = useSettings(canViewSettings);
   const createShift = useCreateShiftPlanning();
   const deleteShift = useDeleteShiftPlanning();
 

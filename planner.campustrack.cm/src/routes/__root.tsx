@@ -8,6 +8,20 @@ import { useAuth } from '@/src/auth';
 import { canAccessRoute } from '@/src/utils/routePermissions';
 import { Toaster } from '@/src/components/ui/sonner';
 
+// Libellé du rôle courant (miroir du mapping `convertApiUserToUser`).
+const ROLE_LABEL_KEYS: Record<string, string> = {
+  'super-admin': 'adminRole',
+  administrateur: 'adminRole',
+  'responsable-departement': 'hodRole',
+  professeur: 'roleProfesseur',
+  etudiant: 'roleEtudiant',
+  'personnel-administratif': 'rolePersonnel',
+};
+
+function roleLabelKey(role?: string): string {
+  return (role && ROLE_LABEL_KEYS[role]) || 'hodRole';
+}
+
 export const Route = createRootRoute({
   component: RootComponent,
 });
@@ -103,12 +117,10 @@ function RootComponent() {
             <div className="flex items-center space-x-3 pl-2 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition-colors group relative">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-bold text-gray-900">{auth.user?.name}</p>
-                <p className="text-xs text-gray-500">
-                  {auth.user?.role === 'super-admin' ? t('adminRole') : t('hodRole')}
-                </p>
+                <p className="text-xs text-gray-500">{t(roleLabelKey(auth.user?.role))}</p>
               </div>
               <div
-                className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'super-admin' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
+                className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'super-admin' || auth.user?.role === 'administrateur' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
               >
                 {auth.user?.name ? auth.user?.name.charAt(0) : "U"}
               </div>
@@ -120,12 +132,14 @@ function RootComponent() {
                 >
                   {t('profile')}
                 </Link>
-                <Link
-                  to="/settings"
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  {t('settings')}
-                </Link>
+                {canAccessRoute(auth.user, '/settings') && (
+                  <Link
+                    to="/settings"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    {t('settings')}
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={auth.logout}

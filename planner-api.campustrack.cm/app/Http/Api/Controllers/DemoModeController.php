@@ -3,8 +3,10 @@
 namespace App\Http\Api\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\AppSetting;
+use App\Models\Tenant;
 use App\Models\User;
+use App\Support\AuthPayload;
+use App\Support\TenantContext;
 use App\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,10 +31,12 @@ class DemoModeController extends Controller
      * État du mode démo + comptes disponibles (uniquement si activé).
      *
      * Public : la page de connexion (non authentifiée) doit pouvoir l'interroger.
+     * Seul le tenant démo est concerné par le mode démo.
      */
     public function index(): JsonResponse
     {
-        $enabled = AppSetting::demoModeEnabled();
+        $demo = Tenant::demo();
+        $enabled = $demo?->demoModeEnabled() ?? false;
 
         return $this->success(
             [
@@ -44,7 +48,7 @@ class DemoModeController extends Controller
     }
 
     /**
-     * Active / désactive le mode démo. Réservé au super-admin.
+     * Active / désactive le mode démo du tenant démo. Réservé au super-admin.
      */
     public function update(Request $request): JsonResponse
     {
@@ -52,24 +56,26 @@ class DemoModeController extends Controller
             'demo_mode' => ['required', 'boolean'],
         ]);
 
-        $settings = AppSetting::instance();
-        $settings->demo_mode = $validated['demo_mode'];
-        $settings->save();
+        $demo = Tenant::demo();
+
+        abort_if(! $demo, 404, 'Aucun tenant démo.');
+
+        $demo->update(['demo_mode' => $validated['demo_mode']]);
 
         return $this->success(
             [
-                'enabled' => $settings->demo_mode,
-                'accounts' => $settings->demo_mode ? $this->demoAccounts() : [],
+                'enabled' => $demo->demo_mode,
+                'accounts' => $demo->demo_mode ? $this->demoAccounts() : [],
             ],
-            $settings->demo_mode ? 'Mode démo activé' : 'Mode démo désactivé'
+            $demo->demo_mode ? 'Mode démo activé' : 'Mode démo désactivé'
         );
     }
 
     /**
      * Connexion démo sans mot de passe.
      *
-     * Ne fonctionne que si le mode démo est actif et ne cible jamais le
-     * rôle `super-admin`.
+     * Ne fonctionne que si le mode démo du tenant démo est actif, et ne cible
+     * jamais le rôle `super-admin` ni un compte hors tenant démo.
      */
     public function login(Request $request): JsonResponse
     {
@@ -77,14 +83,18 @@ class DemoModeController extends Controller
             'role' => ['required', 'string', 'in:'.implode(',', self::DEMO_ROLES)],
         ]);
 
-        if (! AppSetting::demoModeEnabled()) {
+        $demo = Tenant::demo();
+
+        if (! $demo || ! $demo->demoModeEnabled()) {
             return $this->error(null, 'Le mode démo est désactivé.', 403);
         }
 
-        $user = User::where('is_demo', true)
+        // Le rôle `role()` est scopé au tenant démo : on résout dans ce périmètre.
+        $user = TenantContext::run($demo->id, fn () => User::where('is_demo', true)
+            ->where('tenant_id', $demo->id)
             ->where('is_approved', true)
             ->role($validated['role'])
-            ->first();
+            ->first());
 
         if (! $user) {
             return $this->error(null, 'Aucun compte démo disponible pour ce rôle.', 404);
@@ -93,7 +103,7 @@ class DemoModeController extends Controller
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
-        return $this->success($this->authUserPayload($user), 'Connecté en mode démo');
+        return $this->success(AuthPayload::for($user), 'Connecté en mode démo');
     }
 
     /**
@@ -101,31 +111,31 @@ class DemoModeController extends Controller
      */
     private function demoAccounts(): array
     {
+        $demo = Tenant::demo();
+
+        if (! $demo) {
+            return [];
+        }
+
         $order = array_flip(self::DEMO_ROLES);
 
-        return User::where('is_demo', true)
-            ->where('is_approved', true)
-            ->get()
-            ->filter(fn (User $user) => $user->hasAnyRole(self::DEMO_ROLES))
-            ->map(fn (User $user) => [
-                'role' => $user->getRoleNames()->first(),
-                'name' => $user->name,
-                'email' => $user->email,
-            ])
-            ->sortBy(fn (array $account) => $order[$account['role']] ?? 99)
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Serialise l'utilisateur avec ses rôles et permissions effectives
-     * (miroir de `AuthController::authUserPayload`).
-     */
-    private function authUserPayload(User $user): User
-    {
-        $user->load('roles');
-        $user->setRelation('permissions', $user->getAllPermissions());
-
-        return $user;
+        // Les rôles des comptes démo sont scopés au tenant démo : on résout donc
+        // `hasAnyRole`/`getRoleNames` dans ce périmètre (la requête est publique,
+        // aucun contexte tenant n'est posé par ResolveTenant).
+        return TenantContext::run($demo->id, function () use ($demo, $order) {
+            return User::where('is_demo', true)
+                ->where('tenant_id', $demo->id)
+                ->where('is_approved', true)
+                ->get()
+                ->filter(fn (User $user) => $user->hasAnyRole(self::DEMO_ROLES))
+                ->map(fn (User $user) => [
+                    'role' => $user->getRoleNames()->first(),
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ])
+                ->sortBy(fn (array $account) => $order[$account['role']] ?? 99)
+                ->values()
+                ->all();
+        });
     }
 }

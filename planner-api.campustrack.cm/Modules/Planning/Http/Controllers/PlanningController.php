@@ -79,9 +79,13 @@ class PlanningController extends Controller
             ->orderBy('starting_hour', 'asc')
             ->get();
 
+        // Les shifts sont renvoyés avec leurs relations pour que les rôles en
+        // lecture seule (professeur, étudiant) puissent afficher l'emploi du
+        // temps sans charger séparément teachers/rooms/classes (403 pour eux).
+        $planning->setRelation('shiftPlannings', $shiftPlannings);
+
         return $this->success([
             'planning' => $planning,
-            // 'shift_plannings' => $shiftPlannings,
         ], 'Planning récupéré');
     }
 

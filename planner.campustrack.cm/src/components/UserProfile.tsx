@@ -29,7 +29,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, department }) =>
                 />
               ) : (
                 <div
-                  className={`size-full rounded-full flex items-center justify-center text-4xl font-bold text-white ${user.role === 'admin' ? 'bg-primary' : 'bg-secondary'}`}
+                  className={`size-full rounded-full flex items-center justify-center text-4xl font-bold text-white ${user.role === 'administrateur' ? 'bg-primary' : 'bg-secondary'}`}
                 >
                   {user.name.charAt(0)}
                 </div>
@@ -42,14 +42,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, department }) =>
             <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
             <div className="flex items-center space-x-4 mt-2">
               <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin' ? 'bg-indigo-100 text-primary' : 'bg-purple-100 text-purple-800'}`}
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user.role === 'administrateur' ? 'bg-indigo-100 text-primary' : 'bg-purple-100 text-purple-800'}`}
               >
-                {user.role === 'admin' ? (
+                {user.role === 'administrateur' ? (
                   <Shield size={14} className="mr-1.5" />
                 ) : (
                   <UserIcon size={14} className="mr-1.5" />
                 )}
-                {user.role === 'admin' ? t('adminRole') : t('hodRole')}
+                {user.role === 'administrateur' ? t('adminRole') : t('hodRole')}
               </span>
               <span className="flex items-center text-gray-500 text-sm">
                 <Mail size={14} className="mr-1.5" />
@@ -94,7 +94,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, department }) =>
               </div>
 
               {/* Managed Department Section for HOD */}
-              {user.role === 'hod' && department && (
+              {user.role === 'responsable-departement' && department && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('managedDept')}</h3>
                   <div className="bg-purple-50 rounded-xl p-6 border border-purple-100">

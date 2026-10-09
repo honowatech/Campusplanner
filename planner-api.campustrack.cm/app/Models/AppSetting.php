@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Support\TenantContext;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class AppSetting extends Model
 {
+    use BelongsToTenant;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'tenant_id',
         'demo_mode',
         'max_weekly_hours_per_teacher',
         'max_consecutive_hours',
@@ -44,12 +49,16 @@ class AppSetting extends Model
     }
 
     /**
-     * Récupère (ou crée) la ligne singleton des réglages de l'application.
+     * Récupère (ou crée) la ligne de réglages du tenant courant.
+     *
+     * En contexte global (super-admin / CLI), tenant_id est NULL : c'est la
+     * config « plateforme ». Pour un utilisateur de tenant, la ligne est scopée
+     * à son école.
      */
     public static function instance(): self
     {
         return static::query()->firstOrCreate(
-            ['id' => 1],
+            ['tenant_id' => TenantContext::currentId()],
             ['demo_mode' => false]
         );
     }

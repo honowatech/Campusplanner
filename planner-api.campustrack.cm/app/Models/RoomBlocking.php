@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RoomBlocking extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'room_id',
@@ -19,6 +20,7 @@ class RoomBlocking extends Model
         'created_by',
         'is_recurring',
         'recurrence_pattern',
+        'tenant_id',
     ];
 
     protected $casts = [

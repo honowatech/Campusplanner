@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
   LayoutDashboard,
@@ -12,6 +12,9 @@ import {
   Settings,
   UserCog,
   FlaskConical,
+  CreditCard,
+  MessageSquare,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from '@/src/utils/i18n';
 import { useAuth } from '@/src/auth';
@@ -54,6 +57,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen 
       icon: Calendar,
     },
     { id: 'settings', path: '/settings', label: t('settings'), icon: Settings },
+    { id: 'billing', path: '/billing', label: t('billing'), icon: CreditCard },
+    { id: 'sms', path: '/sms', label: t('sms'), icon: MessageSquare },
+    { id: 'administrateur', path: '/admin', label: t('adminConsole'), icon: ShieldCheck },
     { id: 'demo-mode', path: '/demo-mode', label: t('demoMode'), icon: FlaskConical },
     { id: 'profile', path: '/profile', label: t('profile'), icon: UserCircle },
   ];

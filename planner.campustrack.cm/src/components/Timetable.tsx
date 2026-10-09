@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
+import type {
   Course,
   Teacher,
   Room,
@@ -26,20 +26,12 @@ import {
   Calendar,
   Clock,
   Trash2,
-  Sparkles,
-  RefreshCw,
 } from 'lucide-react';
 import { Modal } from './Modal';
 import { useTranslation } from '@/src/utils/i18n';
 import { hasAnyPermission } from '@/src/utils/routePermissions';
 import { formatDateTime } from '@/src/lib/helpers';
 import { TIME_SLOTS } from '../lib/constants';
-import {
-  useGeneratePlanning,
-  useDetectConflicts,
-  useOptimizePlanning,
-} from '@/src/hooks/usePlannings';
-import type { PlanningConflict } from '@/src/services/planningService';
 
 export type TimetableProps = {
   courses: Course[];
@@ -82,11 +74,11 @@ export const Timetable: React.FC<TimetableProps> = ({
     'plannings.delete.all',
     'plannings.delete.department',
   ]);
-  const canGenerate = hasAnyPermission(user?.permissions, ['plannings.generate.auto']);
-  const canDetectConflicts = hasAnyPermission(user?.permissions, [
-    'plannings.detect.conflicts',
-    'plannings.generate.auto',
-  ]);
+  // const canGenerate = hasAnyPermission(user?.permissions, ['plannings.generate.auto']);
+  // const canDetectConflicts = hasAnyPermission(user?.permissions, [
+  //   'plannings.detect.conflicts',
+  //   'plannings.generate.auto',
+  // ]);
 
   const [viewMode, setViewMode] = useState<ViewMode>('standard');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,17 +88,17 @@ export const Timetable: React.FC<TimetableProps> = ({
   const [shiftToDelete, setShiftToDelete] = useState<number | null>(null);
 
   const [selectedDeptId, setSelectedDeptId] = useState<number | ''>(() =>
-    user?.role === 'hod' && user.department_id ? user.department_id : '',
+    user?.role === 'responsable-departement' && user.department_id ? user.department_id : '',
   );
   const [selectedMajor, setSelectedMajor] = useState<string>('');
   const [selectedGroupId, setSelectedGroupId] = useState<number | ''>('');
 
-  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
-  const [dailyHours, setDailyHours] = useState(6);
-  const [generateClassIds, setGenerateClassIds] = useState<number[]>([]);
-  const [generateCourseIds, setGenerateCourseIds] = useState<number[]>([]);
-  const [conflicts, setConflicts] = useState<PlanningConflict[]>([]);
-  const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
+  // const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  // const [dailyHours, setDailyHours] = useState(6);
+  // const [generateClassIds, setGenerateClassIds] = useState<number[]>([]);
+  // const [generateCourseIds, setGenerateCourseIds] = useState<number[]>([]);
+  // const [conflicts, setConflicts] = useState<PlanningConflict[]>([]);
+  // const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<Partial<ShiftPlanning>>({
     course_id: undefined,
@@ -120,9 +112,9 @@ export const Timetable: React.FC<TimetableProps> = ({
     status: 'pending',
   });
 
-  const generatePlanning = useGeneratePlanning();
-  const detectConflicts = useDetectConflicts();
-  const optimizePlanning = useOptimizePlanning();
+  // const generatePlanning = useGeneratePlanning();
+  // const detectConflicts = useDetectConflicts();
+  // const optimizePlanning = useOptimizePlanning();
 
   const filteredShiftPlannings = useMemo(() => {
     return shiftPlannings?.filter((shift) => {
@@ -322,43 +314,43 @@ export const Timetable: React.FC<TimetableProps> = ({
     }
   };
 
-  const toggleClass = (id: number) => {
-    setGenerateClassIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
+  // const toggleClass = (id: number) => {
+  //   setGenerateClassIds((prev) =>
+  //     prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+  //   );
+  // };
 
-  const toggleCourse = (id: number) => {
-    setGenerateCourseIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
+  // const toggleCourse = (id: number) => {
+  //   setGenerateCourseIds((prev) =>
+  //     prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+  //   );
+  // };
 
-  const handleGenerate = () => {
-    generatePlanning.mutate({
-      planning_id: planning.id,
-      courses: generateCourseIds,
-      classes: generateClassIds,
-      daily_hours: dailyHours,
-    });
-    setIsGenerateModalOpen(false);
-  };
+  // const handleGenerate = () => {
+  //   generatePlanning.mutate({
+  //     planning_id: planning.id,
+  //     courses: generateCourseIds,
+  //     classes: generateClassIds,
+  //     daily_hours: dailyHours,
+  //   });
+  //   setIsGenerateModalOpen(false);
+  // };
 
-  const handleDetectConflicts = () => {
-    detectConflicts.mutate(
-      { planning_id: planning.id },
-      {
-        onSuccess: (data) => {
-          setConflicts(data.conflicts);
-          setIsConflictsModalOpen(true);
-        },
-      },
-    );
-  };
+  // const handleDetectConflicts = () => {
+  //   detectConflicts.mutate(
+  //     { planning_id: planning.id },
+  //     {
+  //       onSuccess: (data) => {
+  //         setConflicts(data.conflicts);
+  //         setIsConflictsModalOpen(true);
+  //       },
+  //     },
+  //   );
+  // };
 
-  const handleOptimize = () => {
-    optimizePlanning.mutate(planning.id);
-  };
+  // const handleOptimize = () => {
+  //   optimizePlanning.mutate(planning.id);
+  // };
 
   const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDeptId(Number(e.target.value));
@@ -395,7 +387,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                 <span>{t('addShift')}</span>
               </button>
             )}
-            {canGenerate && (
+            {/*{canGenerate && (
               <button
                 type="button"
                 onClick={() => {
@@ -428,7 +420,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                 <RefreshCw size={14} />
                 <span>{t('optimize')}</span>
               </button>
-            )}
+            )}*/}
           </div>
         </div>
 
@@ -458,9 +450,11 @@ export const Timetable: React.FC<TimetableProps> = ({
               className="bg-transparent border-none text-sm focus:ring-0 text-gray-700 py-1 disabled:cursor-not-allowed disabled:opacity-70"
               value={selectedDeptId}
               onChange={handleDeptChange}
-              disabled={user?.role === 'hod'}
+              disabled={user?.role === 'responsable-departement'}
             >
-              {user?.role !== 'hod' && <option value="">{t('allDepts')}</option>}
+              {user?.role !== 'responsable-departement' && (
+                <option value="">{t('allDepts')}</option>
+              )}
               {departments?.map((department) => (
                 <option key={department.id} value={department.id}>
                   {department.name}
@@ -513,11 +507,17 @@ export const Timetable: React.FC<TimetableProps> = ({
             </button>
             {isExportMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 z-50">
-                <button type="button" className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                >
                   <FileText size={16} className="mr-2 text-red-500" />
                   {t('exportPDF')}
                 </button>
-                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                <button
+                  type="button"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                >
                   <FileSpreadsheet size={16} className="mr-2 text-green-600" />
                   {t('exportExcel')}
                 </button>
@@ -557,18 +557,19 @@ export const Timetable: React.FC<TimetableProps> = ({
                         <div className="p-3 text-sm text-gray-500 font-medium border-r border-gray-100">
                           {slot.label}
                         </div>
-                        <div className="p-2 min-h-[80px]">
+                        <div className="p-2 min-h-20">
                           {slotShifts.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
                               {slotShifts.map((shift) => {
-                                const course = getCourse(shift.course_id);
-                                const classItem = getClass(shift.course_class_id);
-                                const teacher = getTeacher(shift.teacher_id);
-                                const room = getRoom(shift.room_id);
+                                const course = shift.course ?? getCourse(shift.course_id);
+                                const classItem =
+                                  shift.course_class ?? getClass(shift.course_class_id);
+                                const teacher = shift.teacher ?? getTeacher(shift.teacher_id);
+                                const room = shift.room ?? getRoom(shift.room_id);
                                 return (
                                   <div
                                     key={shift.id}
-                                    className="bg-white rounded-md p-2 shadow-sm border border-gray-200 min-w-[200px]"
+                                    className="bg-white rounded-md p-2 shadow-sm border border-gray-200 min-w-50"
                                   >
                                     <div className="flex justify-between items-start">
                                       <div>
@@ -636,7 +637,7 @@ export const Timetable: React.FC<TimetableProps> = ({
                   {filteredClasses.map((classItem) => (
                     <th
                       key={classItem.id}
-                      className="p-4 font-bold text-gray-700 text-center border-b border-r border-gray-200 min-w-[160px] bg-gray-50"
+                      className="p-4 font-bold text-gray-700 text-center border-b border-r border-gray-200 min-w-40 bg-gray-50"
                     >
                       <div className="flex flex-col items-center">
                         <span>{classItem.code || classItem.name}</span>
@@ -668,13 +669,17 @@ export const Timetable: React.FC<TimetableProps> = ({
                             slot.end,
                             classItem.id,
                           );
-                          const course = shift ? getCourse(shift.course_id) : null;
-                          const teacher = shift ? getTeacher(shift.teacher_id) : null;
-                          const room = shift ? getRoom(shift.room_id) : null;
+                          const course = shift
+                            ? (shift.course ?? getCourse(shift.course_id))
+                            : null;
+                          const teacher = shift
+                            ? (shift.teacher ?? getTeacher(shift.teacher_id))
+                            : null;
+                          const room = shift ? (shift.room ?? getRoom(shift.room_id)) : null;
                           return (
                             <td
                               key={classItem.id}
-                              className="p-2 border-b border-r border-gray-200 relative min-h-[80px]"
+                              className="p-2 border-b border-r border-gray-200 relative min-h-20"
                             >
                               {shift ? (
                                 <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200 text-xs">
@@ -739,7 +744,9 @@ export const Timetable: React.FC<TimetableProps> = ({
           )}
 
           <div>
-            <label htmlFor="shift-course" className="block text-sm font-medium text-gray-700 mb-1">{t('course')}</label>
+            <label htmlFor="shift-course" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('course')}
+            </label>
             <select
               required
               id="shift-course"
@@ -759,7 +766,9 @@ export const Timetable: React.FC<TimetableProps> = ({
           </div>
 
           <div>
-            <label htmlFor="shift-class" className="block text-sm font-medium text-gray-700 mb-1">{t('classes')}</label>
+            <label htmlFor="shift-class" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('classes')}
+            </label>
             <select
               required
               id="shift-class"
@@ -785,7 +794,9 @@ export const Timetable: React.FC<TimetableProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="shift-date" className="block text-sm font-medium text-gray-700 mb-1">{t('date')}</label>
+              <label htmlFor="shift-date" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('date')}
+              </label>
               <input
                 required
                 id="shift-date"
@@ -796,7 +807,10 @@ export const Timetable: React.FC<TimetableProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="shift-teacher" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="shift-teacher"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('teachers')}
               </label>
               <select
@@ -822,7 +836,10 @@ export const Timetable: React.FC<TimetableProps> = ({
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label htmlFor="shift-start-time" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="shift-start-time"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('startTime')}
               </label>
               <select
@@ -845,7 +862,12 @@ export const Timetable: React.FC<TimetableProps> = ({
               </select>
             </div>
             <div>
-              <label htmlFor="shift-end-time" className="block text-sm font-medium text-gray-700 mb-1">{t('endTime')}</label>
+              <label
+                htmlFor="shift-end-time"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('endTime')}
+              </label>
               <select
                 required
                 id="shift-end-time"
@@ -865,7 +887,9 @@ export const Timetable: React.FC<TimetableProps> = ({
               </select>
             </div>
             <div>
-              <label htmlFor="shift-room" className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
+              <label htmlFor="shift-room" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('room')}
+              </label>
               <select
                 id="shift-room"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -931,7 +955,7 @@ export const Timetable: React.FC<TimetableProps> = ({
         </div>
       </Modal>
 
-      <Modal
+      {/*<Modal
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}
         title={t('generate')}
@@ -1021,9 +1045,9 @@ export const Timetable: React.FC<TimetableProps> = ({
             </button>
           </div>
         </form>
-      </Modal>
+      </Modal>*/}
 
-      <Modal
+      {/*<Modal
         isOpen={isConflictsModalOpen}
         onClose={() => setIsConflictsModalOpen(false)}
         title={t('detectConflicts')}
@@ -1046,7 +1070,7 @@ export const Timetable: React.FC<TimetableProps> = ({
             ))
           )}
         </div>
-      </Modal>
+      </Modal>*/}
     </div>
   );
 };

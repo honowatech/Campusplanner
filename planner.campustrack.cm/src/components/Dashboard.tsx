@@ -11,7 +11,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import {
+import type {
   Teacher,
   Course,
   DashboardOverview,
@@ -27,8 +27,6 @@ import { dashboardService } from '@/src/services/dashboardService';
 import { AlertsPanel } from './AlertsPanel';
 import { ActivityFeed } from './ActivityFeed';
 import {
-  Sparkles,
-  BrainCircuit,
   Users,
   AlertTriangle,
   Activity,
@@ -54,9 +52,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const canViewOverview = canViewDashboardOverview(user);
-  const [aiAnalysis, setAiAnalysis] = useState<string>('');
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
-  const [loadingAi, setLoadingAi] = useState(false);
+  // const [aiAnalysis, setAiAnalysis] = useState<string>('');
+  // const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  // const [loadingAi, setLoadingAi] = useState(false);
 
   const [apiOverview, setApiOverview] = useState<DashboardOverview | null>(initialData ?? null);
   const [apiAlerts, setApiAlerts] = useState<DashboardAlerts>({
@@ -137,21 +135,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
     }
   }, [isAuthenticated, canViewOverview, period]);
 
-  const handleGenerateInsights = async () => {
-    setLoadingAi(true);
-    try {
-      const [analysis, optimization] = await Promise.all([
-        generateWorkloadAnalysis(teachers, courses),
-        suggestScheduleOptimization(teachers, courses),
-      ]);
-      setAiAnalysis(analysis);
-      setAiSuggestions(optimization.suggestions);
-    } catch (error) {
-      console.error('Failed to generate insights:', error);
-    } finally {
-      setLoadingAi(false);
-    }
-  };
+  // const handleGenerateInsights = async () => {
+  //   setLoadingAi(true);
+  //   try {
+  //     const [analysis, optimization] = await Promise.all([
+  //       generateWorkloadAnalysis(teachers, courses),
+  //       suggestScheduleOptimization(teachers, courses),
+  //     ]);
+  //     setAiAnalysis(analysis);
+  //     setAiSuggestions(optimization.suggestions);
+  //   } catch (error) {
+  //     console.error('Failed to generate insights:', error);
+  //   } finally {
+  //     setLoadingAi(false);
+  //   }
+  // };
 
   const realtimeStats = apiOverview?.realtime;
   const heavyStats = apiOverview?.heavy;
@@ -359,7 +357,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[400px]">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('deptDistribution')}</h3>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -381,7 +379,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[400px]">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('coursesPerDept')}</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -405,7 +403,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
         </div>
       )}
 
-      <div
+      {/*<div
         className="bg-linear-to-br from-indigo-50 to-white p-6 rounded-xl border border-indigo-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
         role="button"
         tabIndex={0}
@@ -459,7 +457,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
             </div>
           </div>
         )}
-      </div>
+      </div>*/}
     </div>
   );
 };

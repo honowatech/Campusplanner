@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Middleware\EnsureTenantIsActive;
 use App\Http\Middleware\EnsureUserIsApproved;
+use App\Http\Middleware\ProtectDemoTenant;
+use App\Http\Middleware\RequireFeature;
+use App\Http\Middleware\ResolveTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,12 +28,16 @@ return Application::configure(basePath: dirname(__DIR__))
         // l'éventuel démarrage de session) : append le place en fin de groupe.
         $middleware->api(append: [
             EnsureUserIsApproved::class,
+            ResolveTenant::class,
+            EnsureTenantIsActive::class,
+            ProtectDemoTenant::class,
         ]);
 
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'feature' => RequireFeature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

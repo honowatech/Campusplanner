@@ -39,10 +39,13 @@ export function createCrudHooks<T, Params, CreateData, UpdateData>(
     alsoInvalidate.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
   };
 
-  const useList = (params?: Params) =>
+  const useList = (params?: Params, options?: { enabled?: boolean }) =>
     useQuery<PaginatedResponse<T>>({
       queryKey: [queryKey, params],
       queryFn: () => service.getAll(params),
+      // Autorise les appels conditionnels (ex. page planning qui ne charge
+      // teachers/rooms/classes que si l'utilisateur a la permission de les voir).
+      enabled: options?.enabled ?? true,
       // Garde la page précédente visible pendant le fetch (pagination / recherche)
       // afin de ne pas démonter la liste ni perdre le focus des champs.
       placeholderData: keepPreviousData,

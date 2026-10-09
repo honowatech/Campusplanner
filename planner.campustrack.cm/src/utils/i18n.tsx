@@ -66,6 +66,11 @@ const translations = {
     demoAccountsDescription: 'One account per role is offered on the login page.',
     demoAccountsEmpty: 'No demo account available.',
 
+    // Billing / SMS / Admin
+    billing: 'Billing',
+    sms: 'SMS',
+    adminConsole: 'Admin Console',
+
     // Profile
     profileDetails: 'Profile Details',
     role: 'Role',
@@ -380,6 +385,11 @@ const translations = {
     demoAccounts: 'Comptes démo',
     demoAccountsDescription: 'Un compte par rôle est proposé sur la page de connexion.',
     demoAccountsEmpty: 'Aucun compte démo disponible.',
+
+    // Billing / SMS / Admin
+    billing: 'Facturation',
+    sms: 'SMS',
+    adminConsole: 'Console admin',
 
     // Profile
     profileDetails: 'Détails du Profil',

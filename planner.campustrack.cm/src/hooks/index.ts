@@ -52,6 +52,9 @@ export {
   useRejectTeacherBlocking,
 } from './useBlockings';
 export { useSettings, useUpdateSettings } from './useSettings';
+export { useFeature } from './useFeature';
+export { useFeatures } from './useFeatures';
+export { useSubscription, usePacks } from './useSubscription';
 export {
   useShiftPlannings,
   useShiftPlanning,

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Modules\Planning\Entities\ShiftPlanning;
 
 class Room extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'name',
@@ -25,6 +26,7 @@ class Room extends Model
         'has_whiteboard',
         'is_active',
         'description',
+        'tenant_id',
     ];
 
     protected $casts = [

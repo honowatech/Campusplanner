@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             TeacherBlockingSeeder::class => 'Teacher Blockings (5)',
             RoomBlockingSeeder::class => 'Room Blockings (7)',
             PlanningDatabaseSeeder::class => 'Planning module (Plannings, Shift plannings on classes)',
+            TenantSeeder::class => 'Demo tenant + tenant_id backfill',
+            PackSeeder::class => 'Features, Packs & demo subscription',
+            DemoTenantSeeder::class => 'Demo tenant + demo mode',
         ];
 
         foreach ($seeders as $seeder => $description) {
