@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\TeacherBlocking;
 use App\Models\User;
+use App\Support\TenantContext;
 use Carbon\Carbon;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Support\Facades\Cache;
@@ -28,9 +29,18 @@ class DashboardService
      */
     private function getCacheKey(string $type, string $method, string $period, ?int $deptId): string
     {
+        $tenantSuffix = TenantContext::currentId() ? ':tenant'.TenantContext::currentId() : ':global';
         $deptSuffix = $deptId ? ":dept{$deptId}" : ':all';
 
-        return self::CACHE_PREFIX."{$type}:{$method}:{$period}{$deptSuffix}";
+        return self::CACHE_PREFIX."{$type}:{$method}:{$period}{$tenantSuffix}{$deptSuffix}";
+    }
+
+    /**
+     * Identifiant du tenant courant (null = contexte global / super-admin).
+     */
+    private function currentTenantId(): ?int
+    {
+        return TenantContext::currentId();
     }
 
     /**
@@ -238,7 +248,24 @@ class DashboardService
      */
     private function countScheduleConflicts(?int $departmentId): int
     {
-        $conflicts = DB::select('
+        $tenantId = $this->currentTenantId();
+        $bindings = [];
+        $conditions = [];
+
+        if ($tenantId !== null) {
+            $conditions[] = 's.tenant_id = ?';
+            $bindings[] = $tenantId;
+        }
+
+        if ($departmentId) {
+            $conditions[] = 'cs.department_id = ?';
+            $bindings[] = $departmentId;
+        }
+
+        $join = $departmentId ? 'JOIN courses cs ON cs.id = s.course_id' : '';
+        $where = ! empty($conditions) ? 'WHERE '.implode(' AND ', $conditions) : '';
+
+        $conflicts = DB::select("
             SELECT COUNT(DISTINCT s.id) AS conflicts
             FROM planning_shift_plannings s
             JOIN planning_shift_plannings o
@@ -251,10 +278,9 @@ class DashboardService
                 OR (s.room_id IS NOT NULL AND s.room_id = o.room_id)
                 OR s.course_class_id = o.course_class_id
              )
-            '.($departmentId ? '
-            JOIN courses cs ON cs.id = s.course_id AND cs.department_id = ?' : ''),
-            $departmentId ? [$departmentId] : []
-        );
+            {$join}
+            {$where}
+        ", $bindings);
 
         return (int) ($conflicts[0]->conflicts ?? 0);
     }
@@ -262,14 +288,16 @@ class DashboardService
     private function calculateCurrentSessions(?int $departmentId): array
     {
         $now = Carbon::now();
+        $tenantId = $this->currentTenantId();
 
         $sessions = DB::table('planning_shift_plannings')
+            ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
             ->where('date', $now->format('Y-m-d'))
             ->where('starting_hour', '<=', $now->format('H:i:s'))
             ->where('ending_hour', '>=', $now->format('H:i:s'))
             ->when($departmentId, function ($q) use ($departmentId) {
-                $q->whereHas('class', function ($cq) use ($departmentId) {
-                    $cq->where('department_id', $departmentId);
+                $q->whereIn('course_class_id', function ($cq) use ($departmentId) {
+                    $cq->select('id')->from('classes')->where('department_id', $departmentId);
                 });
             })
             ->limit(20)
@@ -458,6 +486,8 @@ class DashboardService
 
     private function calculateDepartmentStats(string $period): array
     {
+        $tenantId = $this->currentTenantId();
+
         $departments = Department::withCount([
             'teachers',
             'courses',
@@ -475,8 +505,9 @@ class DashboardService
             // Room utilization
             $totalHours = 40; // Assuming 40h week
             $bookedHours = DB::table('planning_shift_plannings')
-                ->whereHas('class', function ($q) use ($dept) {
-                    $q->where('department_id', $dept->id);
+                ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
+                ->whereIn('course_class_id', function ($q) use ($dept) {
+                    $q->select('id')->from('classes')->where('department_id', $dept->id);
                 })
                 ->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])
                 ->sum(hours_diff_expr());
@@ -488,8 +519,9 @@ class DashboardService
             // Average teacher hours
             $avgTeacherHours = $dept->teachers_count > 0
                 ? round(DB::table('planning_shift_plannings')
-                    ->whereHas('class', function ($q) use ($dept) {
-                        $q->where('department_id', $dept->id);
+                    ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
+                    ->whereIn('course_class_id', function ($q) use ($dept) {
+                        $q->select('id')->from('classes')->where('department_id', $dept->id);
                     })
                     ->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])
                     ->sum(hours_diff_expr()) / $dept->teachers_count, 2)
@@ -659,6 +691,7 @@ class DashboardService
     private function calculateChartsData(string $period, ?int $departmentId): array
     {
         $dates = $this->getPeriodDates($period);
+        $tenantId = $this->currentTenantId();
 
         // Evolution chart data
         $labels = [];
@@ -687,9 +720,10 @@ class DashboardService
             }
 
             $count = DB::table('planning_shift_plannings')
+                ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
                 ->when($departmentId, function ($q) use ($departmentId) {
-                    $q->whereHas('class', function ($cq) use ($departmentId) {
-                        $cq->where('department_id', $departmentId);
+                    $q->whereIn('course_class_id', function ($cq) use ($departmentId) {
+                        $cq->select('id')->from('classes')->where('department_id', $departmentId);
                     });
                 })
                 ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
@@ -710,9 +744,10 @@ class DashboardService
         // Current period totals
         $currentTotals = [
             'sessions' => DB::table('planning_shift_plannings')
+                ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
                 ->when($departmentId, function ($q) use ($departmentId) {
-                    $q->whereHas('class', function ($cq) use ($departmentId) {
-                        $cq->where('department_id', $departmentId);
+                    $q->whereIn('course_class_id', function ($cq) use ($departmentId) {
+                        $cq->select('id')->from('classes')->where('department_id', $departmentId);
                     });
                 })
                 ->whereBetween('date', [$dates['start'], $dates['end']])
@@ -729,9 +764,10 @@ class DashboardService
         // Previous period totals
         $previousTotals = [
             'sessions' => DB::table('planning_shift_plannings')
+                ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
                 ->when($departmentId, function ($q) use ($departmentId) {
-                    $q->whereHas('class', function ($cq) use ($departmentId) {
-                        $cq->where('department_id', $departmentId);
+                    $q->whereIn('course_class_id', function ($cq) use ($departmentId) {
+                        $cq->select('id')->from('classes')->where('department_id', $departmentId);
                     });
                 })
                 ->whereBetween('date', [$dates['previous_start'], $dates['previous_end']])
@@ -767,10 +803,13 @@ class DashboardService
 
     private function getPlanningStats(array $dates, ?int $departmentId): array
     {
+        $tenantId = $this->currentTenantId();
+
         $query = DB::table('planning_shift_plannings')
+            ->when($tenantId, fn ($q) => $q->where('planning_shift_plannings.tenant_id', $tenantId))
             ->when($departmentId, function ($q) use ($departmentId) {
-                $q->whereHas('class', function ($cq) use ($departmentId) {
-                    $cq->where('department_id', $departmentId);
+                $q->whereIn('course_class_id', function ($cq) use ($departmentId) {
+                    $cq->select('id')->from('classes')->where('department_id', $departmentId);
                 });
             })
             ->whereBetween('date', [$dates['start']->format('Y-m-d'), $dates['end']->format('Y-m-d')]);

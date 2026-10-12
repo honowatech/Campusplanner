@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use App\Models\CourseClass;
 use App\Models\Department;
 use App\Models\Room;
+use App\Models\Teacher;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\RoleCatalog;
+use Modules\Planning\Entities\Planning;
+use Modules\Planning\Entities\ShiftPlanning;
 use Tests\TestCase;
 
 class TenantIsolationTest extends TestCase
@@ -128,5 +131,58 @@ class TenantIsolationTest extends TestCase
             ->assertJsonCount(1, 'data.classes.data')
             ->assertJsonFragment(['name' => 'Classe A'])
             ->assertJsonMissing(['name' => 'Classe B']);
+    }
+
+    /** @test */
+    public function dashboard_schedule_conflicts_are_scoped_to_tenant(): void
+    {
+        [$tenantA, $adminA] = $this->tenantWithAdmin('dash-a');
+        [$tenantB] = $this->tenantWithAdmin('dash-b');
+
+        $teacherA = Teacher::factory()->create(['tenant_id' => $tenantA->id]);
+        $teacherB = Teacher::factory()->create(['tenant_id' => $tenantB->id]);
+
+        $planningA = Planning::create([
+            'starting_date' => now()->startOfWeek()->toDateString(),
+            'ending_date' => now()->endOfWeek()->toDateString(),
+            'tenant_id' => $tenantA->id,
+        ]);
+        $planningB = Planning::create([
+            'starting_date' => now()->startOfWeek()->toDateString(),
+            'ending_date' => now()->endOfWeek()->toDateString(),
+            'tenant_id' => $tenantB->id,
+        ]);
+
+        $date = now()->toDateString();
+
+        // Deux shifts qui se chevauchent chez A
+        foreach (['08:00', '09:00'] as $hour) {
+            ShiftPlanning::create([
+                'planning_id' => $planningA->id,
+                'teacher_id' => $teacherA->id,
+                'tenant_id' => $tenantA->id,
+                'date' => $date,
+                'starting_hour' => $hour,
+                'ending_hour' => '11:00',
+            ]);
+        }
+
+        // Deux shifts qui se chevauchent chez B
+        foreach (['08:00', '09:00'] as $hour) {
+            ShiftPlanning::create([
+                'planning_id' => $planningB->id,
+                'teacher_id' => $teacherB->id,
+                'tenant_id' => $tenantB->id,
+                'date' => $date,
+                'starting_hour' => $hour,
+                'ending_hour' => '11:00',
+            ]);
+        }
+
+        // L'admin de A (sans département) ne doit compter que les conflits de son tenant.
+        $this->actingAs($adminA)
+            ->getJson('/api/dashboard/overview?period=7d')
+            ->assertOk()
+            ->assertJsonPath('data.realtime.schedule_conflicts', 2);
     }
 }

@@ -19,10 +19,10 @@ import type {
   DashboardActivity,
   Period,
 } from '@/src/lib/types';
-import {
-  generateWorkloadAnalysis,
-  suggestScheduleOptimization,
-} from '@/src/services/geminiService';
+// import {
+//   generateWorkloadAnalysis,
+//   suggestScheduleOptimization,
+// } from '@/src/services/geminiService';
 import { dashboardService } from '@/src/services/dashboardService';
 import { AlertsPanel } from './AlertsPanel';
 import { ActivityFeed } from './ActivityFeed';
