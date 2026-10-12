@@ -8,6 +8,7 @@ import {
 import { PaginatedResponse, Student } from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 
 export function useStudents(params?: StudentParams) {
@@ -28,12 +29,13 @@ export function useStudent(id: number) {
 
 export function useCreateStudent() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreateStudentData) => studentService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success('Student created successfully!');
+      toast.success(t('toast.studentCreated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -43,13 +45,14 @@ export function useCreateStudent() {
 
 export function useUpdateStudent() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateStudentData }) =>
       studentService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success('Student updated successfully!');
+      toast.success(t('toast.studentUpdated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -59,12 +62,13 @@ export function useUpdateStudent() {
 
 export function useDeleteStudent() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => studentService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success('Student deleted successfully!');
+      toast.success(t('toast.studentDeleted'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

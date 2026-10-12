@@ -18,7 +18,7 @@ class EnsureTenantIsActive
         $user = $request->user();
 
         if ($user && $user->tenant && $user->tenant->status === 'suspended') {
-            abort(403, 'Votre compte est suspendu. Contactez votre administrateur.');
+            abort(403, __('api.errors.tenant_suspended'));
         }
 
         return $next($request);

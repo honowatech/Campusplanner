@@ -65,7 +65,7 @@ class ConflictDetectionService
         if ($conflictingPlannings->isNotEmpty()) {
             $conflict = [
                 'type' => self::TYPE_ROOM_CONFLICT,
-                'message' => 'La salle est déjà occupée pendant ce créneau',
+                'message' => __('planning.conflicts.room_occupied'),
                 'room_id' => $shiftPlanning->room_id,
                 'conflicting_plannings' => $conflictingPlannings->pluck('id')->toArray(),
             ];
@@ -101,7 +101,7 @@ class ConflictDetectionService
         if ($conflictingPlannings->isNotEmpty()) {
             $conflict = [
                 'type' => self::TYPE_TEACHER_CONFLICT,
-                'message' => 'Le professeur est déjà assigné à un autre cours pendant ce créneau',
+                'message' => __('planning.conflicts.teacher_busy'),
                 'teacher_id' => $shiftPlanning->teacher_id,
                 'conflicting_plannings' => $conflictingPlannings->pluck('id')->toArray(),
             ];
@@ -137,7 +137,7 @@ class ConflictDetectionService
         if ($conflictingPlannings->isNotEmpty()) {
             $conflict = [
                 'type' => self::TYPE_CLASS_CONFLICT,
-                'message' => 'La classe a déjà un cours pendant ce créneau',
+                'message' => __('planning.conflicts.class_busy'),
                 'course_class_id' => $shiftPlanning->course_class_id,
                 'conflicting_plannings' => $conflictingPlannings->pluck('id')->toArray(),
             ];
@@ -176,7 +176,7 @@ class ConflictDetectionService
         if ($blocking) {
             $conflict = [
                 'type' => self::TYPE_ROOM_BLOCKING,
-                'message' => 'La salle est bloquée: '.$blocking->reason,
+                'message' => __('planning.conflicts.room_blocked', ['reason' => $blocking->reason]),
                 'room_id' => $shiftPlanning->room_id,
                 'blocking_id' => $blocking->id,
                 'blocking_reason' => $blocking->reason,
@@ -216,7 +216,7 @@ class ConflictDetectionService
         if ($blocking) {
             $conflict = [
                 'type' => self::TYPE_TEACHER_BLOCKING,
-                'message' => 'Le professeur est indisponible: '.$blocking->reason,
+                'message' => __('planning.conflicts.teacher_blocked', ['reason' => $blocking->reason]),
                 'teacher_id' => $shiftPlanning->teacher_id,
                 'blocking_id' => $blocking->id,
                 'blocking_reason' => $blocking->reason,
@@ -260,7 +260,7 @@ class ConflictDetectionService
         if (($currentHours + $hoursNeeded) > $teacher->max_hours_per_week) {
             $conflict = [
                 'type' => self::TYPE_HOURS_EXCEEDED,
-                'message' => 'Le professeur dépasse son quota d\'heures hebdomadaire',
+                'message' => __('planning.conflicts.hours_exceeded'),
                 'teacher_id' => $shiftPlanning->teacher_id,
                 'current_hours' => $currentHours,
                 'hours_needed' => $hoursNeeded,

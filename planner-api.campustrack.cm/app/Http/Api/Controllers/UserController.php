@@ -47,7 +47,7 @@ class UserController extends Controller
         $users = $query->orderBy('created_at', 'desc')
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['users' => $users], 'Liste des utilisateurs récupérée', 200);
+        return $this->success(['users' => $users], __('resources.users.list'), 200);
     }
 
     /**
@@ -57,7 +57,7 @@ class UserController extends Controller
     {
         $user = User::with(['roles', 'permissions', 'department'])->findOrFail($id);
 
-        return $this->success(['user' => $user], 'Utilisateur récupéré', 200);
+        return $this->success(['user' => $user], __('resources.users.retrieved'), 200);
     }
 
     /**
@@ -77,7 +77,7 @@ class UserController extends Controller
             ->orderBy('created_at', 'asc')
             ->paginate($request->per_page ?? 15);
 
-        return $this->success(['users' => $users], 'Comptes en attente de validation', 200);
+        return $this->success(['users' => $users], __('resources.users.pending'), 200);
     }
 
     /**
@@ -97,14 +97,14 @@ class UserController extends Controller
         if (empty($roleName) && $user->roles()->doesntExist()) {
             return $this->error(
                 null,
-                'Aucun rôle demandé pour ce compte. Veuillez en spécifier un.',
+                __('resources.users.no_role_requested'),
                 422
             );
         }
 
         if (! empty($roleName)) {
             if (! Role::where('name', $roleName)->exists()) {
-                return $this->error(null, "Le rôle '{$roleName}' n'existe pas.", 422);
+                return $this->error(null, __('resources.users.role_not_found', ['role' => $roleName]), 422);
             }
             $user->assignRole($roleName);
         }
@@ -117,7 +117,7 @@ class UserController extends Controller
 
         return $this->success(
             ['user' => $user->load(['roles', 'permissions', 'department'])],
-            'Compte validé avec succès',
+            __('resources.users.approved'),
             200
         );
     }
@@ -132,7 +132,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return $this->success(null, 'Demande de compte rejetée', 200);
+        return $this->success(null, __('resources.users.rejected'), 200);
     }
 
     /**
@@ -144,7 +144,7 @@ class UserController extends Controller
         if ((int) $id === $request->user()->id) {
             return $this->error(
                 null,
-                'Vous ne pouvez pas suspendre votre propre compte.',
+                __('resources.users.cannot_deactivate_self'),
                 400
             );
         }
@@ -160,7 +160,7 @@ class UserController extends Controller
 
         return $this->success(
             ['user' => $user->load(['roles', 'permissions', 'department'])],
-            'Compte suspendu. Toutes les sessions ont été révoquées.',
+            __('resources.users.deactivated'),
             200
         );
     }
@@ -186,7 +186,7 @@ class UserController extends Controller
             && ! $request->user()->hasRole('super-admin')) {
             return $this->error(
                 null,
-                'Seul un super-admin peut attribuer les rôles : '.implode(', ', $adminRoles),
+                __('resources.users.only_super_admin_roles', ['roles' => implode(', ', $adminRoles)]),
                 403
             );
         }
@@ -206,7 +206,7 @@ class UserController extends Controller
             return $user;
         });
 
-        return $this->success(['user' => $user->load(['roles', 'permissions', 'department'])], 'Utilisateur créé avec succès', 201);
+        return $this->success(['user' => $user->load(['roles', 'permissions', 'department'])], __('resources.users.created'), 201);
     }
 
     /**
@@ -217,7 +217,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->hasRole('super-admin') && ! $request->user()->hasRole('super-admin')) {
-            return $this->error(null, 'Non autorisé à modifier ce utilisateur', 403);
+            return $this->error(null, __('resources.users.unauthorized_update'), 403);
         }
 
         $validated = $request->validate([
@@ -252,7 +252,7 @@ class UserController extends Controller
 
         return $this->success(
             ['user' => $user->load(['roles', 'permissions', 'department'])],
-            'Utilisateur mis à jour avec succès',
+            __('resources.users.updated'),
             200
         );
     }
@@ -265,15 +265,15 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->hasRole('super-admin')) {
-            return $this->error(null, 'Le super-admin ne peut pas être supprimé', 403);
+            return $this->error(null, __('resources.users.cannot_delete_super_admin'), 403);
         }
 
         if ($user->id === $request->user()->id) {
-            return $this->error(null, 'Vous ne pouvez pas vous supprimer vous-même', 400);
+            return $this->error(null, __('resources.users.cannot_delete_self'), 400);
         }
 
         $user->delete();
 
-        return $this->success(null, 'Utilisateur supprimé avec succès', 200);
+        return $this->success(null, __('resources.users.deleted'), 200);
     }
 }

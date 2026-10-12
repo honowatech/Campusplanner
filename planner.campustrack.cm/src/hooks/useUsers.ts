@@ -9,6 +9,7 @@ import {
 import { PaginatedResponse, User } from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 
 export function useUsers(params?: UserParams) {
@@ -29,12 +30,13 @@ export function useUser(id: number) {
 
 export function useCreateUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreateUserData) => userService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Utilisateur créé avec succès');
+      toast.success(t('toast.userCreated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -44,13 +46,14 @@ export function useCreateUser() {
 
 export function useUpdateUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateUserData }) =>
       userService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Utilisateur mis à jour avec succès');
+      toast.success(t('toast.userUpdated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -60,12 +63,13 @@ export function useUpdateUser() {
 
 export function useDeleteUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => userService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('User deleted successfully!');
+      toast.success(t('toast.userDeleted'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -91,12 +95,13 @@ export function usePendingUsers(params?: UserParams) {
 
 export function useApproveUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, role }: { id: number; role?: string }) => userService.approve(id, role),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Compte validé avec succès');
+      toast.success(t('toast.userApproved'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -106,12 +111,13 @@ export function useApproveUser() {
 
 export function useRejectUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => userService.reject(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Demande de compte rejetée');
+      toast.success(t('toast.userRejected'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -121,12 +127,13 @@ export function useRejectUser() {
 
 export function useDeactivateUser() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => userService.deactivate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Compte suspendu : sessions révoquées');
+      toast.success(t('toast.userDeactivated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

@@ -23,7 +23,7 @@ class AdminPackController extends Controller
             ->orderBy('sort')
             ->get();
 
-        return $this->success(['packs' => $packs], 'Liste des packs récupérée');
+        return $this->success(['packs' => $packs], __('admin.packs.list'));
     }
 
     public function store(Request $request): JsonResponse
@@ -44,7 +44,7 @@ class AdminPackController extends Controller
 
         $this->syncFeatures($pack, $validated['features'] ?? []);
 
-        return $this->success(['pack' => $pack->load('features')], 'Pack créé', 201);
+        return $this->success(['pack' => $pack->load('features')], __('admin.packs.created'), 201);
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -68,7 +68,7 @@ class AdminPackController extends Controller
             $this->syncFeatures($pack, $validated['features']);
         }
 
-        return $this->success(['pack' => $pack->load('features')], 'Pack mis à jour');
+        return $this->success(['pack' => $pack->load('features')], __('admin.packs.updated'));
     }
 
     public function destroy(int $id): JsonResponse
@@ -76,12 +76,12 @@ class AdminPackController extends Controller
         $pack = Pack::findOrFail($id);
 
         if ($pack->subscriptions()->exists()) {
-            return $this->error(null, 'Ce pack est utilisé par des abonnements.', 400);
+            return $this->error(null, __('admin.packs.in_use'), 400);
         }
 
         $pack->delete();
 
-        return $this->success(null, 'Pack supprimé');
+        return $this->success(null, __('admin.packs.deleted'));
     }
 
     /**

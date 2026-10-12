@@ -24,6 +24,6 @@ class AdminPaymentController extends Controller
             ->latest()
             ->paginate($request->integer('per_page', 20));
 
-        return $this->success(['payments' => $payments], 'Paiements récupérés');
+        return $this->success(['payments' => $payments], __('admin.payments.retrieved'));
     }
 }

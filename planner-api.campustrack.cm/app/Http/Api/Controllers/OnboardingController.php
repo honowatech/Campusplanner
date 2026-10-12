@@ -27,6 +27,6 @@ class OnboardingController extends Controller
 
         $tenant = app(TenantService::class)->create($validated);
 
-        return $this->success(['tenant' => $tenant], 'Inscription réussie', 201);
+        return $this->success(['tenant' => $tenant], __('admin.onboarding.registered'), 201);
     }
 }

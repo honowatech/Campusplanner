@@ -10,6 +10,7 @@ import {
 import { Planning } from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 
 export function usePlannings(params?: PlanningParams) {
@@ -29,12 +30,13 @@ export function usePlanning(id: number) {
 
 export function useCreatePlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreatePlanningData) => planningService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
-      toast.success('Planning created successfully!');
+      toast.success(t('toast.planningCreated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -44,13 +46,14 @@ export function useCreatePlanning() {
 
 export function useUpdatePlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdatePlanningData }) =>
       planningService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
-      toast.success('Planning updated successfully!');
+      toast.success(t('toast.planningUpdated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -60,12 +63,13 @@ export function useUpdatePlanning() {
 
 export function useDeletePlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => planningService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
-      toast.success('Planning deleted successfully!');
+      toast.success(t('toast.planningDeleted'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -75,13 +79,14 @@ export function useDeletePlanning() {
 
 export function useGeneratePlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: GeneratePlanningData) => planningService.generate(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
       queryClient.invalidateQueries({ queryKey: ['planning'] });
-      toast.success(`${data.total_generated} shifts generated.`);
+      toast.success(t('toast.shiftsGenerated', { count: data.total_generated }));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -100,13 +105,14 @@ export function useDetectConflicts() {
 
 export function useOptimizePlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (planningId: number) => planningService.optimize(planningId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plannings'] });
       queryClient.invalidateQueries({ queryKey: ['planning'] });
-      toast.success('Timetable optimized.');
+      toast.success(t('toast.timetableOptimized'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

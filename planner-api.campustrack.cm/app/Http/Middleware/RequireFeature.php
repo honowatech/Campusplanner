@@ -23,7 +23,7 @@ class RequireFeature
         $user = $request->user();
 
         if (! $user) {
-            abort(401, 'Unauthenticated.');
+            abort(401, __('api.errors.unauthenticated'));
         }
 
         if ($user->hasRole(RoleCatalog::GLOBAL_ROLE)) {
@@ -33,7 +33,7 @@ class RequireFeature
         $tenant = $user->tenant;
 
         if (! $tenant || ! FeatureRegistry::has($tenant, $feature)) {
-            abort(403, "Cette fonctionnalité n'est pas incluse dans votre pack d'abonnement.");
+            abort(403, __('api.errors.feature_not_included'));
         }
 
         return $next($request);

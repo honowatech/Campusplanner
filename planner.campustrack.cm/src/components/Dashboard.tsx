@@ -39,6 +39,7 @@ import {
 import { useTranslation } from '@/src/utils/i18n';
 import { useAuth } from '@/src/auth';
 import { canViewDashboardOverview } from '@/src/utils/routePermissions';
+import { getLocale } from '@/src/lib/locale';
 
 interface DashboardProps {
   initialData?: DashboardOverview;
@@ -181,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData, teachers, cou
             </div>
             {apiOverview?.generated_at && (
               <span className="text-xs text-gray-400">
-                {t('lastUpdate')}: {new Date(apiOverview.generated_at).toLocaleString()}
+                {t('lastUpdate')}: {new Date(apiOverview.generated_at).toLocaleString(getLocale())}
               </span>
             )}
           </div>

@@ -3,6 +3,7 @@ import { settingsService, UpdateSettingsData } from '@/src/services/settingsServ
 import { AppSettings } from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -32,12 +33,13 @@ export function useSettings(enabled = true) {
 
 export function useUpdateSettings() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: UpdateSettingsData) => settingsService.update(data),
     onSuccess: (newSettings) => {
       queryClient.setQueryData(['settings'], newSettings);
-      toast.success('Settings updated successfully!');
+      toast.success(t('toast.settingsUpdated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

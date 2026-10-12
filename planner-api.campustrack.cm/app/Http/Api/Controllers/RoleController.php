@@ -53,7 +53,7 @@ class RoleController extends Controller
         // pivot model_has_roles au lieu d'utiliser withCount('users').
         $this->attachUsersCount($roles);
 
-        return $this->success(['roles' => $roles], 'Liste des rôles récupérée', 200);
+        return $this->success(['roles' => $roles], __('resources.roles.list'), 200);
     }
 
     /**
@@ -99,7 +99,7 @@ class RoleController extends Controller
         // Le nom doit être unique au sein du tenant (le `unique:roles,name` global
         // serait trop restrictif avec plusieurs écoles).
         if ($this->scopedQuery($request)->where('name', $validated['name'])->exists()) {
-            return $this->error(null, 'Un rôle portant ce nom existe déjà.', 422);
+            return $this->error(null, __('resources.roles.name_exists'), 422);
         }
 
         // `Role::create` (spatie teams) rattache le rôle au tenant courant.
@@ -114,7 +114,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['role' => $role->load('permissions')],
-            'Rôle créé avec succès',
+            __('resources.roles.created'),
             201
         );
     }
@@ -126,7 +126,7 @@ class RoleController extends Controller
     {
         $role = $this->scopedQuery($request)->with(['permissions', 'users'])->findOrFail($id);
 
-        return $this->success(['role' => $role], 'Rôle récupéré', 200);
+        return $this->success(['role' => $role], __('resources.roles.retrieved'), 200);
     }
 
     /**
@@ -138,7 +138,7 @@ class RoleController extends Controller
 
         // Prevent modification of super-admin role by non-super-admins
         if ($role->name === 'super-admin' && ! $request->user()->hasRole('super-admin')) {
-            return $this->error(null, 'Non autorisé à modifier ce rôle', 403);
+            return $this->error(null, __('resources.roles.unauthorized_update'), 403);
         }
 
         $validated = $request->validate([
@@ -163,7 +163,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['role' => $role->load('permissions')],
-            'Rôle mis à jour avec succès',
+            __('resources.roles.updated'),
             200
         );
     }
@@ -177,21 +177,21 @@ class RoleController extends Controller
 
         // Prevent deletion of super-admin role
         if ($role->name === 'super-admin') {
-            return $this->error(null, 'Le rôle super-admin ne peut pas être supprimé', 403);
+            return $this->error(null, __('resources.roles.cannot_delete_super_admin'), 403);
         }
 
         // Check if role has users
         if ($role->users()->count() > 0) {
             return $this->error(
                 null,
-                'Ce rôle est attribué à des utilisateurs. Veuillez d\'abord retirer ce rôle des utilisateurs.',
+                __('resources.roles.cannot_delete_with_users'),
                 400
             );
         }
 
         $role->delete();
 
-        return $this->success(null, 'Rôle supprimé avec succès', 200);
+        return $this->success(null, __('resources.roles.deleted'), 200);
     }
 
     /**
@@ -203,7 +203,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['permissions' => $role->permissions],
-            'Permissions du rôle récupérées',
+            __('resources.roles.permissions_retrieved'),
             200
         );
     }
@@ -226,7 +226,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['role' => $role->load('permissions')],
-            'Permissions synchronisées avec succès',
+            __('resources.roles.permissions_synced'),
             200
         );
     }
@@ -242,7 +242,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['users' => $users],
-            'Utilisateurs avec ce rôle récupérés',
+            __('resources.roles.users_retrieved'),
             200
         );
     }
@@ -256,7 +256,7 @@ class RoleController extends Controller
 
         if (in_array($role->name, ['super-admin', 'administrateur'], true)
             && ! $request->user()->hasRole('super-admin')) {
-            return $this->error(null, 'Seul un super-admin peut attribuer ce rôle.', 403);
+            return $this->error(null, __('resources.roles.only_super_admin_assign'), 403);
         }
 
         $validated = $request->validate([
@@ -272,7 +272,7 @@ class RoleController extends Controller
 
         return $this->success(
             ['assigned_count' => count($validated['user_ids'])],
-            'Rôle attribué aux utilisateurs avec succès',
+            __('resources.roles.assigned_to_users'),
             200
         );
     }
@@ -290,7 +290,7 @@ class RoleController extends Controller
         $forbidden = array_intersect($permissions, RoleCatalog::PLATFORM_PERMISSIONS);
 
         if ($forbidden !== []) {
-            abort(403, 'Permissions réservées à la plateforme : '.implode(', ', $forbidden));
+            abort(403, __('resources.roles.platform_permissions_reserved', ['permissions' => implode(', ', $forbidden)]));
         }
     }
 }

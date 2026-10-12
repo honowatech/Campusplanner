@@ -61,7 +61,7 @@ class DoubleurService
                 } else {
                     $failed[] = [
                         'class_id' => $classId,
-                        'reason' => 'Aucune salle disponible',
+                        'reason' => __('planning.doubleur.no_room_available'),
                     ];
 
                     continue;
@@ -75,7 +75,7 @@ class DoubleurService
                     $failed[] = [
                         'class_id' => $classId,
                         'conflicts' => $conflicts,
-                        'reason' => 'Conflits détectés',
+                        'reason' => __('planning.doubleur.conflicts_detected'),
                     ];
 
                     continue;
@@ -231,7 +231,7 @@ class DoubleurService
             'optimized' => $optimized,
             'skipped' => $skipped,
             'total_optimizations' => count($optimized),
-            'message' => count($optimized).' doubleurs créés',
+            'message' => __('planning.doubleur.optimized', ['count' => count($optimized)]),
         ];
     }
 

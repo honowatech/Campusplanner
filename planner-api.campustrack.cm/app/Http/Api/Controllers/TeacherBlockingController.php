@@ -50,7 +50,7 @@ class TeacherBlockingController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['blockings' => $blockings], 'Teacher blockings list retrieved', 200);
+        return $this->success(['blockings' => $blockings], __('api.teacher_blockings.list'), 200);
     }
 
     /**
@@ -80,7 +80,7 @@ class TeacherBlockingController extends Controller
         if ($hasOverlapping) {
             return $this->error(
                 null,
-                'You already have an approved blocking for this period.',
+                __('api.teacher_blockings.already_approved'),
                 422
             );
         }
@@ -92,7 +92,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blocking' => $blocking->load('teacher')],
-            'Blocking request submitted successfully and is pending approval',
+            __('api.teacher_blockings.submitted'),
             201
         );
     }
@@ -105,7 +105,7 @@ class TeacherBlockingController extends Controller
         $blocking = TeacherBlocking::with(['teacher', 'approvedBy'])->findOrFail($id);
         $this->authorize('view', $blocking);
 
-        return $this->success(['blocking' => $blocking], 'Teacher blocking retrieved', 200);
+        return $this->success(['blocking' => $blocking], __('api.teacher_blockings.retrieved'), 200);
     }
 
     /**
@@ -121,7 +121,7 @@ class TeacherBlockingController extends Controller
         if (! $blocking->isPending()) {
             return $this->error(
                 null,
-                'Cannot update a blocking that has already been '.$blocking->status,
+                __('api.teacher_blockings.cannot_update', ['status' => $blocking->status]),
                 403
             );
         }
@@ -137,7 +137,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blocking' => $blocking->load('teacher')],
-            'Blocking request updated successfully',
+            __('api.teacher_blockings.updated'),
             200
         );
     }
@@ -155,14 +155,14 @@ class TeacherBlockingController extends Controller
         if (! $blocking->isPending()) {
             return $this->error(
                 null,
-                'Cannot delete a blocking that has already been '.$blocking->status,
+                __('api.teacher_blockings.cannot_delete', ['status' => $blocking->status]),
                 403
             );
         }
 
         $blocking->delete();
 
-        return $this->success(null, 'Blocking request deleted successfully', 200);
+        return $this->success(null, __('api.teacher_blockings.deleted'), 200);
     }
 
     /**
@@ -177,7 +177,7 @@ class TeacherBlockingController extends Controller
         if (! $blocking->isPending()) {
             return $this->error(
                 null,
-                'This blocking has already been '.$blocking->status,
+                __('api.teacher_blockings.already_processed', ['status' => $blocking->status]),
                 422
             );
         }
@@ -186,7 +186,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blocking' => $blocking->load(['teacher', 'approvedBy'])],
-            'Blocking request approved successfully',
+            __('api.teacher_blockings.approved'),
             200
         );
     }
@@ -203,7 +203,7 @@ class TeacherBlockingController extends Controller
         if (! $blocking->isPending()) {
             return $this->error(
                 null,
-                'This blocking has already been '.$blocking->status,
+                __('api.teacher_blockings.already_processed', ['status' => $blocking->status]),
                 422
             );
         }
@@ -216,7 +216,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blocking' => $blocking->load(['teacher', 'approvedBy'])],
-            'Blocking request rejected',
+            __('api.teacher_blockings.rejected'),
             200
         );
     }
@@ -235,7 +235,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blockings' => $blockings],
-            'Pending blockings retrieved',
+            __('api.teacher_blockings.pending'),
             200
         );
     }
@@ -268,7 +268,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blockings' => $blockings],
-            'Teacher blockings retrieved',
+            __('api.teacher_blockings.list'),
             200
         );
     }
@@ -285,7 +285,7 @@ class TeacherBlockingController extends Controller
         $teacher = Teacher::where('user_id', $user->id)->first();
 
         if (! $teacher) {
-            return $this->error(null, 'No teacher profile found for this user', 404);
+            return $this->error(null, __('api.teacher_blockings.no_profile'), 404);
         }
 
         $query = $teacher->blockings();
@@ -300,7 +300,7 @@ class TeacherBlockingController extends Controller
 
         return $this->success(
             ['blockings' => $blockings],
-            'My blockings retrieved',
+            __('api.teacher_blockings.my_list'),
             200
         );
     }
@@ -370,6 +370,6 @@ class TeacherBlockingController extends Controller
         return $this->success([
             'is_available' => $isAvailable,
             'conflicts' => $conflicts,
-        ], 'Teacher availability checked', 200);
+        ], __('api.teacher_blockings.availability_checked'), 200);
     }
 }

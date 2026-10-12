@@ -35,7 +35,7 @@ class BillingController extends Controller
             ])
             ->values();
 
-        return $this->success(['packs' => $packs], 'Liste des packs récupérée');
+        return $this->success(['packs' => $packs], __('admin.billing.packs_retrieved'));
     }
 
     /**
@@ -49,6 +49,6 @@ class BillingController extends Controller
             ? app(TenantSubscriptionsService::class)->currentSummary($tenant)
             : null;
 
-        return $this->success(['subscription' => $subscription], 'Abonnement courant récupéré');
+        return $this->success(['subscription' => $subscription], __('admin.billing.subscription_retrieved'));
     }
 }

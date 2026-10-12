@@ -148,7 +148,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                         }
                       />
                       <p className="text-xs text-gray-500 mt-2">
-                        Maximum teaching load per teacher per week.
+                        {t('maxWeeklyHoursHint')}
                       </p>
                     </div>
 
@@ -167,7 +167,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                         onChange={(e) => handleNumberChange('maxConsecutiveHours', e.target.value)}
                       />
                       <p className="text-xs text-gray-500 mt-2">
-                        Limit on back-to-back sessions without a break.
+                        {t('maxConsecutiveHoursHint')}
                       </p>
                     </div>
 
@@ -246,7 +246,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
             {activeTab === 'general' && (
               <div className="text-center py-12 text-gray-500">
                 <Sliders className="mx-auto mb-3 opacity-20" size={48} />
-                <p>General application settings will appear here.</p>
+                <p>{t('generalSettingsPlaceholder')}</p>
               </div>
             )}
 
@@ -270,7 +270,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                           id="sms-api-key"
                           type="password"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm bg-white"
-                          placeholder="Enter your API Key"
+                          placeholder={t('apiKeyPlaceholder')}
                           value={localSettings?.smsConfig?.apiKey || ''}
                           onChange={(e) => handleSmsConfigChange('apiKey', e.target.value)}
                         />
@@ -291,7 +291,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                           value={localSettings?.smsConfig?.sender_id || ''}
                           onChange={(e) => handleSmsConfigChange('sender_id', e.target.value)}
                         />
-                        <p className="text-xs text-gray-500 mt-1">Max 11 characters</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('maxChars')}</p>
                       </div>
 
                       <div>

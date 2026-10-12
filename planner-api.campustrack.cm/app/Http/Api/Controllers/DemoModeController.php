@@ -43,7 +43,7 @@ class DemoModeController extends Controller
                 'enabled' => $enabled,
                 'accounts' => $enabled ? $this->demoAccounts() : [],
             ],
-            'État du mode démo récupéré'
+            __('admin.demo.status_retrieved')
         );
     }
 
@@ -58,7 +58,7 @@ class DemoModeController extends Controller
 
         $demo = Tenant::demo();
 
-        abort_if(! $demo, 404, 'Aucun tenant démo.');
+        abort_if(! $demo, 404, __('admin.demo.no_tenant'));
 
         $demo->update(['demo_mode' => $validated['demo_mode']]);
 
@@ -67,7 +67,7 @@ class DemoModeController extends Controller
                 'enabled' => $demo->demo_mode,
                 'accounts' => $demo->demo_mode ? $this->demoAccounts() : [],
             ],
-            $demo->demo_mode ? 'Mode démo activé' : 'Mode démo désactivé'
+            $demo->demo_mode ? __('admin.demo.enabled') : __('admin.demo.disabled')
         );
     }
 
@@ -86,7 +86,7 @@ class DemoModeController extends Controller
         $demo = Tenant::demo();
 
         if (! $demo || ! $demo->demoModeEnabled()) {
-            return $this->error(null, 'Le mode démo est désactivé.', 403);
+            return $this->error(null, __('admin.demo.disabled_error'), 403);
         }
 
         // Le rôle `role()` est scopé au tenant démo : on résout dans ce périmètre.
@@ -97,13 +97,13 @@ class DemoModeController extends Controller
             ->first());
 
         if (! $user) {
-            return $this->error(null, 'Aucun compte démo disponible pour ce rôle.', 404);
+            return $this->error(null, __('admin.demo.no_account'), 404);
         }
 
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
-        return $this->success(AuthPayload::for($user), 'Connecté en mode démo');
+        return $this->success(AuthPayload::for($user), __('admin.demo.logged_in'));
     }
 
     /**

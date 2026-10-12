@@ -43,7 +43,7 @@ class PermissionController extends Controller
         }
 
         if (in_array($name, RoleCatalog::PLATFORM_PERMISSIONS, true)) {
-            abort(403, 'Cette permission est réservée à la plateforme.');
+            abort(403, __('resources.permissions.platform_reserved'));
         }
     }
 
@@ -66,7 +66,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permissions' => $permissions],
-            'Liste des permissions récupérée',
+            __('resources.permissions.list'),
             200
         );
     }
@@ -92,7 +92,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permission' => $permission],
-            'Permission créée avec succès',
+            __('resources.permissions.created'),
             201
         );
     }
@@ -106,7 +106,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permission' => $permission],
-            'Permission récupérée',
+            __('resources.permissions.retrieved'),
             200
         );
     }
@@ -130,7 +130,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permission' => $permission],
-            'Permission mise à jour avec succès',
+            __('resources.permissions.updated'),
             200
         );
     }
@@ -148,14 +148,14 @@ class PermissionController extends Controller
         if ($permission->roles()->count() > 0) {
             return $this->error(
                 null,
-                'Cette permission est utilisée par des rôles. Veuillez d\'abord la retirer des rôles.',
+                __('resources.permissions.cannot_delete_with_roles'),
                 400
             );
         }
 
         $permission->delete();
 
-        return $this->success(null, 'Permission supprimée avec succès', 200);
+        return $this->success(null, __('resources.permissions.deleted'), 200);
     }
 
     /**
@@ -179,7 +179,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permissions_by_resource' => $grouped],
-            'Permissions groupées par ressource',
+            __('resources.permissions.grouped_by_resource'),
             200
         );
     }
@@ -194,7 +194,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['roles' => $roles],
-            'Rôles avec cette permission récupérés',
+            __('resources.permissions.roles_retrieved'),
             200
         );
     }

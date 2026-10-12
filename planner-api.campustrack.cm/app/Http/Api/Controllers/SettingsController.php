@@ -32,7 +32,7 @@ class SettingsController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->success($this->toPayload(AppSetting::instance()), 'Réglages récupérés');
+        return $this->success($this->toPayload(AppSetting::instance()), __('api.settings.retrieved'));
     }
 
     /**
@@ -68,7 +68,7 @@ class SettingsController extends Controller
 
         $settings->save();
 
-        return $this->success($this->toPayload($settings), 'Réglages mis à jour');
+        return $this->success($this->toPayload($settings), __('api.settings.updated'));
     }
 
     /**

@@ -16,7 +16,7 @@ const crud = createCrudHooks<
   service: departmentService,
   queryKey: 'departments',
   singleKey: 'department',
-  label: 'Département',
+  label: 'department',
 });
 
 export const useDepartments = crud.useList;

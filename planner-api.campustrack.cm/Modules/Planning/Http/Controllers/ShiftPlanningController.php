@@ -37,7 +37,7 @@ class ShiftPlanningController extends Controller
             'shift_plannings' => $shiftPlannings,
             'plannings' => $plannings,
             'classes' => $classes,
-        ], 'Cours planifiés récupérés');
+        ], __('planning.shift_planning.list'));
     }
 
     public function store(StoreShiftPlanningRequest $request)
@@ -66,7 +66,7 @@ class ShiftPlanningController extends Controller
 
         return $this->success(
             ['shift_planning' => $shiftPlanning],
-            'Cours planifié créé avec succès',
+            __('planning.shift_planning.created'),
             201
         );
     }
@@ -76,7 +76,7 @@ class ShiftPlanningController extends Controller
         $shiftPlanning = ShiftPlanning::with(['courseClass', 'teacher', 'course', 'room', 'planning'])->findOrFail($id);
         $this->authorize('view', $shiftPlanning);
 
-        return $this->success(['shift_planning' => $shiftPlanning], 'Cours planifié récupéré');
+        return $this->success(['shift_planning' => $shiftPlanning], __('planning.shift_planning.retrieved'));
     }
 
     public function update(UpdateShiftPlanningRequest $request, int $id)
@@ -87,7 +87,7 @@ class ShiftPlanningController extends Controller
 
         return $this->success(
             ['shift_planning' => Planning::findShiftPlanningById($id)],
-            'Cours planifié mis à jour avec succès',
+            __('planning.shift_planning.updated'),
             200
         );
     }
@@ -98,7 +98,7 @@ class ShiftPlanningController extends Controller
 
         Planning::deleteShiftPlanning($id);
 
-        return $this->success(null, 'Cours planifié supprimé avec succès', 200);
+        return $this->success(null, __('planning.shift_planning.deleted'), 200);
     }
 
     public function teachersSelect(Request $request)
@@ -112,7 +112,7 @@ class ShiftPlanningController extends Controller
             ->limit(10)
             ->get();
 
-        return $this->success(['teachers' => $teachers], 'Enseignants récupérés', 200);
+        return $this->success(['teachers' => $teachers], __('planning.shift_planning.teachers_retrieved'), 200);
     }
 
     protected function updateStatuses($shiftPlannings): void

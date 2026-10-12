@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '@/src/services/api';
 import { AxiosError } from 'axios';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { useTranslation } from '@/src/utils/i18n';
 
 type ApiUserWithRoles = {
   id: number;
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ne remplace plus toute l'application par un spinner)
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Restaure l'état d'auth au chargement : le cookie de session httpOnly fait
   // foi, GET /api/auth-user est la seule source de vérité
@@ -120,13 +122,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         localStorage.setItem('show-login-toast', 'true');
       } else {
-        setApiError(response.data.message || 'Erreur de connexion');
+        setApiError(response.data.message || t('errors.login'));
         throw new Error(response.data.message);
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string; data?: Record<string, string[]> }>;
       const errorMessage =
-        axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
+        axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       // On relance l'erreur axios pour permettre au formulaire d'extraire
       // les erreurs de champs (422) de la réponse.
@@ -151,13 +153,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true);
         localStorage.setItem('show-login-toast', 'true');
       } else {
-        setApiError(response.data.message || 'Erreur de connexion');
+        setApiError(response.data.message || t('errors.login'));
         throw new Error(response.data.message);
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
-        axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
+        axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       throw axiosError;
     } finally {

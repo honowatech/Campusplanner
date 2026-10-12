@@ -37,6 +37,6 @@ class AuditLogController extends Controller
 
         $logs = $query->latest()->paginate($request->integer('per_page', 20));
 
-        return $this->success(['logs' => $logs], "Journal d'audit récupéré");
+        return $this->success(['logs' => $logs], __('admin.audit_logs.retrieved'));
     }
 }

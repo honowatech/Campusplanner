@@ -23,11 +23,12 @@ import {
 } from '@/src/hooks/useAdmin';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { Tenant, AdminPack, AdminFeature } from '@/src/lib/types';
+import { getLocale } from '@/src/lib/locale';
 
 type Tab = 'tenants' | 'packs' | 'features' | 'gateway' | 'payments';
 
 function formatAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + currency;
+  return new Intl.NumberFormat(getLocale()).format(amount) + ' ' + currency;
 }
 
 export function AdminConsole() {
@@ -403,7 +404,7 @@ function PaymentsTab() {
                 <td className="py-2 pr-4 text-gray-900 font-medium">{payment.tenant_id}</td>
                 <td className="py-2 pr-4 text-gray-900">{formatAmount(payment.amount, payment.currency)}</td>
                 <td className="py-2 pr-4 text-gray-600">{payment.status}</td>
-                <td className="py-2 pr-4 text-gray-600">{payment.created_at ? new Date(payment.created_at).toLocaleDateString('fr-FR') : '—'}</td>
+                <td className="py-2 pr-4 text-gray-600">{payment.created_at ? new Date(payment.created_at).toLocaleDateString(getLocale()) : '—'}</td>
               </tr>
             ))}
           </tbody>

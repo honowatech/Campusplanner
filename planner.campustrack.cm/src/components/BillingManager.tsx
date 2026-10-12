@@ -4,14 +4,15 @@ import { useSubscription, usePacks } from '@/src/hooks/useSubscription';
 import { usePayments, useCheckout } from '@/src/hooks/useBilling';
 import { Pack, Payment } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { getLocale } from '@/src/lib/locale';
 
 function formatAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + currency;
+  return new Intl.NumberFormat(getLocale()).format(amount) + ' ' + currency;
 }
 
 function formatDate(iso?: string): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('fr-FR');
+  return new Date(iso).toLocaleDateString(getLocale());
 }
 
 function statusLabel(status: string): string {

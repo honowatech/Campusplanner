@@ -21,7 +21,7 @@ class PaymentGatewayController extends Controller
     {
         $gateway = PaymentGateway::active() ?? PaymentGateway::query()->latest()->first();
 
-        return $this->success(['gateway' => $this->payload($gateway)], 'Passerelle récupérée');
+        return $this->success(['gateway' => $this->payload($gateway)], __('admin.payment_gateway.retrieved'));
     }
 
     public function update(Request $request): JsonResponse
@@ -60,7 +60,7 @@ class PaymentGatewayController extends Controller
             'is_active' => (bool) $gateway->is_active,
         ]);
 
-        return $this->success(['gateway' => $this->payload($gateway)], 'Passerelle mise à jour');
+        return $this->success(['gateway' => $this->payload($gateway)], __('admin.payment_gateway.updated'));
     }
 
     /**

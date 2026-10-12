@@ -11,7 +11,7 @@ const crud = createCrudHooks<Course, CourseParams, CreateCourseData, UpdateCours
   service: courseService,
   queryKey: 'courses',
   singleKey: 'course',
-  label: 'Cours',
+  label: 'course',
 });
 
 export const useCourses = crud.useList;

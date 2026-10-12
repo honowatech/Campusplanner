@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 import type { PaginatedResponse } from '@/src/lib/types';
 
@@ -60,11 +61,12 @@ export function createCrudHooks<T, Params, CreateData, UpdateData>(
 
   const useCreate = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     return useMutation({
       mutationFn: (data: CreateData) => service.create(data),
       onSuccess: () => {
         invalidateAll(queryClient);
-        toast.success(`${label} créé(e) avec succès`);
+        toast.success(t('toast.created', { label: t(label) }));
       },
       onError: (error) => {
         toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -74,11 +76,12 @@ export function createCrudHooks<T, Params, CreateData, UpdateData>(
 
   const useUpdate = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     return useMutation({
       mutationFn: ({ id, data }: { id: number; data: UpdateData }) => service.update(id, data),
       onSuccess: () => {
         invalidateAll(queryClient);
-        toast.success(`${label} mis(e) à jour avec succès`);
+        toast.success(t('toast.updated', { label: t(label) }));
       },
       onError: (error) => {
         toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -88,11 +91,12 @@ export function createCrudHooks<T, Params, CreateData, UpdateData>(
 
   const useDelete = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     return useMutation({
       mutationFn: (id: number) => service.delete(id),
       onSuccess: () => {
         invalidateAll(queryClient);
-        toast.success(`${label} supprimé(e) avec succès`);
+        toast.success(t('toast.deleted', { label: t(label) }));
       },
       onError: (error) => {
         toast.error(getErrorMessage(error as unknown as AxiosError));

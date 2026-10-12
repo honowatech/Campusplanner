@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '@/src/utils/i18n';
 import { smsService, SmsSettingsData } from '@/src/services/smsService';
 import { SmsCredential, SmsLog, PaginatedResponse } from '@/src/lib/types';
 import { toast } from 'sonner';
@@ -15,12 +16,13 @@ export function useSmsSettings() {
 
 export function useUpdateSmsSettings() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: SmsSettingsData) => smsService.updateSettings(data),
     onSuccess: (credential) => {
       queryClient.setQueryData(['sms-settings'], credential);
-      toast.success('Configuration SMS enregistrée.');
+      toast.success(t('toast.smsConfigSaved'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -30,12 +32,13 @@ export function useUpdateSmsSettings() {
 
 export function useSendSms() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ to, message }: { to: string; message: string }) => smsService.send(to, message),
     onSuccess: (log) => {
       queryClient.invalidateQueries({ queryKey: ['sms-logs'] });
-      toast.success(log.status === 'sent' ? 'SMS envoyé.' : "Échec de l'envoi SMS.");
+      toast.success(log.status === 'sent' ? t('toast.smsSent') : t('toast.smsSendFailed'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -44,9 +47,11 @@ export function useSendSms() {
 }
 
 export function useTestSms() {
+  const { t } = useTranslation();
+
   return useMutation({
     mutationFn: ({ to, message }: { to: string; message?: string }) => smsService.test(to, message),
-    onSuccess: () => toast.success('SMS de test envoyé.'),
+    onSuccess: () => toast.success(t('toast.smsTestSent')),
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
     },

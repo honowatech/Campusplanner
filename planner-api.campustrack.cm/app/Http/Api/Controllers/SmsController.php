@@ -25,7 +25,7 @@ class SmsController extends Controller
 
         return $this->success(
             ['credential' => $this->credentialPayload($tenant->smsCredential)],
-            'Configuration SMS récupérée'
+            __('admin.sms.settings_retrieved')
         );
     }
 
@@ -74,7 +74,7 @@ class SmsController extends Controller
 
         return $this->success(
             ['credential' => $this->credentialPayload($credential)],
-            'Configuration SMS mise à jour'
+            __('admin.sms.settings_updated')
         );
     }
 
@@ -99,7 +99,7 @@ class SmsController extends Controller
             $idempotencyKey,
         );
 
-        return $this->success(['log' => $log], 'SMS envoyé', 201);
+        return $this->success(['log' => $log], __('admin.sms.sent'), 201);
     }
 
     /**
@@ -120,7 +120,7 @@ class SmsController extends Controller
             $validated['message'] ?? 'Test SMS CampusTrack',
         );
 
-        return $this->success(['log' => $log], 'SMS de test envoyé', 201);
+        return $this->success(['log' => $log], __('admin.sms.test_sent'), 201);
     }
 
     /**
@@ -135,7 +135,7 @@ class SmsController extends Controller
             ->latest()
             ->paginate($request->integer('per_page', 20));
 
-        return $this->success(['logs' => $logs], 'Journal SMS récupéré');
+        return $this->success(['logs' => $logs], __('admin.sms.logs_retrieved'));
     }
 
     /**
@@ -147,7 +147,7 @@ class SmsController extends Controller
     {
         $tenant = $request->user()?->tenant;
 
-        abort_if(! $tenant, 403, 'Aucun tenant associé à ce compte.');
+        abort_if(! $tenant, 403, __('admin.tenant.not_found'));
 
         return $tenant;
     }

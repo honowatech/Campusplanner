@@ -20,7 +20,7 @@ class AdminFeatureController extends Controller
     {
         $features = Feature::query()->orderBy('id')->get();
 
-        return $this->success(['features' => $features], 'Liste des fonctionnalités récupérée');
+        return $this->success(['features' => $features], __('admin.features.list'));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -37,6 +37,6 @@ class AdminFeatureController extends Controller
         // Invalide les caches de fonctionnalités des tenants concernés.
         FeatureRegistry::flushCacheForAll();
 
-        return $this->success(['feature' => $feature], 'Fonctionnalité mise à jour');
+        return $this->success(['feature' => $feature], __('admin.features.updated'));
     }
 }

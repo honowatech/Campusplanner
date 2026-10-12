@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '@/src/utils/i18n';
 import {
   adminService,
   CreateTenantPayload,
@@ -27,23 +28,26 @@ export function useTenants() {
 
 export function useCreateTenant() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreateTenantPayload) => adminService.createTenant(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.tenants });
-      toast.success('Tenant créé.');
+      toast.success(t('toast.tenantCreated'));
     },
     onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
   });
 }
 
 export function useSuspendTenant() {
-  return useTenantStatusMutation('suspendTenant', 'Tenant suspendu.');
+  const { t } = useTranslation();
+  return useTenantStatusMutation('suspendTenant', t('toast.tenantSuspended'));
 }
 
 export function useReactivateTenant() {
-  return useTenantStatusMutation('reactivateTenant', 'Tenant réactivé.');
+  const { t } = useTranslation();
+  return useTenantStatusMutation('reactivateTenant', t('toast.tenantReactivated'));
 }
 
 function useTenantStatusMutation(
@@ -71,13 +75,14 @@ export function useAdminPacks() {
 
 export function useSavePack() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, data }: { id?: number; data: PackPayload }) =>
       id ? adminService.updatePack(id, data) : adminService.createPack(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.packs });
-      toast.success('Pack enregistré.');
+      toast.success(t('toast.packSaved'));
     },
     onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
   });
@@ -85,12 +90,13 @@ export function useSavePack() {
 
 export function useDeletePack() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => adminService.deletePack(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.packs });
-      toast.success('Pack supprimé.');
+      toast.success(t('toast.packDeleted'));
     },
     onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
   });
@@ -126,12 +132,13 @@ export function usePaymentGateway() {
 
 export function useUpdatePaymentGateway() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: GatewayPayload) => adminService.updateGateway(data),
     onSuccess: (gateway) => {
       queryClient.setQueryData(ADMIN_QUERY_KEYS.gateway, gateway);
-      toast.success('Passerelle PayMe configurée.');
+      toast.success(t('toast.gatewayConfigured'));
     },
     onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
   });

@@ -11,7 +11,7 @@ const crud = createCrudHooks<Room, RoomParams, CreateRoomData, UpdateRoomData>({
   service: roomService,
   queryKey: 'rooms',
   singleKey: 'room',
-  label: 'Salle',
+  label: 'room',
 });
 
 export const useRooms = crud.useList;

@@ -33,7 +33,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['departments' => $departments],
-            'Liste des départements récupérée',
+            __('resources.departments.list'),
             200
         );
     }
@@ -56,7 +56,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['department' => $department],
-            'Département créé avec succès',
+            __('resources.departments.created'),
             201
         );
     }
@@ -71,7 +71,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['department' => $department],
-            'Département récupéré',
+            __('resources.departments.retrieved'),
             200
         );
     }
@@ -96,7 +96,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['department' => $department],
-            'Département mis à jour avec succès',
+            __('resources.departments.updated'),
             200
         );
     }
@@ -113,14 +113,14 @@ class DepartmentController extends Controller
         if ($department->users()->count() > 0) {
             return $this->error(
                 null,
-                'Ce département contient des utilisateurs. Veuillez d\'abord les réassigner.',
+                __('resources.departments.cannot_delete_with_users'),
                 400
             );
         }
 
         $department->delete();
 
-        return $this->success(null, 'Département supprimé avec succès', 200);
+        return $this->success(null, __('resources.departments.deleted'), 200);
     }
 
     /**
@@ -134,7 +134,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['users' => $users],
-            'Utilisateurs du département récupérés',
+            __('resources.departments.users_retrieved'),
             200
         );
     }
@@ -154,7 +154,7 @@ class DepartmentController extends Controller
 
         return $this->success(
             ['stats' => $stats],
-            'Statistiques du département récupérées',
+            __('resources.departments.stats_retrieved'),
             200
         );
     }

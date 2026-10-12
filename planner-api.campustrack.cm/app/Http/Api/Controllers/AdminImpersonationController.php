@@ -33,7 +33,7 @@ class AdminImpersonationController extends Controller
         Auth::guard('web')->login($target);
         $request->session()->regenerate();
 
-        return $this->success(AuthPayload::for($target), 'Impersonation démarrée');
+        return $this->success(AuthPayload::for($target), __('admin.impersonation.started'));
     }
 
     /**
@@ -44,18 +44,18 @@ class AdminImpersonationController extends Controller
         $adminId = $request->session()->pull('impersonator_id');
 
         if (! $adminId) {
-            return $this->error(null, 'Aucune impersonation active.', 400);
+            return $this->error(null, __('admin.impersonation.none_active'), 400);
         }
 
         $admin = User::find($adminId);
 
         if (! $admin) {
-            return $this->error(null, 'Compte administrateur introuvable.', 404);
+            return $this->error(null, __('admin.impersonation.admin_not_found'), 404);
         }
 
         Auth::guard('web')->login($admin);
         $request->session()->regenerate();
 
-        return $this->success(AuthPayload::for($admin), 'Impersonation terminée');
+        return $this->success(AuthPayload::for($admin), __('admin.impersonation.stopped'));
     }
 }

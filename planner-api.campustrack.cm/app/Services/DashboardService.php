@@ -335,7 +335,11 @@ class DashboardService
             $alerts['critical'][] = [
                 'type' => 'class_over_capacity',
                 'severity' => 'critical',
-                'message' => "La classe '{$class->name}' dépasse la capacité ({$class->students_count}/{$class->capacity})",
+                'message' => __('dashboard.alerts.class_over_capacity', [
+                    'class' => $class->name,
+                    'count' => $class->students_count,
+                    'capacity' => $class->capacity,
+                ]),
                 'entity_id' => $class->id,
                 'entity_type' => 'CourseClass',
                 'created_at' => now()->format('Y-m-d\TH:i:s\Z'),
@@ -358,7 +362,11 @@ class DashboardService
                 $alerts['critical'][] = [
                     'type' => 'teacher_over_hours',
                     'severity' => 'critical',
-                    'message' => "L'enseignant {$teacher->full_name} approche du maximum d'heures ({$currentHours}/{$teacher->max_hours_per_week})",
+                    'message' => __('dashboard.alerts.teacher_over_hours', [
+                        'teacher' => $teacher->full_name,
+                        'current' => $currentHours,
+                        'max' => $teacher->max_hours_per_week,
+                    ]),
                     'entity_id' => $teacher->id,
                     'entity_type' => 'Teacher',
                     'created_at' => now()->format('Y-m-d\TH:i:s\Z'),
@@ -381,7 +389,9 @@ class DashboardService
             $alerts['warnings'][] = [
                 'type' => 'pending_blocking_old',
                 'severity' => 'warning',
-                'message' => "Demande de blocage en attente depuis +{$thresholds['pending_blockings_days']} jours",
+                'message' => __('dashboard.alerts.pending_blocking_old', [
+                    'days' => $thresholds['pending_blockings_days'],
+                ]),
                 'entity_id' => $blocking->id,
                 'entity_type' => 'TeacherBlocking',
                 'created_at' => $blocking->created_at->format('Y-m-d\TH:i:s\Z'),
@@ -401,7 +411,9 @@ class DashboardService
             $alerts['info'][] = [
                 'type' => 'teacher_no_courses',
                 'severity' => 'info',
-                'message' => "L'enseignant {$teacher->full_name} n'a aucun cours assigné",
+                'message' => __('dashboard.alerts.teacher_no_courses', [
+                    'teacher' => $teacher->full_name,
+                ]),
                 'entity_id' => $teacher->id,
                 'entity_type' => 'Teacher',
                 'created_at' => now()->format('Y-m-d\TH:i:s\Z'),
@@ -636,7 +648,7 @@ class DashboardService
         foreach ($blockings as $blocking) {
             $activities[] = [
                 'type' => 'blocking_created',
-                'description' => "Demande de blocage créée par {$blocking->teacher->full_name}",
+                'description' => __('dashboard.activity.blocking_created', ['name' => $blocking->teacher->full_name]),
                 'status' => $blocking->status,
                 'created_at' => $blocking->created_at->format('Y-m-d\TH:i:s\Z'),
             ];
@@ -657,7 +669,7 @@ class DashboardService
         foreach ($students as $student) {
             $activities[] = [
                 'type' => 'student_admission',
-                'description' => "Nouvel étudiant inscrit: {$student->full_name}",
+                'description' => __('dashboard.activity.student_admission', ['name' => $student->full_name]),
                 'created_at' => Carbon::parse($student->admission_date)->format('Y-m-d\TH:i:s\Z'),
             ];
         }
@@ -675,7 +687,7 @@ class DashboardService
         foreach ($teachers as $teacher) {
             $activities[] = [
                 'type' => 'teacher_hired',
-                'description' => "Nouvel enseignant embauché: {$teacher->full_name}",
+                'description' => __('dashboard.activity.teacher_hired', ['name' => $teacher->full_name]),
                 'created_at' => Carbon::parse($teacher->hired_at)->format('Y-m-d\TH:i:s\Z'),
             ];
         }

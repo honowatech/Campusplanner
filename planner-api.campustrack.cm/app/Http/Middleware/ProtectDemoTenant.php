@@ -27,7 +27,7 @@ class ProtectDemoTenant
             $tenant = $user->tenant;
 
             if ($tenant?->is_demo && $request->isMethod('delete')) {
-                abort(403, 'Les suppressions sont désactivées sur le tenant démo.');
+                abort(403, __('api.errors.demo_delete_disabled'));
             }
         }
 

@@ -217,7 +217,7 @@ class RecurrenceService
         $errors = [];
 
         if (! isset($pattern['frequency'])) {
-            $errors[] = 'La fréquence est requise';
+            $errors[] = __('planning.recurrence.frequency_required');
         } else {
             $validFrequencies = [
                 self::FREQUENCY_DAILY,
@@ -227,12 +227,12 @@ class RecurrenceService
             ];
 
             if (! in_array($pattern['frequency'], $validFrequencies)) {
-                $errors[] = 'Fréquence invalide';
+                $errors[] = __('planning.recurrence.frequency_invalid');
             }
         }
 
         if (isset($pattern['days']) && ! is_array($pattern['days'])) {
-            $errors[] = 'Les jours doivent être un tableau';
+            $errors[] = __('planning.recurrence.days_must_be_array');
         }
 
         return $errors;

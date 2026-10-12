@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         return $this->success(
             ['user' => $user],
-            'Compte créé avec succès. En attente de validation par un administrateur.',
+            __('api.auth.registered'),
             201
         );
     }
@@ -47,7 +47,7 @@ class AuthController extends Controller
 
                 return $this->error(
                     null,
-                    'Votre compte est en attente de validation par un administrateur.',
+                    __('api.auth.account_pending'),
                     403
                 );
             }
@@ -56,10 +56,10 @@ class AuthController extends Controller
             // aucun token n'est délivré au client.
             $request->session()->regenerate();
 
-            return $this->success($this->authUserPayload($user), 'User signed in successfully', 200);
+            return $this->success($this->authUserPayload($user), __('api.auth.signed_in'), 200);
         }
 
-        return $this->error(null, 'Invalid credentials', 401);
+        return $this->error(null, __('api.auth.invalid_credentials'), 401);
     }
 
     public function logout(Request $request): JsonResponse
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return $this->success(null, 'User signed out successfully', 200);
+        return $this->success(null, __('api.auth.signed_out'), 200);
     }
 
     public function authUser(): JsonResponse
@@ -78,10 +78,10 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if (! $user) {
-            return $this->error(null, 'User not authenticated', 401);
+            return $this->error(null, __('api.auth.not_authenticated'), 401);
         }
 
-        return $this->success($this->authUserPayload($user), 'User is authenticated', 200);
+        return $this->success($this->authUserPayload($user), __('api.auth.authenticated'), 200);
     }
 
     /**

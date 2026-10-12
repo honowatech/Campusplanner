@@ -7,6 +7,7 @@ import { canViewDashboardOverview } from '@/src/utils/routePermissions';
 import type { AuthState } from '@/src/auth';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { useTranslation, translate } from '@/src/utils/i18n';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
@@ -18,13 +19,14 @@ export const Route = createFileRoute('/')({
       return await dashboardService.getOverview();
     } catch (error) {
       console.error('Failed to load dashboard:', error);
-      toast.error('Impossible de charger le tableau de bord. Veuillez réessayer.');
+      toast.error(translate('toast.dashboardLoadError'));
       return null;
     }
   },
 });
 
 function DashboardPage() {
+  const { t } = useTranslation();
   const data = Route.useLoaderData();
   const { data: teachers } = useTeachers();
   const { data: courses } = useCourses();
@@ -32,7 +34,7 @@ function DashboardPage() {
   useEffect(() => {
     const showToast = localStorage.getItem('show-login-toast');
     if (showToast === 'true') {
-      toast.success('Connexion réussie');
+      toast.success(t('toast.loginSuccess'));
       localStorage.removeItem('show-login-toast');
     }
   }, []);

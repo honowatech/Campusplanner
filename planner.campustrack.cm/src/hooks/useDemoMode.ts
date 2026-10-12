@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '@/src/utils/i18n';
 import { demoModeService } from '@/src/services/demoModeService';
 import { DemoModeStatus } from '@/src/lib/types';
 import { toast } from 'sonner';
@@ -15,12 +16,13 @@ export function useDemoMode() {
 
 export function useToggleDemoMode() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (enabled: boolean) => demoModeService.toggle(enabled),
     onSuccess: (data) => {
       queryClient.setQueryData(['demo-mode'], data);
-      toast.success(data.enabled ? 'Mode démo activé' : 'Mode démo désactivé');
+      toast.success(data.enabled ? t('toast.demoEnabled') : t('toast.demoDisabled'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

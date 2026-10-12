@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { API_BASE_URL } from '@/src/lib/constants';
+import { getStoredLanguage } from '@/src/lib/locale';
 
 type RetriableConfig = InternalAxiosRequestConfig & { csrfRetried?: boolean };
 
@@ -48,6 +49,7 @@ export function ensureCsrfCookie(force = false): Promise<void> {
 // écriture, l'API rejetant les POST/PUT/PATCH/DELETE sans X-XSRF-TOKEN.
 apiClient.interceptors.request.use(
   (config) => {
+    config.headers.set('Accept-Language', getStoredLanguage());
     const method = (config.method ?? 'get').toLowerCase();
     if (!SAFE_METHODS.includes(method) && !config.url?.includes('csrf-cookie')) {
       return ensureCsrfCookie().then(() => config);
@@ -99,5 +101,9 @@ export function getValidationErrors(error: AxiosError): Record<string, string[]>
 // Helper pour obtenir le message d'erreur
 export function getErrorMessage(error: AxiosError): string {
   const data = error.response?.data as { message?: string };
-  return data?.message || 'Une erreur est survenue. Veuillez réessayer.';
+  const fallback =
+    getStoredLanguage() === 'fr'
+      ? 'Une erreur est survenue. Veuillez réessayer.'
+      : 'An error occurred. Please try again.';
+  return data?.message || fallback;
 }

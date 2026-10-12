@@ -35,7 +35,7 @@ class FeatureController extends Controller
                 'features' => $features,
                 'groups' => FeatureRegistry::groups(),
             ],
-            'Liste des fonctionnalités récupérée'
+            __('admin.features.list')
         );
     }
 }

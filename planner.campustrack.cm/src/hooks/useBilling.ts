@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '@/src/utils/i18n';
 import { paymentService, CheckoutPayload } from '@/src/services/paymentService';
 import { Payment, PaginatedResponse } from '@/src/lib/types';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ export function usePayments() {
 
 export function useCheckout() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ payload, idempotencyKey }: { payload: CheckoutPayload; idempotencyKey?: string }) =>
@@ -24,9 +26,9 @@ export function useCheckout() {
       queryClient.invalidateQueries({ queryKey: ['subscription'] });
 
       if (payment.status === 'in_progress') {
-        toast.success('Paiement initié. Validez la transaction sur votre téléphone.');
+        toast.success(t('toast.paymentInitiated'));
       } else {
-        toast.error("Le paiement n'a pas pu être initié.");
+        toast.error(t('toast.paymentInitFailed'));
       }
     },
     onError: (error) => {

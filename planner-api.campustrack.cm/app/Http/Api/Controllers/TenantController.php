@@ -27,7 +27,7 @@ class TenantController extends Controller
             ->latest()
             ->paginate($request->integer('per_page', 20));
 
-        return $this->success(['tenants' => $tenants], 'Liste des tenants récupérée');
+        return $this->success(['tenants' => $tenants], __('admin.tenants.list'));
     }
 
     public function store(Request $request): JsonResponse
@@ -43,7 +43,7 @@ class TenantController extends Controller
 
         $tenant = app(TenantService::class)->create($validated);
 
-        return $this->success(['tenant' => $tenant->load('subscriptions')], 'Tenant créé', 201);
+        return $this->success(['tenant' => $tenant->load('subscriptions')], __('admin.tenants.created'), 201);
     }
 
     public function show(int $id): JsonResponse
@@ -53,7 +53,7 @@ class TenantController extends Controller
             ->with('subscriptions.pack')
             ->findOrFail($id);
 
-        return $this->success(['tenant' => $tenant], 'Tenant récupéré');
+        return $this->success(['tenant' => $tenant], __('admin.tenants.retrieved'));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -68,21 +68,21 @@ class TenantController extends Controller
 
         $tenant->update($validated);
 
-        return $this->success(['tenant' => $tenant], 'Tenant mis à jour');
+        return $this->success(['tenant' => $tenant], __('admin.tenants.updated'));
     }
 
     public function suspend(int $id): JsonResponse
     {
         $tenant = app(TenantService::class)->suspend(Tenant::findOrFail($id));
 
-        return $this->success(['tenant' => $tenant], 'Tenant suspendu');
+        return $this->success(['tenant' => $tenant], __('admin.tenants.suspended'));
     }
 
     public function reactivate(int $id): JsonResponse
     {
         $tenant = app(TenantService::class)->reactivate(Tenant::findOrFail($id));
 
-        return $this->success(['tenant' => $tenant], 'Tenant réactivé');
+        return $this->success(['tenant' => $tenant], __('admin.tenants.reactivated'));
     }
 
     public function destroy(int $id): JsonResponse
@@ -90,11 +90,11 @@ class TenantController extends Controller
         $tenant = Tenant::findOrFail($id);
 
         if ($tenant->is_demo) {
-            return $this->error(null, 'Le tenant démo ne peut pas être supprimé.', 403);
+            return $this->error(null, __('admin.tenants.demo_not_deletable'), 403);
         }
 
         $tenant->delete();
 
-        return $this->success(null, 'Tenant supprimé');
+        return $this->success(null, __('admin.tenants.deleted'));
     }
 }

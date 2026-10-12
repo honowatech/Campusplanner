@@ -61,7 +61,7 @@ class TeacherController extends Controller
         $teachers = $query->with(['department', 'courses', 'user'])
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['teachers' => $teachers], 'Liste des enseignants récupérée', 200);
+        return $this->success(['teachers' => $teachers], __('resources.teachers.list'), 200);
     }
 
     /**
@@ -96,7 +96,7 @@ class TeacherController extends Controller
 
         return $this->success(
             ['teacher' => $teacher->load(['department', 'courses'])],
-            'Enseignant créé avec succès',
+            __('resources.teachers.created'),
             201
         );
     }
@@ -118,7 +118,7 @@ class TeacherController extends Controller
         ])->findOrFail($id);
         $this->authorize('view', $teacher);
 
-        return $this->success(['teacher' => $teacher], 'Enseignant récupéré', 200);
+        return $this->success(['teacher' => $teacher], __('resources.teachers.retrieved'), 200);
     }
 
     /**
@@ -135,7 +135,7 @@ class TeacherController extends Controller
 
         return $this->success(
             ['teacher' => $teacher->load(['department', 'courses'])],
-            'Enseignant mis à jour avec succès',
+            __('resources.teachers.updated'),
             200
         );
     }
@@ -152,7 +152,7 @@ class TeacherController extends Controller
         if ($teacher->shiftPlannings()->count() > 0) {
             return $this->error(
                 null,
-                'Cet enseignant a des plannings. Veuillez d\'abord les réassigner.',
+                __('resources.teachers.cannot_delete_with_plannings'),
                 400
             );
         }
@@ -160,7 +160,7 @@ class TeacherController extends Controller
         $teacher->courses()->detach();
         $teacher->delete();
 
-        return $this->success(null, 'Enseignant supprimé avec succès', 200);
+        return $this->success(null, __('resources.teachers.deleted'), 200);
     }
 
     /**
@@ -180,7 +180,7 @@ class TeacherController extends Controller
 
         return $this->success(
             ['courses' => $teacher->courses],
-            'Matières synchronisées avec succès',
+            __('resources.teachers.courses_synced'),
             200
         );
     }
@@ -205,7 +205,7 @@ class TeacherController extends Controller
 
         return $this->success(
             ['schedule' => $plannings],
-            'Emploi du temps récupéré',
+            __('resources.teachers.schedule_retrieved'),
             200
         );
     }
@@ -241,7 +241,7 @@ class TeacherController extends Controller
             'is_available' => $isAvailable,
             'has_blocking' => $hasBlocking,
             'has_planning' => $hasPlanning,
-        ], 'Disponibilité vérifiée', 200);
+        ], __('resources.teachers.availability_checked'), 200);
     }
 
     /**
@@ -283,7 +283,7 @@ class TeacherController extends Controller
 
         return $this->success(
             ['teachers' => $teachers],
-            'Enseignants disponibles trouvés',
+            __('resources.teachers.available_found'),
             200
         );
     }

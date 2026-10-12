@@ -23,7 +23,7 @@ class PaymentController extends Controller
     {
         $tenant = $request->user()?->tenant;
 
-        abort_if(! $tenant, 403, 'Aucun tenant associé à ce compte.');
+        abort_if(! $tenant, 403, __('admin.tenant.not_found'));
 
         $validated = $request->validate([
             'pack_id' => 'required|integer|exists:packs,id',
@@ -41,7 +41,7 @@ class PaymentController extends Controller
             $request->header('Idempotency-Key'),
         );
 
-        return $this->success(['payment' => $payment], 'Paiement initié', 201);
+        return $this->success(['payment' => $payment], __('admin.payments.initiated'), 201);
     }
 
     /**
@@ -51,13 +51,13 @@ class PaymentController extends Controller
     {
         $tenant = $request->user()?->tenant;
 
-        abort_if(! $tenant, 403, 'Aucun tenant associé à ce compte.');
+        abort_if(! $tenant, 403, __('admin.tenant.not_found'));
 
         $payments = Payment::query()
             ->where('tenant_id', $tenant->id)
             ->latest()
             ->paginate($request->integer('per_page', 20));
 
-        return $this->success(['payments' => $payments], 'Historique des paiements récupéré');
+        return $this->success(['payments' => $payments], __('admin.payments.history_retrieved'));
     }
 }
