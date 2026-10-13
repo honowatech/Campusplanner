@@ -41,8 +41,34 @@ class PaymentServiceTest extends TestCase
     private function fakePaymeInitiate(string $gatewayReference = 'GW-123'): void
     {
         Http::fake([
-            '*/auth/login' => Http::response(['token' => 'jwt-token'], 200),
-            '*/transaction/init_payment' => Http::response(['gateway_reference' => $gatewayReference], 200),
+            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt-token']], 200),
+            '*/api/transaction/init_payment' => Http::response([
+                'data' => [
+                    'gateway_reference' => $gatewayReference,
+                    'external_reference' => 'ext-'.$gatewayReference,
+                ],
+            ], 200),
+        ]);
+    }
+
+    private function fakePaymeStatus(string $status): void
+    {
+        Http::fake([
+            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt-token']], 200),
+            '*/api/clients/transaction/payment_status' => Http::response(['data' => ['status' => $status]], 200),
+        ]);
+    }
+
+    private function pendingPayment(string $slug, string $gatewayReference): Payment
+    {
+        $tenant = Tenant::firstOrCreate(['slug' => $slug], ['name' => $slug]);
+
+        return Payment::create([
+            'tenant_id' => $tenant->id,
+            'amount' => 60000,
+            'currency' => 'XAF',
+            'status' => PaymentStatus::InProgress->value,
+            'gateway_reference' => $gatewayReference,
         ]);
     }
 
@@ -76,32 +102,11 @@ class PaymentServiceTest extends TestCase
     }
 
     /** @test */
-    public function process_callback_is_idempotent(): void
+    public function successful_payment_activates_the_subscription(): void
     {
-        $tenant = Tenant::firstOrCreate(['slug' => 'pay-cb'], ['name' => 'Pay CB']);
+        $this->gateway();
+        $this->fakePaymeStatus('SUCCESSFUL');
 
-        $payment = Payment::create([
-            'tenant_id' => $tenant->id,
-            'amount' => 60000,
-            'currency' => 'XAF',
-            'status' => PaymentStatus::InProgress->value,
-            'gateway_reference' => 'GW-CB-1',
-        ]);
-
-        $payload = ['gateway_reference' => 'GW-CB-1', 'status' => 'SUCCESSFUL'];
-        $service = app(PaymentService::class);
-
-        $first = $service->processCallback($payload);
-        $second = $service->processCallback($payload);
-
-        $this->assertNotNull($first);
-        $this->assertNull($second);
-        $this->assertEquals(PaymentStatus::Paid->value, $payment->fresh()->status);
-    }
-
-    /** @test */
-    public function successful_callback_activates_the_subscription(): void
-    {
         $tenant = Tenant::firstOrCreate(['slug' => 'pay-activate'], ['name' => 'Pay Activate']);
         $pack = $this->pack('standard-annual');
 
@@ -114,12 +119,65 @@ class PaymentServiceTest extends TestCase
             'metadata' => ['pack_id' => $pack->id, 'billing_period' => 'annual'],
         ]);
 
-        app(PaymentService::class)->processCallback([
-            'gateway_reference' => 'GW-ACT-1',
-            'status' => 'SUCCESSFUL',
-        ]);
+        app(PaymentService::class)->reconcilePending();
 
         $this->assertEquals(1, $tenant->subscriptions()->where('status', 'active')->count());
+    }
+
+    /** @test */
+    public function reconcile_pending_marks_successful_payment_as_paid(): void
+    {
+        $this->gateway();
+        $this->fakePaymeStatus('SUCCESSFUL');
+        $payment = $this->pendingPayment('pay-poll-ok', 'GW-POLL-OK');
+
+        $updated = app(PaymentService::class)->reconcilePending();
+
+        $this->assertEquals(1, $updated);
+        $this->assertEquals(PaymentStatus::Paid->value, $payment->fresh()->status);
+    }
+
+    /** @test */
+    public function reconcile_pending_keeps_payment_in_progress(): void
+    {
+        $this->gateway();
+        $this->fakePaymeStatus('PAYMENT_IN_PROGRESS');
+        $payment = $this->pendingPayment('pay-poll-prog', 'GW-POLL-PROG');
+
+        $updated = app(PaymentService::class)->reconcilePending();
+
+        $this->assertEquals(0, $updated);
+        $this->assertEquals(PaymentStatus::InProgress->value, $payment->fresh()->status);
+    }
+
+    /** @test */
+    public function reconcile_pending_marks_failed_payment_as_failed(): void
+    {
+        $this->gateway();
+        $this->fakePaymeStatus('FAILED');
+        $payment = $this->pendingPayment('pay-poll-fail', 'GW-POLL-FAIL');
+
+        $updated = app(PaymentService::class)->reconcilePending();
+
+        $this->assertEquals(1, $updated);
+        $this->assertEquals(PaymentStatus::Failed->value, $payment->fresh()->status);
+    }
+
+    /** @test */
+    public function reconcile_pending_marks_stale_payment_for_manual_review(): void
+    {
+        $this->gateway();
+        // Si le paiement périmé était réinterrogé, il recevrait SUCCESSFUL ;
+        // il doit rester « à vérifier » sans appel à l'API.
+        $this->fakePaymeStatus('SUCCESSFUL');
+
+        $payment = $this->pendingPayment('pay-stale', 'GW-STALE');
+        $payment->forceFill(['created_at' => now()->subMinutes(30)])->save();
+
+        $updated = app(PaymentService::class)->reconcilePending();
+
+        $this->assertEquals(1, $updated);
+        $this->assertEquals(PaymentStatus::NeedsReview->value, $payment->fresh()->status);
     }
 
     /** @test */

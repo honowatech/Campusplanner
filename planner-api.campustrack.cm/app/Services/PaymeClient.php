@@ -3,36 +3,27 @@
 namespace App\Services;
 
 use App\Models\PaymentGateway;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Client HTTP PayMe (MamoniPay).
- *
- * Le JWT d'authentification est mis en cache (clé par gateway) et régénéré à
- * expiration (cf. §8 du plan : « JWT PayMe mis en cache, régénéré sur 401 »).
- *
- * ⚠️ Les enveloppes de réponse exactes de PayMe doivent être confirmées (voir
- * §10 du plan). La lecture est volontairement défensive.
- */
 class PaymeClient
 {
     /**
-     * Authentifie la plateforme et retourne un JWT (mis en cache).
+     * Authentifie la plateforme et retourne le jeton d'accès (mis en cache).
      */
     public function token(PaymentGateway $gateway): string
     {
         return Cache::remember(
             "payme_token:{$gateway->id}",
             now()->addMinutes((int) config('payme.token_ttl', 50)),
-            function () use ($gateway) {
-                return $this->requestToken($gateway);
-            }
+            fn () => $this->authenticate($gateway)
         );
     }
 
     /**
-     * Oublie le token en cache (régénération forcée).
+     * Oublie le jeton en cache (régénération forcée, ex. crédences modifiées).
      */
     public function forgetToken(PaymentGateway $gateway): void
     {
@@ -40,16 +31,34 @@ class PaymeClient
     }
 
     /**
+     * Normalise un numéro de téléphone au format international attendu par
+     * PayMe : sans « + », sans espaces, indicatif pays `237` préfixé si absent.
+     */
+    public function normalizePhone(string $phone): string
+    {
+        // Ne conserve que les chiffres.
+        $digits = (string) preg_replace('/\D+/', '', $phone);
+
+        // Préfixe international « 00 » → indicatif pays nu.
+        $digits = (string) preg_replace('/^00/', '', $digits);
+
+        // Numéro local camerounais (9 chiffres) → préfixe « 237 ».
+        if (strlen($digits) === 9) {
+            $digits = '237'.$digits;
+        }
+
+        return $digits;
+    }
+
+    /**
      * Initie un paiement (mobile money) et retourne la référence passerelle.
      *
      * @param  array<string, mixed>  $payload
-     * @return array{success: bool, gateway_reference?: string|null, payment_url?: string|null, error?: string|null}
+     * @return array{success: bool, gateway_reference?: string|null, external_reference?: string|null, error?: string|null}
      */
-    public function initiatePayment(PaymentGateway $gateway, string $token, array $payload): array
+    public function initiatePayment(PaymentGateway $gateway, array $payload): array
     {
-        $response = Http::timeout((int) config('payme.timeout', 15))
-            ->withToken($token)
-            ->post($this->url($gateway, 'init_payment_path'), $payload);
+        $response = $this->post($gateway, 'init_payment_path', $payload);
 
         if ($response->failed()) {
             return [
@@ -58,12 +67,13 @@ class PaymeClient
             ];
         }
 
-        $body = $response->json();
+        $body = $response->json() ?? [];
+        $data = $body['data'] ?? $body;
 
         return [
             'success' => true,
-            'gateway_reference' => $body['gateway_reference'] ?? $body['reference'] ?? $body['transaction_id'] ?? null,
-            'payment_url' => $body['payment_url'] ?? $body['paymelink'] ?? $body['url'] ?? null,
+            'gateway_reference' => $data['gateway_reference'] ?? null,
+            'external_reference' => $data['external_reference'] ?? null,
         ];
     }
 
@@ -72,13 +82,11 @@ class PaymeClient
      *
      * @return array{success: bool, status?: string|null, error?: string|null}
      */
-    public function paymentStatus(PaymentGateway $gateway, string $token, string $gatewayReference): array
+    public function paymentStatus(PaymentGateway $gateway, string $gatewayReference): array
     {
-        $response = Http::timeout((int) config('payme.timeout', 15))
-            ->withToken($token)
-            ->post($this->url($gateway, 'payment_status_path'), [
-                'gateway_reference' => $gatewayReference,
-            ]);
+        $response = $this->post($gateway, 'payment_status_path', [
+            'gateway_reference' => $gatewayReference,
+        ]);
 
         if ($response->failed()) {
             return [
@@ -87,34 +95,45 @@ class PaymeClient
             ];
         }
 
-        $body = $response->json();
+        $body = $response->json() ?? [];
+        $data = $body['data'] ?? $body;
 
         return [
             'success' => true,
-            'status' => $body['status'] ?? $body['transaction_status'] ?? null,
+            'status' => $data['status'] ?? null,
         ];
     }
 
     /**
-     * Authentifie auprès de PayMe et extrait le JWT.
+     * Authentifie auprès de PayMe et extrait le jeton (`data.token`).
      */
-    private function requestToken(PaymentGateway $gateway): string
+    private function authenticate(PaymentGateway $gateway): string
     {
-        $response = Http::timeout((int) config('payme.timeout', 15))
+        $response = Http::timeout((int) config('payme.timeout', 30))
             ->post($this->url($gateway, 'login_path'), [
                 'user_name' => $gateway->user_name,
                 'password' => $gateway->password,
             ]);
 
         if ($response->failed()) {
+            Log::error('PayMe : échec de l\'authentification.', [
+                'gateway_id' => $gateway->id,
+                'status' => $response->status(),
+                'response' => mb_substr((string) $response->body(), 0, 500),
+            ]);
+
             throw new \RuntimeException('PayMe auth HTTP '.$response->status().': '.mb_substr($response->body(), 0, 200));
         }
 
-        $body = $response->json();
-
-        $token = $body['token'] ?? $body['access_token'] ?? $body['jwt'] ?? null;
+        $body = $response->json() ?? [];
+        $token = $body['data']['token'] ?? $body['token'] ?? null;
 
         if (! $token) {
+            Log::error('PayMe : authentification sans jeton.', [
+                'gateway_id' => $gateway->id,
+                'response' => mb_substr((string) $response->body(), 0, 500),
+            ]);
+
             throw new \RuntimeException('Réponse d\'authentification PayMe sans jeton.');
         }
 
@@ -122,14 +141,53 @@ class PaymeClient
     }
 
     /**
-     * Construit l'URL d'un endpoint PayMe selon le mode (sandbox/live).
+     * Envoie une requête authentifiée, avec ré-authentification sur `401`.
+     */
+    private function post(PaymentGateway $gateway, string $pathKey, array $payload): Response
+    {
+        $response = $this->send($gateway, $pathKey, $this->token($gateway), $payload);
+
+        if ($response->status() === 401) {
+            $this->forgetToken($gateway);
+
+            $response = $this->send($gateway, $pathKey, $this->token($gateway), $payload);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Envoie la requête avec le jeton fourni (JSON + Bearer).
+     */
+    private function send(PaymentGateway $gateway, string $pathKey, string $token, array $payload): Response
+    {
+        return Http::timeout((int) config('payme.timeout', 15))
+            ->withToken($token)
+            ->accept('application/json')
+            ->contentType('application/json')
+            ->post($this->url($gateway, $pathKey), $payload);
+    }
+
+    /**
+     * Construit l'URL d'un endpoint PayMe (base + chemin configuré).
      */
     private function url(PaymentGateway $gateway, string $pathKey): string
     {
         $base = $gateway->endpoint
-            ?: config($gateway->mode === 'live' ? 'payme.live_base_url' : 'payme.sandbox_base_url');
+            ?: ($gateway->mode === 'live'
+                ? config('payme.live_base_url')
+                : config('payme.sandbox_base_url'));
 
-        return rtrim((string) $base, '/')
+        $url = rtrim((string) $base, '/')
             .'/'.ltrim((string) config("payme.{$pathKey}"), '/');
+
+        Log::debug('PayMe request URL', [
+            'gateway_id' => $gateway->id,
+            'path' => $pathKey,
+            'url' => $url,
+        ]);
+
+        return $url;
     }
+
 }

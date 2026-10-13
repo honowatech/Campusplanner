@@ -10,8 +10,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Réconciliation de secours : interroge PayMe pour les paiements en attente
- * (en complément du webhook). Planifiée avec `withoutOverlapping`.
+ * Réconciliation : interroge PayMe pour les paiements en attente (polling,
+ * unique mécanisme de confirmation — aucun webhook). Planifiée avec
+ * `withoutOverlapping`.
  */
 class PaymeReconciliationJob implements ShouldQueue
 {

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\SmsLog;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Envoi de SMS par tenant, avec journalisation et idempotence.
@@ -61,12 +62,28 @@ class SmsService
         try {
             $result = $this->client->send($credential, $message, [$to]);
 
+            if (! $result['success']) {
+                Log::error('Échec de l\'envoi SMS.', [
+                    'tenant_id' => $tenant->id,
+                    'sms_log_id' => $log->id,
+                    'to' => $to,
+                    'error' => $result['error'] ?? null,
+                ]);
+            }
+
             $log->update([
                 'status' => $result['success'] ? SmsLog::STATUS_SENT : SmsLog::STATUS_FAILED,
                 'provider_ref' => $result['provider_ref'] ?? null,
                 'error' => $result['error'] ?? null,
             ]);
         } catch (\Throwable $e) {
+            Log::error('Exception lors de l\'envoi SMS.', [
+                'tenant_id' => $tenant->id,
+                'sms_log_id' => $log->id,
+                'to' => $to,
+                'exception' => $e,
+            ]);
+
             $log->update([
                 'status' => SmsLog::STATUS_FAILED,
                 'error' => $e->getMessage(),

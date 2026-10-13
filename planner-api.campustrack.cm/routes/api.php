@@ -17,7 +17,6 @@ use App\Http\Api\Controllers\FeatureController;
 use App\Http\Api\Controllers\OnboardingController;
 use App\Http\Api\Controllers\PaymentController;
 use App\Http\Api\Controllers\PaymentGatewayController;
-use App\Http\Api\Controllers\PaymeWebhookController;
 use App\Http\Api\Controllers\PermissionController;
 use App\Http\Api\Controllers\RoleController;
 use App\Http\Api\Controllers\RoomBlockingController;
@@ -65,9 +64,6 @@ Route::post('/onboarding', [OnboardingController::class, 'register'])->middlewar
 // au super-admin (route protégée plus bas).
 Route::get('/demo-mode', [DemoModeController::class, 'index']);
 Route::post('/demo-login', [DemoModeController::class, 'login'])->middleware('throttle:10,1');
-
-// Webhook PayMe : public (hors auth), idempotent par hash.
-Route::post('/payments/payme/callback', [PaymeWebhookController::class, 'callback']);
 
 // Protected API routes
 Route::middleware(['auth:sanctum'])->group(function () {

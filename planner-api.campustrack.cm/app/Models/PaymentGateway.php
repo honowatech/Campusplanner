@@ -32,9 +32,9 @@ class PaymentGateway extends Model
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-    ];
+    // protected $hidden = [
+    //     'password',
+    // ];
 
     /**
      * Get the attributes that should be cast.

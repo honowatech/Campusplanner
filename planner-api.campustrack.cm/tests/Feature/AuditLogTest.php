@@ -38,8 +38,8 @@ class AuditLogTest extends TestCase
         ]);
 
         Http::fake([
-            '*/auth/login' => Http::response(['token' => 'jwt'], 200),
-            '*/transaction/init_payment' => Http::response(['gateway_reference' => 'GW-AUDIT-1'], 200),
+            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt']], 200),
+            '*/api/transaction/init_payment' => Http::response(['data' => ['gateway_reference' => 'GW-AUDIT-1']], 200),
         ]);
 
         $tenant = Tenant::firstOrCreate(['slug' => 'audit-pay'], ['name' => 'Audit Pay']);
@@ -52,8 +52,21 @@ class AuditLogTest extends TestCase
     }
 
     /** @test */
-    public function successful_callback_records_payment_paid(): void
+    public function successful_payment_records_payment_paid(): void
     {
+        PaymentGateway::create([
+            'provider' => 'payme',
+            'user_name' => 'merchant',
+            'password' => 'secret',
+            'mode' => 'sandbox',
+            'is_active' => true,
+        ]);
+
+        Http::fake([
+            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt']], 200),
+            '*/api/clients/transaction/payment_status' => Http::response(['data' => ['status' => 'SUCCESSFUL']], 200),
+        ]);
+
         $tenant = Tenant::firstOrCreate(['slug' => 'audit-cb'], ['name' => 'Audit CB']);
 
         $payment = Payment::create([
@@ -64,10 +77,7 @@ class AuditLogTest extends TestCase
             'gateway_reference' => 'GW-AUDIT-CB',
         ]);
 
-        app(PaymentService::class)->processCallback([
-            'gateway_reference' => 'GW-AUDIT-CB',
-            'status' => 'SUCCESSFUL',
-        ]);
+        app(PaymentService::class)->reconcilePending();
 
         $this->assertDatabaseHas('audit_logs', ['event' => 'payment.paid', 'tenant_id' => $tenant->id]);
     }

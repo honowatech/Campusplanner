@@ -13,11 +13,11 @@ return [
     |
     */
 
-    'base_url' => env('NEXAH_API_BASE_URL', 'https://sms.nexah.net/api'),
+    'base_url' => env('NEXAH_API_BASE_URL', 'https://smsvas.com/bulk/public/index.php/api/v1'),
 
-    'send_path' => env('NEXAH_SEND_PATH', '/sms/send'),
+    'send_path' => env('NEXAH_SEND_PATH', '/sendsms'),
 
-    'balance_path' => env('NEXAH_BALANCE_PATH', '/sms/balance'),
+    'balance_path' => env('NEXAH_BALANCE_PATH', '/smscredit'),
 
     'timeout' => (int) env('NEXAH_TIMEOUT', 15),
 

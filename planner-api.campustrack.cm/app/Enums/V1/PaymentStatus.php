@@ -6,7 +6,7 @@ namespace App\Enums\V1;
  * Machine à états des paiements (cf. §7 du plan : idempotence au niveau service).
  *
  * Seules les transitions déclarées sont autorisées ; toute autre transition est
- * un no-op (rejeu d'un webhook déjà traité, etc.).
+ * un no-op (rejeu d'un statut déjà traité, etc.).
  */
 enum PaymentStatus: string
 {
@@ -16,6 +16,7 @@ enum PaymentStatus: string
     case Failed = 'failed';
     case Refunded = 'refunded';
     case Deposited = 'deposited';
+    case NeedsReview = 'needs_review';
 
     /**
      * États terminaux (aucune transition sortante).
@@ -24,7 +25,7 @@ enum PaymentStatus: string
      */
     public static function terminal(): array
     {
-        return [self::Failed, self::Refunded, self::Deposited];
+        return [self::Failed, self::Refunded, self::Deposited, self::NeedsReview];
     }
 
     public function isTerminal(): bool
@@ -49,9 +50,9 @@ enum PaymentStatus: string
     {
         return match ($this) {
             self::Pending => [self::InProgress, self::Paid, self::Failed],
-            self::InProgress => [self::Paid, self::Failed],
+            self::InProgress => [self::Paid, self::Failed, self::NeedsReview],
             self::Paid => [self::Refunded],
-            self::Failed, self::Refunded, self::Deposited => [],
+            self::Failed, self::Refunded, self::Deposited, self::NeedsReview => [],
         };
     }
 }

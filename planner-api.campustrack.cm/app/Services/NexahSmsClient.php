@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\SmsCredential;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Client HTTP Nexah Bulk SMS.
@@ -26,7 +27,8 @@ class NexahSmsClient
     public function send(SmsCredential $credential, string $message, array $recipients): array
     {
         $response = Http::timeout((int) config('nexah.timeout', 15))
-            ->asForm()
+            ->accept('application/json')
+            ->contentType('application/json')
             ->post($this->url('send_path'), [
                 'user' => $credential->user,
                 'password' => $credential->password,
@@ -94,8 +96,15 @@ class NexahSmsClient
      */
     private function url(string $pathKey): string
     {
-        return rtrim((string) config('nexah.base_url'), '/')
+        $url = rtrim((string) config('nexah.base_url'), '/')
             .'/'.ltrim((string) config("nexah.{$pathKey}"), '/');
+
+        Log::debug('Nexah SMS request URL', [
+            'path' => $pathKey,
+            'url' => $url,
+        ]);
+
+        return $url;
     }
 
     /**

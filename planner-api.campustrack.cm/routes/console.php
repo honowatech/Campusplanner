@@ -42,8 +42,8 @@ Schedule::command('dashboard:warm-cache heavy --period=30d')
     ->onOneServer()
     ->runInBackground();
 
-// Réconciliation PayMe (polling de secours des paiements en attente)
+// Réconciliation PayMe (polling des paiements en attente, cf. MAMONIPAY_API.md).
 Schedule::job(new PaymeReconciliationJob)
-    ->everyFiveMinutes()
+    ->everyFifteenSeconds()
     ->withoutOverlapping()
     ->onOneServer();
