@@ -28,7 +28,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['roles' => $roles],
-            'Rôles de l\'utilisateur récupérés',
+            __('resources.user_roles.list'),
             200
         );
     }
@@ -50,7 +50,7 @@ class UserRoleController extends Controller
             && ! $request->user()->hasRole('super-admin')) {
             return $this->error(
                 null,
-                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                __('resources.user_roles.only_super_admin_manage', ['roles' => implode(', ', self::RESTRICTED_ROLES)]),
                 403
             );
         }
@@ -59,10 +59,10 @@ class UserRoleController extends Controller
 
         if ($mode === 'sync') {
             $user->syncRoles($validated['roles']);
-            $message = 'Rôles synchronisés avec succès';
+            $message = __('resources.user_roles.synced');
         } else {
             $user->assignRole($validated['roles']);
-            $message = 'Rôles attribués avec succès';
+            $message = __('resources.user_roles.assigned');
         }
 
         return $this->success(
@@ -88,7 +88,7 @@ class UserRoleController extends Controller
             && ! $request->user()->hasRole('super-admin')) {
             return $this->error(
                 null,
-                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                __('resources.user_roles.only_super_admin_manage', ['roles' => implode(', ', self::RESTRICTED_ROLES)]),
                 403
             );
         }
@@ -97,7 +97,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['roles' => $user->roles()->pluck('name')],
-            'Rôles retirés avec succès',
+            __('resources.user_roles.removed'),
             200
         );
     }
@@ -118,7 +118,7 @@ class UserRoleController extends Controller
             && ! $request->user()->hasRole('super-admin')) {
             return $this->error(
                 null,
-                'Seul un super-admin peut gérer les rôles : '.implode(', ', self::RESTRICTED_ROLES),
+                __('resources.user_roles.only_super_admin_manage', ['roles' => implode(', ', self::RESTRICTED_ROLES)]),
                 403
             );
         }
@@ -127,7 +127,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['roles' => $user->roles()->pluck('name')],
-            'Rôles synchronisés avec succès',
+            __('resources.user_roles.synced'),
             200
         );
     }
@@ -142,7 +142,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['permissions' => $permissions],
-            'Permissions directes de l\'utilisateur récupérées',
+            __('resources.user_roles.direct_permissions_retrieved'),
             200
         );
     }
@@ -157,7 +157,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['permissions' => $permissions],
-            'Toutes les permissions de l\'utilisateur récupérées',
+            __('resources.user_roles.all_permissions_retrieved'),
             200
         );
     }
@@ -178,7 +178,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['permissions' => $user->permissions()->pluck('name')],
-            'Permissions attribuées avec succès',
+            __('resources.user_roles.permissions_granted'),
             200
         );
     }
@@ -199,7 +199,7 @@ class UserRoleController extends Controller
 
         return $this->success(
             ['permissions' => $user->permissions()->pluck('name')],
-            'Permissions révoquées avec succès',
+            __('resources.user_roles.permissions_revoked'),
             200
         );
     }
@@ -222,7 +222,7 @@ class UserRoleController extends Controller
                 'has_permission' => $hasPermission,
                 'permission' => $validated['permission'],
             ],
-            'Vérification de permission effectuée',
+            __('resources.user_roles.permission_checked'),
             200
         );
     }

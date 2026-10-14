@@ -40,7 +40,7 @@ class CourseController extends Controller
         $courses = $query->with(['department', 'teachers'])
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['courses' => $courses], 'Liste des matières récupérée', 200);
+        return $this->success(['courses' => $courses], __('resources.courses.list'), 200);
     }
 
     /**
@@ -69,7 +69,7 @@ class CourseController extends Controller
 
         return $this->success(
             ['course' => $course->load('department')],
-            'Matière créée avec succès',
+            __('resources.courses.created'),
             201
         );
     }
@@ -82,7 +82,7 @@ class CourseController extends Controller
         $course = Course::with(['department', 'teachers', 'shiftPlannings'])->findOrFail($id);
         $this->authorize('view', $course);
 
-        return $this->success(['course' => $course], 'Matière récupérée', 200);
+        return $this->success(['course' => $course], __('resources.courses.retrieved'), 200);
     }
 
     /**
@@ -113,7 +113,7 @@ class CourseController extends Controller
 
         return $this->success(
             ['course' => $course->load('department')],
-            'Matière mise à jour avec succès',
+            __('resources.courses.updated'),
             200
         );
     }
@@ -130,14 +130,14 @@ class CourseController extends Controller
         if ($course->teachers()->count() > 0) {
             return $this->error(
                 null,
-                'Cette matière est assignée à des enseignants. Veuillez d\'abord les désassigner.',
+                __('resources.courses.cannot_delete_with_teachers'),
                 400
             );
         }
 
         $course->delete();
 
-        return $this->success(null, 'Matière supprimée avec succès', 200);
+        return $this->success(null, __('resources.courses.deleted'), 200);
     }
 
     /**
@@ -151,7 +151,7 @@ class CourseController extends Controller
 
         return $this->success(
             ['teachers' => $teachers],
-            'Enseignants de la matière récupérés',
+            __('resources.courses.teachers_retrieved'),
             200
         );
     }

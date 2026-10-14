@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CourseClass;
 use App\Models\Student;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -27,6 +28,12 @@ class StudentSeeder extends Seeder
 
         $classes = CourseClass::all();
         $studentCount = 0;
+
+        // Le rôle `etudiant` est scopé au tenant : on l'assigne dans le contexte
+        // du tenant démo. Les classes sont lues AVANT (tenant_id encore NULL ici,
+        // le backfill `TenantSeeder` intervenant plus tard).
+        $demo = Tenant::where('slug', 'demo')->firstOrFail();
+        setPermissionsTeamId($demo->id);
 
         foreach ($classes as $class) {
             $studentsToCreate = min($class->capacity - 5, 25); // Leave some spots available
@@ -66,6 +73,8 @@ class StudentSeeder extends Seeder
                 ]);
             }
         }
+
+        setPermissionsTeamId(null);
 
         $this->command->info("Students seeded successfully! ({$studentCount} students created with user accounts)");
     }

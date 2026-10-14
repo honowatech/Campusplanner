@@ -11,7 +11,7 @@ const crud = createCrudHooks<CourseClass, ClassParams, CreateClassData, UpdateCl
   service: classService,
   queryKey: 'classes',
   singleKey: 'class',
-  label: 'Classe',
+  label: 'class',
 });
 
 export const useClasses = crud.useList;

@@ -8,6 +8,7 @@ import {
 import { ShiftPlanning, PaginatedResponse } from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
+import { useTranslation } from '@/src/utils/i18n';
 import type { AxiosError } from 'axios';
 
 export function useShiftPlannings(params?: ShiftPlanningParams) {
@@ -27,6 +28,7 @@ export function useShiftPlanning(id: number) {
 
 export function useCreateShiftPlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreateShiftPlanningData) => planningService.createShift(data),
@@ -38,7 +40,7 @@ export function useCreateShiftPlanning() {
       queryClient.invalidateQueries({
         queryKey: ['planning', created.shift_planning?.planning_id ?? created.planning_id],
       });
-      toast.success('Shift created successfully!');
+      toast.success(t('toast.shiftCreated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -48,13 +50,14 @@ export function useCreateShiftPlanning() {
 
 export function useUpdateShiftPlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateShiftPlanningData }) =>
       planningService.updateShift(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shiftPlannings'] });
-      toast.success('Shift updated successfully!');
+      toast.success(t('toast.shiftUpdated'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));
@@ -64,6 +67,7 @@ export function useUpdateShiftPlanning() {
 
 export function useDeleteShiftPlanning() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (id: number) => planningService.deleteShift(id),
@@ -72,7 +76,7 @@ export function useDeleteShiftPlanning() {
       queryClient.invalidateQueries({
         queryKey: ['planning'],
       });
-      toast.success('Shift deleted successfully!');
+      toast.success(t('toast.shiftDeleted'));
     },
     onError: (error) => {
       toast.error(getErrorMessage(error as unknown as AxiosError));

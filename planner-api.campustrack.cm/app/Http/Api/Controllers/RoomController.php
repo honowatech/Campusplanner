@@ -68,7 +68,7 @@ class RoomController extends Controller
         $rooms = $query->with(['department'])
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['rooms' => $rooms], 'Rooms list retrieved', 200);
+        return $this->success(['rooms' => $rooms], __('resources.rooms.list'), 200);
     }
 
     /**
@@ -84,7 +84,7 @@ class RoomController extends Controller
 
         return $this->success(
             ['room' => $room->load('department')],
-            'Room created successfully',
+            __('resources.rooms.created'),
             201
         );
     }
@@ -103,7 +103,7 @@ class RoomController extends Controller
         ])->findOrFail($id);
         $this->authorize('view', $room);
 
-        return $this->success(['room' => $room], 'Room retrieved', 200);
+        return $this->success(['room' => $room], __('resources.rooms.retrieved'), 200);
     }
 
     /**
@@ -120,7 +120,7 @@ class RoomController extends Controller
 
         return $this->success(
             ['room' => $room->load('department')],
-            'Room updated successfully',
+            __('resources.rooms.updated'),
             200
         );
     }
@@ -137,7 +137,7 @@ class RoomController extends Controller
         if ($room->shiftPlannings()->count() > 0) {
             return $this->error(
                 null,
-                'Cannot delete room with existing plannings. Please remove plannings first.',
+                __('resources.rooms.cannot_delete_with_plannings'),
                 400
             );
         }
@@ -146,14 +146,14 @@ class RoomController extends Controller
         if ($room->classes()->count() > 0) {
             return $this->error(
                 null,
-                'Cannot delete room assigned to classes. Please reassign classes first.',
+                __('resources.rooms.cannot_delete_with_classes'),
                 400
             );
         }
 
         $room->delete();
 
-        return $this->success(null, 'Room deleted successfully', 200);
+        return $this->success(null, __('resources.rooms.deleted'), 200);
     }
 
     /**
@@ -178,7 +178,7 @@ class RoomController extends Controller
 
         return $this->success(
             ['blockings' => $blockings],
-            'Room blockings retrieved',
+            __('resources.rooms.blockings_retrieved'),
             200
         );
     }
@@ -220,7 +220,7 @@ class RoomController extends Controller
         return $this->success([
             'is_available' => $isAvailable,
             'conflicts' => $conflicts,
-        ], 'Room availability checked', 200);
+        ], __('resources.rooms.availability_checked'), 200);
     }
 
     /**
@@ -250,7 +250,7 @@ class RoomController extends Controller
         return $this->success([
             'plannings' => $plannings,
             'blockings' => $blockings,
-        ], 'Room schedule retrieved', 200);
+        ], __('resources.rooms.schedule_retrieved'), 200);
     }
 
     /**
@@ -296,7 +296,7 @@ class RoomController extends Controller
 
         return $this->success(
             ['rooms' => $rooms],
-            'Salles disponibles trouvées',
+            __('resources.rooms.available_found'),
             200
         );
     }

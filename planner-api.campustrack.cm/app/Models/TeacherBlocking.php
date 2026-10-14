@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TeacherBlocking extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'teacher_id',
@@ -20,6 +21,7 @@ class TeacherBlocking extends Model
         'approved_by',
         'approved_at',
         'rejection_reason',
+        'tenant_id',
     ];
 
     protected $casts = [

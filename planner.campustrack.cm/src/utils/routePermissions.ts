@@ -1,45 +1,71 @@
-import type { User } from '@/src/lib/types';
+import type { User, UserRole } from '@/src/lib/types';
 
 /**
- * Garde d'accès côté client. Une page est visible si l'utilisateur possède
- * soit une permission de consultation (`*.view`, mode lecture seule), soit une
- * permission de gestion (`*.manage`/`*.create`/etc., mode CRUD). Les pages de
- * gestion purement administratives (users, departments, settings, demo-mode)
- * restent réservées aux administrateurs.
- * La vraie autorisation reste côté API (403) ; ce mapping améliore l'UX.
+ * Garde d'accès côté client. La vraie autorisation reste côté API (403) ;
+ * ce mapping améliore l'UX (masquage du menu + redirection).
+ *
+ * Règles d'accès par rôle (pages) :
+ * - Student : UE (courses), timetables, profile (+ dashboard).
+ * - Teacher : students, UE, timetables, profile (+ dashboard).
+ * - Admin   : classes, teachers, students, UE, rooms, timetables, profile,
+ *             + gestion tenant (users, settings, departments, billing, sms).
+ * - HOD     : classes, teachers, students, UE, rooms, timetables, profile (+ dashboard).
+ * - super-admin (global) : accès total.
+ * - Les pages admin/système (users, settings, departments, billing, sms) sont
+ *   réservées à l'admin de tenant et au super-admin (périmètre tenant).
+ *   L'Admin Console et le mode démo restent exclusifs au super-admin.
+ *
+ * `personnel-administratif` n'est pas dans le cahier des charges ci-dessus :
+ * il conserve son accès en lecture seule (départements inclus).
  */
-type RoutePermissionRule = {
-  match: (pathname: string) => boolean;
-  permissions: string[];
-};
 
-export const routePermissions: RoutePermissionRule[] = [
-  { match: (p) => p === '/users', permissions: ['users.create', 'users.edit', 'users.delete'] },
-  { match: (p) => p === '/settings', permissions: ['settings.edit'] },
-  { match: (p) => p === '/demo-mode', permissions: ['demo-mode.manage'] },
-  {
-    match: (p) => p === '/departments',
-    permissions: ['departments.create', 'departments.edit', 'departments.delete'],
-  },
-  {
-    match: (p) => p === '/teachers',
-    permissions: ['teachers.view.all', 'teachers.view.department', 'teachers.manage.department'],
-  },
-  {
-    match: (p) => p === '/students',
-    permissions: [
-      'students.view.all',
-      'students.view.department',
-      'students.view.class',
-      'students.create',
-      'students.edit',
-      'students.delete',
-    ],
-  },
-  { match: (p) => p === '/rooms', permissions: ['rooms.view', 'rooms.manage'] },
-  { match: (p) => p === '/classes', permissions: ['classes.view', 'classes.manage'] },
-  { match: (p) => p === '/courses', permissions: ['courses.view', 'courses.manage'] },
-];
+/**
+ * Pages accessibles par rôle. Le super-admin est traité à part (accès total).
+ */
+const ROLE_PAGES: Record<UserRole, string[]> = {
+  'super-admin': [],
+  etudiant: ['/', '/courses', '/timetables', '/plannings/*', '/profile'],
+  professeur: ['/', '/students', '/courses', '/timetables', '/plannings/*', '/profile'],
+  administrateur: [
+    '/',
+    '/classes',
+    '/teachers',
+    '/students',
+    '/courses',
+    '/rooms',
+    '/timetables',
+    '/plannings/*',
+    '/profile',
+    '/users',
+    '/settings',
+    '/departments',
+    '/billing',
+    '/sms',
+  ],
+  'responsable-departement': [
+    '/',
+    '/classes',
+    '/teachers',
+    '/students',
+    '/courses',
+    '/rooms',
+    '/timetables',
+    '/plannings/*',
+    '/profile',
+  ],
+  'personnel-administratif': [
+    '/',
+    '/departments',
+    '/classes',
+    '/teachers',
+    '/students',
+    '/courses',
+    '/rooms',
+    '/timetables',
+    '/plannings/*',
+    '/profile',
+  ],
+};
 
 export function hasAnyPermission(
   userPermissions: string[] | undefined,
@@ -49,10 +75,41 @@ export function hasAnyPermission(
   return required.some((permission) => userPermissions.includes(permission));
 }
 
+/**
+ * Indique si un chemin est couvert par une entrée de `ROLE_PAGES`.
+ *
+ * Deux formes sont acceptées :
+ * - `/classes`      : correspondance exacte ;
+ * - `/plannings/*`  : préfixe (toute route enfant, ex. `/plannings/42`).
+ */
+function matchesRoute(pattern: string, pathname: string): boolean {
+  if (pattern.endsWith('/*')) {
+    const prefix = pattern.slice(0, -1); // '/plannings/'
+    return pathname.startsWith(prefix);
+  }
+
+  return pathname === pattern;
+}
+
 export function canAccessRoute(user: User | null, pathname: string): boolean {
-  const rule = routePermissions.find((r) => r.match(pathname));
-  if (!rule) return true; // route non protégée
-  return hasAnyPermission(user?.permissions, rule.permissions);
+  if (!user) return false;
+
+  const role = user.role;
+  if (!role) return false;
+
+  // Le super-admin (global) accède à toutes les pages.
+  if (role === 'super-admin') return true;
+
+  // Pages explicitement accessibles au rôle de l'utilisateur (correspondance
+  // exacte ou par préfixe pour les routes dynamiques comme `/plannings/$id`).
+  const allowed = ROLE_PAGES[role];
+  if (!allowed.some((pattern) => matchesRoute(pattern, pathname))) return false;
+
+  // Garde de fonctionnalité (miroir du middleware `feature:*` côté API).
+  // const feature = featureForPath(pathname);
+  // return !feature || hasFeature(user, feature);
+
+  return true;
 }
 
 /**
@@ -63,5 +120,5 @@ export function canAccessRoute(user: User | null, pathname: string): boolean {
  * pas autorisé.
  */
 export function canViewDashboardOverview(user: User | null | undefined): boolean {
-  return user?.role === 'super-admin' || user?.role === 'admin';
+  return user?.role === 'super-admin' || user?.role === 'administrateur';
 }

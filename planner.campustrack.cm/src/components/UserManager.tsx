@@ -242,7 +242,7 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   <td className="p-4">
                     <div className="flex items-center">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs mr-3 ${user.role === 'admin' ? 'bg-indigo-500' : 'bg-purple-500'}`}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs mr-3 ${user.role === 'administrateur' ? 'bg-indigo-500' : 'bg-purple-500'}`}
                       >
                         {user.name.charAt(0)}
                       </div>
@@ -266,13 +266,13 @@ export const UserManager: React.FC<UserManagerProps> = ({
                   </td>
                   <td className="p-4">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-indigo-100 text-primary' : 'bg-purple-100 text-purple-800'}`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'administrateur' ? 'bg-indigo-100 text-primary' : 'bg-purple-100 text-purple-800'}`}
                     >
-                      {user.role === 'admin' ? t('adminRole') : t('hodRole')}
+                      {user.role === 'administrateur' ? t('adminRole') : t('hodRole')}
                     </span>
                   </td>
                   <td className="p-4 text-gray-600">
-                    {user.role === 'hod' && user.department_id ? (
+                    {user.role === 'responsable-departement' && user.department_id ? (
                       <div className="flex items-center">
                         <Building2 size={14} className="mr-2 text-gray-400" />
                         {getDepartmentName(user.department_id)}

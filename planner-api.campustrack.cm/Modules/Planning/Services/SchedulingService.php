@@ -52,7 +52,7 @@ class SchedulingService
             foreach ($classes as $classId) {
                 $class = CourseClass::with('students')->find($classId);
                 if (! $class) {
-                    $this->warnings[] = "Classe ID $classId non trouvée";
+                    $this->warnings[] = __('planning.scheduling.warning_class_not_found', ['class' => $classId]);
 
                     continue;
                 }
@@ -60,14 +60,14 @@ class SchedulingService
                 foreach ($courses as $courseId) {
                     $course = Course::find($courseId);
                     if (! $course) {
-                        $this->warnings[] = "Cours ID $courseId non trouvé";
+                        $this->warnings[] = __('planning.scheduling.warning_course_not_found', ['course' => $courseId]);
 
                         continue;
                     }
 
                     $teachers = $course->teachers;
                     if ($teachers->isEmpty()) {
-                        $this->warnings[] = "Aucun professeur assigné au cours: {$course->name}";
+                        $this->warnings[] = __('planning.scheduling.warning_no_teacher', ['course' => $course->name]);
 
                         continue;
                     }
@@ -195,7 +195,7 @@ class SchedulingService
                 'course_name' => $course->name,
                 'hours_scheduled' => $hoursScheduled,
                 'hours_needed' => $hoursNeeded,
-                'reason' => 'Impossible de trouver des créneaux disponibles',
+                'reason' => __('planning.scheduling.no_slots_available'),
             ];
         }
     }
@@ -277,7 +277,7 @@ class SchedulingService
                 'success' => false,
                 'conflicts' => $conflicts,
                 'proposals' => $proposals,
-                'message' => 'Conflits détectés. Propositions de résolution disponibles.',
+                'message' => __('planning.conflicts.detected_with_proposals'),
             ];
         }
 
@@ -286,7 +286,7 @@ class SchedulingService
         return [
             'success' => true,
             'shift_planning' => $shiftPlanning,
-            'message' => 'Cours planifié avec succès',
+            'message' => __('planning.scheduling.course_scheduled'),
         ];
     }
 
@@ -380,7 +380,7 @@ class SchedulingService
         return [
             'optimized' => $optimized,
             'skipped' => $skipped,
-            'message' => "$optimized conflits résolus automatiquement",
+            'message' => __('planning.scheduling.optimized', ['count' => $optimized]),
         ];
     }
 }

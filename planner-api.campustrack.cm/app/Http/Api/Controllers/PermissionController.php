@@ -3,7 +3,9 @@
 namespace App\Http\Api\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\RoleCatalog;
 use App\Traits\HttpResponses;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -13,11 +15,44 @@ class PermissionController extends Controller
     use HttpResponses;
 
     /**
+     * Requête de permissions scopée au rôle de l'appelant.
+     *
+     * Les permissions sont GLOBALES (pas de tenant_id) : elles ne sont donc pas
+     * isolées par école, mais les permissions « plateforme » (roles.manage,
+     * permissions.manage, tenants.manage, …) sont masquées aux admins de tenant
+     * afin qu'ils ne puissent ni les voir ni les manipuler.
+     */
+    private function scopedQuery(Request $request): Builder
+    {
+        $query = Permission::query();
+
+        if (! $request->user()?->hasRole('super-admin')) {
+            $query->whereNotIn('name', RoleCatalog::PLATFORM_PERMISSIONS);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Refuse qu'un admin de tenant manipule une permission réservée plateforme.
+     */
+    private function ensureNotPlatformPermission(Request $request, string $name): void
+    {
+        if ($request->user()?->hasRole('super-admin')) {
+            return;
+        }
+
+        if (in_array($name, RoleCatalog::PLATFORM_PERMISSIONS, true)) {
+            abort(403, __('resources.permissions.platform_reserved'));
+        }
+    }
+
+    /**
      * Display a listing of the permissions.
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Permission::query();
+        $query = $this->scopedQuery($request);
 
         if ($request->has('search')) {
             $query->where('name', 'like', '%'.$request->search.'%');
@@ -31,7 +66,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permissions' => $permissions],
-            'Liste des permissions récupérée',
+            __('resources.permissions.list'),
             200
         );
     }
@@ -48,6 +83,8 @@ class PermissionController extends Controller
             'scope' => 'nullable|string|max:50',
         ]);
 
+        $this->ensureNotPlatformPermission($request, $validated['name']);
+
         $permission = Permission::create([
             'name' => $validated['name'],
             'guard_name' => 'web',
@@ -55,7 +92,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permission' => $permission],
-            'Permission créée avec succès',
+            __('resources.permissions.created'),
             201
         );
     }
@@ -63,13 +100,13 @@ class PermissionController extends Controller
     /**
      * Display the specified permission.
      */
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
-        $permission = Permission::with('roles')->findOrFail($id);
+        $permission = $this->scopedQuery($request)->with('roles')->findOrFail($id);
 
         return $this->success(
             ['permission' => $permission],
-            'Permission récupérée',
+            __('resources.permissions.retrieved'),
             200
         );
     }
@@ -79,20 +116,21 @@ class PermissionController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $permission = Permission::findOrFail($id);
+        $permission = $this->scopedQuery($request)->findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255|unique:permissions,name,'.$id,
         ]);
 
         if (isset($validated['name'])) {
+            $this->ensureNotPlatformPermission($request, $validated['name']);
             $permission->name = $validated['name'];
             $permission->save();
         }
 
         return $this->success(
             ['permission' => $permission],
-            'Permission mise à jour avec succès',
+            __('resources.permissions.updated'),
             200
         );
     }
@@ -100,30 +138,32 @@ class PermissionController extends Controller
     /**
      * Remove the specified permission.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        $permission = Permission::findOrFail($id);
+        $permission = $this->scopedQuery($request)->findOrFail($id);
+
+        $this->ensureNotPlatformPermission($request, $permission->name);
 
         // Check if permission is used by roles
         if ($permission->roles()->count() > 0) {
             return $this->error(
                 null,
-                'Cette permission est utilisée par des rôles. Veuillez d\'abord la retirer des rôles.',
+                __('resources.permissions.cannot_delete_with_roles'),
                 400
             );
         }
 
         $permission->delete();
 
-        return $this->success(null, 'Permission supprimée avec succès', 200);
+        return $this->success(null, __('resources.permissions.deleted'), 200);
     }
 
     /**
      * Group permissions by resource.
      */
-    public function byResource(): JsonResponse
+    public function byResource(Request $request): JsonResponse
     {
-        $permissions = Permission::all();
+        $permissions = $this->scopedQuery($request)->get();
         $grouped = [];
 
         foreach ($permissions as $permission) {
@@ -139,7 +179,7 @@ class PermissionController extends Controller
 
         return $this->success(
             ['permissions_by_resource' => $grouped],
-            'Permissions groupées par ressource',
+            __('resources.permissions.grouped_by_resource'),
             200
         );
     }
@@ -147,14 +187,14 @@ class PermissionController extends Controller
     /**
      * Get roles with this permission.
      */
-    public function getRoles(int $id): JsonResponse
+    public function getRoles(Request $request, int $id): JsonResponse
     {
-        $permission = Permission::findOrFail($id);
+        $permission = $this->scopedQuery($request)->findOrFail($id);
         $roles = $permission->roles;
 
         return $this->success(
             ['roles' => $roles],
-            'Rôles avec cette permission récupérés',
+            __('resources.permissions.roles_retrieved'),
             200
         );
     }

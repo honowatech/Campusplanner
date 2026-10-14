@@ -52,7 +52,7 @@ class CourseClassController extends Controller
             ->withCount('students')
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['classes' => $classes], 'Classes list retrieved', 200);
+        return $this->success(['classes' => $classes], __('resources.classes.list'), 200);
     }
 
     /**
@@ -77,7 +77,7 @@ class CourseClassController extends Controller
 
         return $this->success(
             ['class' => $class->load('department')],
-            'Class created successfully',
+            __('resources.classes.created'),
             201
         );
     }
@@ -101,7 +101,7 @@ class CourseClassController extends Controller
         ])->withCount('students')->findOrFail($id);
         $this->authorize('view', $class);
 
-        return $this->success(['class' => $class], 'Class retrieved', 200);
+        return $this->success(['class' => $class], __('resources.classes.retrieved'), 200);
     }
 
     /**
@@ -127,7 +127,7 @@ class CourseClassController extends Controller
         if (isset($validated['capacity']) && $validated['capacity'] < $class->students()->count()) {
             return $this->error(
                 null,
-                'Cannot reduce capacity below current student count ('.$class->students()->count().')',
+                __('resources.classes.cannot_reduce_capacity', ['count' => $class->students()->count()]),
                 422
             );
         }
@@ -136,7 +136,7 @@ class CourseClassController extends Controller
 
         return $this->success(
             ['class' => $class->load('department')],
-            'Class updated successfully',
+            __('resources.classes.updated'),
             200
         );
     }
@@ -153,7 +153,7 @@ class CourseClassController extends Controller
         if ($class->students()->count() > 0) {
             return $this->error(
                 null,
-                'Cannot delete class with enrolled students. Please reassign students first.',
+                __('resources.classes.cannot_delete_with_students'),
                 400
             );
         }
@@ -162,14 +162,14 @@ class CourseClassController extends Controller
         if ($class->shiftPlannings()->count() > 0) {
             return $this->error(
                 null,
-                'Cannot delete class with existing plannings. Please remove plannings first.',
+                __('resources.classes.cannot_delete_with_plannings'),
                 400
             );
         }
 
         $class->delete();
 
-        return $this->success(null, 'Class deleted successfully', 200);
+        return $this->success(null, __('resources.classes.deleted'), 200);
     }
 
     /**
@@ -188,7 +188,7 @@ class CourseClassController extends Controller
                 'enrolled_count' => $class->students()->count(),
                 'available_spots' => $class->getAvailableSpots(),
             ],
-            'Class students retrieved',
+            __('resources.classes.students_retrieved'),
             200
         );
     }
@@ -212,7 +212,7 @@ class CourseClassController extends Controller
         if ($studentCount > $availableSpots) {
             return $this->error(
                 null,
-                "Not enough spots available. Only {$availableSpots} spots left.",
+                __('resources.classes.not_enough_spots', ['spots' => $availableSpots]),
                 422
             );
         }
@@ -225,7 +225,7 @@ class CourseClassController extends Controller
                 'added_count' => $studentCount,
                 'available_spots' => $class->getAvailableSpots(),
             ],
-            'Students added to class successfully',
+            __('resources.classes.students_added'),
             200
         );
     }
@@ -250,7 +250,7 @@ class CourseClassController extends Controller
 
         return $this->success(
             ['schedule' => $plannings],
-            'Class schedule retrieved',
+            __('resources.classes.schedule_retrieved'),
             200
         );
     }
@@ -270,7 +270,7 @@ class CourseClassController extends Controller
 
         return $this->success(
             ['teachers' => $teachers],
-            'Class teachers retrieved',
+            __('resources.classes.teachers_retrieved'),
             200
         );
     }

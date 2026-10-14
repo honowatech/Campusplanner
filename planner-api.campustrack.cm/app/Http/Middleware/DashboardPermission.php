@@ -24,7 +24,7 @@ class DashboardPermission
             if ($requestedDeptId && $requestedDeptId != $user->department_id) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Accès non autorisé. Vous ne pouvez voir que les données de votre département',
+                    'message' => __('dashboard.permission.department_only'),
                     'data' => null,
                 ], 403);
             }

@@ -13,6 +13,7 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as TimetablesRouteImport } from './routes/timetables'
 import { Route as TeachersRouteImport } from './routes/teachers'
 import { Route as StudentsRouteImport } from './routes/students'
+import { Route as SmsRouteImport } from './routes/sms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -21,6 +22,8 @@ import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as DemoModeRouteImport } from './routes/demo-mode'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ClassesRouteImport } from './routes/classes'
+import { Route as BillingRouteImport } from './routes/billing'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlanningsPlanningIdRouteImport } from './routes/plannings.$planningId'
 
@@ -42,6 +45,11 @@ const TeachersRoute = TeachersRouteImport.update({
 const StudentsRoute = StudentsRouteImport.update({
   id: '/students',
   path: '/students',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SmsRoute = SmsRouteImport.update({
+  id: '/sms',
+  path: '/sms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -84,6 +92,16 @@ const ClassesRoute = ClassesRouteImport.update({
   path: '/classes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -97,6 +115,8 @@ const PlanningsPlanningIdRoute = PlanningsPlanningIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/billing': typeof BillingRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
@@ -105,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
   '/timetables': typeof TimetablesRoute
@@ -113,6 +134,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/billing': typeof BillingRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
@@ -121,6 +144,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
   '/timetables': typeof TimetablesRoute
@@ -130,6 +154,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/billing': typeof BillingRoute
   '/classes': typeof ClassesRoute
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
@@ -138,6 +164,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
   '/timetables': typeof TimetablesRoute
@@ -148,6 +175,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/billing'
     | '/classes'
     | '/courses'
     | '/demo-mode'
@@ -156,6 +185,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/sms'
     | '/students'
     | '/teachers'
     | '/timetables'
@@ -164,6 +194,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
+    | '/billing'
     | '/classes'
     | '/courses'
     | '/demo-mode'
@@ -172,6 +204,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/sms'
     | '/students'
     | '/teachers'
     | '/timetables'
@@ -180,6 +213,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
+    | '/billing'
     | '/classes'
     | '/courses'
     | '/demo-mode'
@@ -188,6 +223,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/sms'
     | '/students'
     | '/teachers'
     | '/timetables'
@@ -197,6 +233,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  BillingRoute: typeof BillingRoute
   ClassesRoute: typeof ClassesRoute
   CoursesRoute: typeof CoursesRoute
   DemoModeRoute: typeof DemoModeRoute
@@ -205,6 +243,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RoomsRoute: typeof RoomsRoute
   SettingsRoute: typeof SettingsRoute
+  SmsRoute: typeof SmsRoute
   StudentsRoute: typeof StudentsRoute
   TeachersRoute: typeof TeachersRoute
   TimetablesRoute: typeof TimetablesRoute
@@ -240,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/students'
       fullPath: '/students'
       preLoaderRoute: typeof StudentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sms': {
+      id: '/sms'
+      path: '/sms'
+      fullPath: '/sms'
+      preLoaderRoute: typeof SmsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -298,6 +344,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClassesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -317,6 +377,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  BillingRoute: BillingRoute,
   ClassesRoute: ClassesRoute,
   CoursesRoute: CoursesRoute,
   DemoModeRoute: DemoModeRoute,
@@ -325,6 +387,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RoomsRoute: RoomsRoute,
   SettingsRoute: SettingsRoute,
+  SmsRoute: SmsRoute,
   StudentsRoute: StudentsRoute,
   TeachersRoute: TeachersRoute,
   TimetablesRoute: TimetablesRoute,

@@ -58,7 +58,7 @@ class SchedulingController extends Controller
         if ($planningDepartmentId !== null) {
             if ($user->department_id === null
                 || (int) $user->department_id !== (int) $planningDepartmentId) {
-                abort(403, 'Ce planning n\'appartient pas à votre département.');
+                abort(403, __('planning.not_owned_by_department'));
             }
 
             return;
@@ -73,13 +73,13 @@ class SchedulingController extends Controller
             if ($departments->count() !== 1
                 || $user->department_id === null
                 || (int) $departments->first() !== (int) $user->department_id) {
-                abort(403, 'Ces classes n\'appartiennent pas à votre département.');
+                abort(403, __('planning.classes_not_owned_by_department'));
             }
 
             return;
         }
 
-        abort(403, 'Ce planning n\'appartient pas à votre département.');
+        abort(403, __('planning.not_owned_by_department'));
     }
 
     public function generate(Request $request)
@@ -116,7 +116,7 @@ class SchedulingController extends Controller
             $options
         );
 
-        return $this->success($result, 'Génération terminée', 201);
+        return $this->success($result, __('planning.scheduling.generated'), 201);
     }
 
     public function detectConflicts(Request $request)
@@ -134,7 +134,7 @@ class SchedulingController extends Controller
         return $this->success([
             'conflicts' => $conflicts,
             'total_conflicts' => count($conflicts),
-        ], 'Détection de conflits terminée');
+        ], __('planning.scheduling.conflicts_detected'));
     }
 
     public function resolveConflicts(Request $request)
@@ -156,10 +156,10 @@ class SchedulingController extends Controller
                 return $this->success([
                     'shift_planning' => $result,
                     'resolved' => true,
-                ], 'Conflit résolu automatiquement');
+                ], __('planning.conflicts.auto_resolved'));
             }
 
-            return $this->error(null, 'Impossible de résoudre automatiquement', 422);
+            return $this->error(null, __('planning.conflicts.cannot_auto_resolve'), 422);
         }
 
         $conflicts = $this->conflictService->detectConflicts($shiftPlanning, $shiftPlanning->id);
@@ -168,7 +168,7 @@ class SchedulingController extends Controller
         return $this->success([
             'conflicts' => $conflicts,
             'proposals' => $proposals,
-        ], 'Propositions de résolution');
+        ], __('planning.proposals.available'));
     }
 
     public function statistics(Request $request, int $planningId)
@@ -177,7 +177,7 @@ class SchedulingController extends Controller
         $this->authorize('view', $planning);
         $stats = $this->schedulingService->getStatistics($planning);
 
-        return $this->success($stats, 'Statistiques récupérées');
+        return $this->success($stats, __('planning.scheduling.statistics_retrieved'));
     }
 
     public function optimize(Request $request, int $planningId)
@@ -188,7 +188,7 @@ class SchedulingController extends Controller
         $this->authorizePlanningScope($planning);
         $result = $this->schedulingService->optimizeSchedule($planning);
 
-        return $this->success($result, 'Optimisation terminée');
+        return $this->success($result, __('planning.scheduling.optimization_completed'));
     }
 
     public function makeRecurring(Request $request, int $id)
@@ -212,7 +212,7 @@ class SchedulingController extends Controller
             'end_date' => $request->input('end_date'),
         ]);
 
-        return $this->success($result, 'Série récurrente créée', 201);
+        return $this->success($result, __('planning.recurrence.created'), 201);
     }
 
     public function updateRecurringSeries(Request $request, int $id)
@@ -238,7 +238,7 @@ class SchedulingController extends Controller
 
         $result = $this->recurrenceService->updateRecurringSeries($parent, $data);
 
-        return $this->success($result, 'Série mise à jour');
+        return $this->success($result, __('planning.recurrence.updated'));
     }
 
     public function deleteRecurringSeries(Request $request, int $id)
@@ -255,7 +255,7 @@ class SchedulingController extends Controller
             $request->input('delete_children', true)
         );
 
-        return $this->success($result, 'Série supprimée');
+        return $this->success($result, __('planning.recurrence.deleted'));
     }
 
     public function expandRecurring(int $id)
@@ -267,7 +267,7 @@ class SchedulingController extends Controller
         return $this->success([
             'shifts' => $shifts,
             'total' => $shifts->count(),
-        ], 'Série développée');
+        ], __('planning.recurrence.expanded'));
     }
 
     public function createDoubleur(Request $request, int $id)
@@ -294,7 +294,7 @@ class SchedulingController extends Controller
             ]
         );
 
-        return $this->success($result, 'Doubleur créé', 201);
+        return $this->success($result, __('planning.doubleur.created'), 201);
     }
 
     public function doubleurOpportunities(Request $request)
@@ -315,7 +315,7 @@ class SchedulingController extends Controller
         return $this->success([
             'opportunities' => $opportunities,
             'total' => count($opportunities),
-        ], 'Opportunités de doubleur récupérées');
+        ], __('planning.doubleur.opportunities_retrieved'));
     }
 
     public function simultaneousCourses(Request $request)
@@ -332,7 +332,7 @@ class SchedulingController extends Controller
         return $this->success([
             'simultaneous' => $simultaneous,
             'total' => count($simultaneous),
-        ], 'Cours simultanés récupérés');
+        ], __('planning.doubleur.simultaneous_retrieved'));
     }
 
     public function getProposals(int $id)
@@ -345,7 +345,7 @@ class SchedulingController extends Controller
             return $this->success([
                 'conflicts' => [],
                 'proposals' => [],
-            ], 'Aucun conflit détecté');
+            ], __('planning.conflicts.none_detected'));
         }
 
         $proposals = $this->resolutionService->getProposalsForConflicts($conflicts, $shiftPlanning);
@@ -353,7 +353,7 @@ class SchedulingController extends Controller
         return $this->success([
             'conflicts' => $conflicts,
             'proposals' => $proposals,
-        ], 'Propositions récupérées');
+        ], __('planning.proposals.retrieved'));
     }
 
     public function applyProposal(Request $request, int $id)
@@ -394,6 +394,6 @@ class SchedulingController extends Controller
         return $this->success([
             'shift_planning' => $shiftPlanning->fresh(),
             'remaining_conflicts' => $conflicts,
-        ], 'Proposition appliquée');
+        ], __('planning.proposals.applied'));
     }
 }

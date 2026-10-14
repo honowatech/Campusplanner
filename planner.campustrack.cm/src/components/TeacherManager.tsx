@@ -118,7 +118,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         // Pour un responsable, force son département ; sinon le premier
         // département disponible (l'admin pourra le modifier dans le formulaire).
         department_id:
-          user.role === 'hod'
+          user.role === 'responsable-departement'
             ? user.department_id
             : departments.length > 0
               ? departments[0].id
@@ -425,7 +425,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 <div className="relative">
                   <select
                     id="teacher-detail-department"
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'responsable-departement' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                     value={formData.department_id}
                     onChange={(e) =>
                       setFormData({
@@ -433,7 +433,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                         department_id: Number(e.target.value),
                       })
                     }
-                    disabled={user.role === 'hod'}
+                    disabled={user.role === 'responsable-departement'}
                   >
                     {departments?.map((department) => (
                       <option key={department.id} value={department.id}>
@@ -441,7 +441,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                       </option>
                     ))}
                   </select>
-                  {user.role === 'hod' && (
+                  {user.role === 'responsable-departement' && (
                     <Lock
                       size={14}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -546,7 +546,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           </div>
 
           {/* Admin Filter Dropdown */}
-          {user.role === 'admin' && (
+          {user.role === 'administrateur' && (
             <div className="relative w-full sm:w-56">
               <Filter
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -721,7 +721,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               <div className="relative">
                 <select
                   id="teacher-department"
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'responsable-departement' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                   value={formData.department_id}
                   onChange={(e) =>
                     setFormData({
@@ -729,7 +729,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                       department_id: Number(e.target.value),
                     })
                   }
-                  disabled={user.role === 'hod'}
+                  disabled={user.role === 'responsable-departement'}
                 >
                   {departments?.map((department) => (
                     <option key={department.id} value={department.id}>
@@ -737,7 +737,7 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                     </option>
                   ))}
                 </select>
-                {user.role === 'hod' && (
+                {user.role === 'responsable-departement' && (
                   <Lock
                     size={14}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"

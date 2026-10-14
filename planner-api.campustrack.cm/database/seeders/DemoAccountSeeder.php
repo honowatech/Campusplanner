@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ class DemoAccountSeeder extends Seeder
      * Rôles proposés en mode démo (tous les rôles sauf `super-admin`).
      */
     private const DEMO_ACCOUNTS = [
-        // 'administrateur' => ['name' => 'Démo Administrateur', 'email' => 'demo.administrateur@campustrack.com'],
+        'administrateur' => ['name' => 'Démo Administrateur', 'email' => 'demo.administrateur@campustrack.com'],
         'responsable-departement' => ['name' => 'Démo Responsable', 'email' => 'demo.responsable@campustrack.com'],
         'personnel-administratif' => ['name' => 'Démo Personnel', 'email' => 'demo.personnel@campustrack.com'],
         'professeur' => ['name' => 'Démo Professeur', 'email' => 'demo.professeur@campustrack.com'],
@@ -27,6 +28,11 @@ class DemoAccountSeeder extends Seeder
     {
         $departmentId = Department::query()->orderBy('id')->value('id');
 
+        // Les comptes démo appartiennent au tenant démo : on scope l'assignation
+        // de rôle à ce tenant (spatie teams).
+        $demo = Tenant::where('slug', 'demo')->firstOrFail();
+        setPermissionsTeamId($demo->id);
+
         foreach (self::DEMO_ACCOUNTS as $role => $account) {
             $user = User::firstOrCreate(
                 ['email' => $account['email']],
@@ -36,15 +42,23 @@ class DemoAccountSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                     'is_approved' => true,
+                    'tenant_id' => $demo->id,
                     'department_id' => $departmentId,
                 ]
             );
 
             // Maintient le rôle et l'approbation, même si le compte existait déjà.
             $user->assignRole($role);
-            $user->update(['is_approved' => true, 'is_demo' => true, 'department_id' => $departmentId]);
+            $user->update([
+                'is_approved' => true,
+                'is_demo' => true,
+                'tenant_id' => $demo->id,
+                'department_id' => $departmentId,
+            ]);
 
             $this->command->info("Demo account [{$role}] ready: {$account['email']}");
         }
+
+        setPermissionsTeamId(null);
     }
 }

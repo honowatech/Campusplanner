@@ -1,8 +1,9 @@
-import { User, UserRole, Role, Permission } from '@/src/lib/types';
+import { User, UserRole, Role, Permission, SubscriptionSummary } from '@/src/lib/types';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '@/src/services/api';
 import { AxiosError } from 'axios';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { useTranslation } from '@/src/utils/i18n';
 
 type ApiUserWithRoles = {
   id: number;
@@ -11,6 +12,8 @@ type ApiUserWithRoles = {
   department_id?: number;
   roles?: Role[];
   permissions?: Permission[];
+  features?: string[];
+  subscription?: SubscriptionSummary | null;
 };
 
 function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole = 'etudiant'): User {
@@ -21,8 +24,8 @@ function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole =
   if (roles.length > 0) {
     const roleNames = roles.map((r) => r.name);
     if (roleNames.includes('super-admin')) primaryRole = 'super-admin';
-    else if (roleNames.includes('administrateur')) primaryRole = 'admin';
-    else if (roleNames.includes('responsable-departement')) primaryRole = 'hod';
+    else if (roleNames.includes('administrateur')) primaryRole = 'administrateur';
+    else if (roleNames.includes('responsable-departement')) primaryRole = 'responsable-departement';
     else if (roleNames.includes('professeur')) primaryRole = 'professeur';
     else if (roleNames.includes('etudiant')) primaryRole = 'etudiant';
     else if (roleNames.includes('personnel-administratif')) primaryRole = 'personnel-administratif';
@@ -35,6 +38,8 @@ function convertApiUserToUser(apiUser: ApiUserWithRoles, defaultRole: UserRole =
     role: primaryRole,
     roles: roles,
     permissions: permissions.map((permission) => permission.name),
+    features: apiUser.features ?? [],
+    subscription: apiUser.subscription ?? null,
     department_id: apiUser.department_id,
   };
 }
@@ -62,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ne remplace plus toute l'application par un spinner)
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Restaure l'état d'auth au chargement : le cookie de session httpOnly fait
   // foi, GET /api/auth-user est la seule source de vérité
@@ -116,13 +122,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         localStorage.setItem('show-login-toast', 'true');
       } else {
-        setApiError(response.data.message || 'Erreur de connexion');
+        setApiError(response.data.message || t('errors.login'));
         throw new Error(response.data.message);
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string; data?: Record<string, string[]> }>;
       const errorMessage =
-        axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
+        axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       // On relance l'erreur axios pour permettre au formulaire d'extraire
       // les erreurs de champs (422) de la réponse.
@@ -147,13 +153,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true);
         localStorage.setItem('show-login-toast', 'true');
       } else {
-        setApiError(response.data.message || 'Erreur de connexion');
+        setApiError(response.data.message || t('errors.login'));
         throw new Error(response.data.message);
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
-        axiosError.response?.data?.message || 'Erreur de connexion. Veuillez réessayer.';
+        axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       throw axiosError;
     } finally {

@@ -1,3 +1,5 @@
+import { getLocale } from './locale';
+
 export const formatDateTime = (
   datetime: string,
   options: {
@@ -12,7 +14,7 @@ export const formatDateTime = (
     year: 'numeric',
   },
 ) => {
-  return new Date(datetime).toLocaleDateString('en-GB', {
+  return new Date(datetime).toLocaleDateString(getLocale(), {
     weekday: options.weekday,
     day: options.day,
     month: options.month,

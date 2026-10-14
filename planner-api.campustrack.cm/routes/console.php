@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Schedule;
+use App\Jobs\PaymeReconciliationJob;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,3 +41,9 @@ Schedule::command('dashboard:warm-cache heavy --period=30d')
     ->withoutOverlapping()
     ->onOneServer()
     ->runInBackground();
+
+// Réconciliation PayMe (polling des paiements en attente, cf. MAMONIPAY_API.md).
+Schedule::job(new PaymeReconciliationJob)
+    ->everyFifteenSeconds()
+    ->withoutOverlapping()
+    ->onOneServer();

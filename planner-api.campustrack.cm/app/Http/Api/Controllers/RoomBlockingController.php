@@ -46,7 +46,7 @@ class RoomBlockingController extends Controller
             ->orderBy('start_datetime', 'desc')
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['blockings' => $blockings], 'Room blockings list retrieved', 200);
+        return $this->success(['blockings' => $blockings], __('api.room_blockings.list'), 200);
     }
 
     /**
@@ -93,7 +93,7 @@ class RoomBlockingController extends Controller
 
         if ($conflicts->count() > 0) {
             $response['warnings'] = [
-                'message' => 'This blocking conflicts with existing plannings',
+                'message' => __('api.room_blockings.conflicts_warning'),
                 'conflicts_count' => $conflicts->count(),
                 'conflicts' => $conflicts,
             ];
@@ -101,7 +101,7 @@ class RoomBlockingController extends Controller
 
         return $this->success(
             $response,
-            'Room blocking created successfully',
+            __('api.room_blockings.created'),
             201
         );
     }
@@ -114,7 +114,7 @@ class RoomBlockingController extends Controller
         $blocking = RoomBlocking::with(['room', 'createdBy'])->findOrFail($id);
         $this->authorize('view', $blocking);
 
-        return $this->success(['blocking' => $blocking], 'Room blocking retrieved', 200);
+        return $this->success(['blocking' => $blocking], __('api.room_blockings.retrieved'), 200);
     }
 
     /**
@@ -139,7 +139,7 @@ class RoomBlockingController extends Controller
 
         return $this->success(
             ['blocking' => $blocking->load(['room', 'createdBy'])],
-            'Room blocking updated successfully',
+            __('api.room_blockings.updated'),
             200
         );
     }
@@ -153,7 +153,7 @@ class RoomBlockingController extends Controller
         $this->authorize('delete', $blocking);
         $blocking->delete();
 
-        return $this->success(null, 'Room blocking deleted successfully', 200);
+        return $this->success(null, __('api.room_blockings.deleted'), 200);
     }
 
     /**
@@ -180,7 +180,7 @@ class RoomBlockingController extends Controller
 
         return $this->success(
             ['blockings' => $blockings],
-            'Room blockings retrieved',
+            __('api.room_blockings.list'),
             200
         );
     }
@@ -228,6 +228,6 @@ class RoomBlockingController extends Controller
             'has_conflicts' => $hasConflicts,
             'blocking_conflicts' => $blockingConflicts,
             'planning_conflicts' => $planningConflicts,
-        ], 'Conflict check completed', 200);
+        ], __('api.room_blockings.conflict_check'), 200);
     }
 }

@@ -59,7 +59,7 @@ class StudentController extends Controller
         $students = $query->with(['user', 'class'])
             ->paginate($request->per_page ?? 9);
 
-        return $this->success(['students' => $students], 'Students list retrieved', 200);
+        return $this->success(['students' => $students], __('resources.students.list'), 200);
     }
 
     /**
@@ -90,7 +90,7 @@ class StudentController extends Controller
 
         return $this->success(
             ['student' => $student->load(['user', 'class'])],
-            'Student created successfully with user account',
+            __('resources.students.created'),
             201
         );
     }
@@ -112,7 +112,7 @@ class StudentController extends Controller
         ])->findOrFail($id);
         $this->authorize('view', $student);
 
-        return $this->success(['student' => $student], 'Student retrieved', 200);
+        return $this->success(['student' => $student], __('resources.students.retrieved'), 200);
     }
 
     /**
@@ -143,7 +143,7 @@ class StudentController extends Controller
 
         return $this->success(
             ['student' => $student->load(['user', 'class'])],
-            'Student updated successfully',
+            __('resources.students.updated'),
             200
         );
     }
@@ -164,7 +164,7 @@ class StudentController extends Controller
             $user->delete();
         }
 
-        return $this->success(null, 'Student and associated user account deleted successfully', 200);
+        return $this->success(null, __('resources.students.deleted'), 200);
     }
 
     /**
@@ -176,7 +176,7 @@ class StudentController extends Controller
         $this->authorize('view', $student);
 
         if (! $student->class) {
-            return $this->error(null, 'Student is not assigned to any class', 404);
+            return $this->error(null, __('resources.students.not_assigned'), 404);
         }
 
         $startDate = $request->input('start_date', now()->format('Y-m-d'));
@@ -191,7 +191,7 @@ class StudentController extends Controller
 
         return $this->success(
             ['schedule' => $plannings],
-            'Student schedule retrieved',
+            __('resources.students.schedule_retrieved'),
             200
         );
     }
@@ -214,7 +214,7 @@ class StudentController extends Controller
         if (! $newClass->hasAvailableSpace()) {
             return $this->error(
                 null,
-                'Target class is full. No available spots.',
+                __('resources.students.class_full'),
                 422
             );
         }
@@ -227,7 +227,7 @@ class StudentController extends Controller
                 'student' => $student->load('class'),
                 'previous_class' => $oldClass,
             ],
-            'Student moved to new class successfully',
+            __('resources.students.moved'),
             200
         );
     }
@@ -245,7 +245,7 @@ class StudentController extends Controller
 
         return $this->success(
             ['students' => $students],
-            'Unassigned students retrieved',
+            __('resources.students.unassigned_retrieved'),
             200
         );
     }

@@ -44,7 +44,7 @@ class PlanningController extends Controller
 
         $plannings = $query->get();
 
-        return $this->success(['plannings' => $plannings], 'Plannings récupérés');
+        return $this->success(['plannings' => $plannings], __('planning.planning.list'));
     }
 
     public function store(StorePlanningRequest $request)
@@ -63,7 +63,7 @@ class PlanningController extends Controller
 
         return $this->success(
             ['planning' => $planning],
-            'Planning créé avec succès',
+            __('planning.planning.created'),
             201
         );
     }
@@ -79,10 +79,14 @@ class PlanningController extends Controller
             ->orderBy('starting_hour', 'asc')
             ->get();
 
+        // Les shifts sont renvoyés avec leurs relations pour que les rôles en
+        // lecture seule (professeur, étudiant) puissent afficher l'emploi du
+        // temps sans charger séparément teachers/rooms/classes (403 pour eux).
+        $planning->setRelation('shiftPlannings', $shiftPlannings);
+
         return $this->success([
             'planning' => $planning,
-            // 'shift_plannings' => $shiftPlannings,
-        ], 'Planning récupéré');
+        ], __('planning.planning.retrieved'));
     }
 
     public function update(UpdatePlanningRequest $request, int $id)
@@ -93,7 +97,7 @@ class PlanningController extends Controller
 
         return $this->success(
             ['planning' => Planning::findPlanningById($id)],
-            'Planning mis à jour avec succès',
+            __('planning.planning.updated'),
             200
         );
     }
@@ -104,6 +108,6 @@ class PlanningController extends Controller
 
         Planning::deletePlanning($id);
 
-        return $this->success(null, 'Planning supprimé avec succès', 200);
+        return $this->success(null, __('planning.planning.deleted'), 200);
     }
 }

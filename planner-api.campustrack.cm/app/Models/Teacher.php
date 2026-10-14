@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,7 +12,7 @@ use Modules\Planning\Entities\ShiftPlanning;
 
 class Teacher extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'teachers';
 
@@ -26,6 +27,7 @@ class Teacher extends Model
         'max_hours_per_week',
         'is_active',
         'hired_at',
+        'tenant_id',
     ];
 
     protected $casts = [

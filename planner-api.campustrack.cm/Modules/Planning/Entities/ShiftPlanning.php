@@ -6,13 +6,14 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\Room;
 use App\Models\Teacher;
+use App\Traits\BelongsToTenant;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ShiftPlanning extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'planning_shift_plannings';
 
@@ -32,6 +33,7 @@ class ShiftPlanning extends Model
         'recurrence_pattern',
         'parent_id',
         'recurrence_end_date',
+        'tenant_id',
     ];
 
     protected $casts = [

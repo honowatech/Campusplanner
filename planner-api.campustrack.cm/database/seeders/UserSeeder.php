@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,6 +16,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $departments = Department::all();
+
+        // Les utilisateurs de test appartiennent au tenant démo.
+        $demo = Tenant::where('slug', 'demo')->firstOrFail();
+        setPermissionsTeamId($demo->id);
 
         $rolesByDepartment = [
             'administrateur',
@@ -68,6 +73,8 @@ class UserSeeder extends Seeder
                 $userCount++;
             }
         }
+
+        setPermissionsTeamId(null);
 
         $this->command->info("Users seeded successfully! ({$userCount} users created with roles)");
     }

@@ -3,12 +3,13 @@
 namespace Modules\Planning\Entities;
 
 use App\Models\Department;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Planning extends Model
 {
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'planning_plannings';
 
@@ -18,6 +19,7 @@ class Planning extends Model
         'ending_date',
         'description',
         'department_id',
+        'tenant_id',
     ];
 
     protected $casts = [

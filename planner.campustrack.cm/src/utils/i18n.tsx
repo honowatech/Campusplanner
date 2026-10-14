@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-
-type Language = 'en' | 'fr';
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import type { Language } from '@/src/lib/locale';
+import { STORAGE_KEY, getStoredLanguage } from '@/src/lib/locale';
 
 const translations = {
   en: {
@@ -65,6 +65,11 @@ const translations = {
     demoAccounts: 'Demo accounts',
     demoAccountsDescription: 'One account per role is offered on the login page.',
     demoAccountsEmpty: 'No demo account available.',
+
+    // Billing / SMS / Admin
+    billing: 'Billing',
+    sms: 'SMS',
+    adminConsole: 'Admin Console',
 
     // Profile
     profileDetails: 'Profile Details',
@@ -317,6 +322,70 @@ const translations = {
     completed: 'Completed',
     ongoing: 'Ongoing',
     canceled: 'Canceled',
+
+    maxWeeklyHoursHint: 'Maximum teaching load per teacher per week.',
+    maxConsecutiveHoursHint: 'Limit on back-to-back sessions without a break.',
+    generalSettingsPlaceholder: 'General application settings will appear here.',
+    apiKeyPlaceholder: 'Enter your API Key',
+    maxChars: 'Max 11 characters',
+
+    room: 'Room',
+    course: 'Course',
+    teacher: 'Teacher',
+
+    errors: {
+      generic: 'An error occurred. Please try again.',
+      login: 'Login error',
+      loginRetry: 'Login error. Please try again.',
+    },
+
+    toast: {
+      created: '{label} created successfully',
+      updated: '{label} updated successfully',
+      deleted: '{label} deleted successfully',
+      roomBlockingCreated: 'Room blocking created successfully',
+      roomBlockingUpdated: 'Room blocking updated successfully',
+      roomBlockingDeleted: 'Room blocking deleted successfully',
+      teacherBlockingCreated: 'Teacher blocking created successfully',
+      teacherBlockingUpdated: 'Teacher blocking updated successfully',
+      teacherBlockingDeleted: 'Teacher blocking deleted successfully',
+      teacherBlockingApproved: 'Teacher blocking approved successfully',
+      teacherBlockingRejected: 'Teacher blocking rejected successfully',
+      planningCreated: 'Planning created successfully',
+      planningUpdated: 'Planning updated successfully',
+      planningDeleted: 'Planning deleted successfully',
+      shiftsGenerated: '{count} shifts generated.',
+      timetableOptimized: 'Timetable optimized.',
+      shiftCreated: 'Shift created successfully',
+      shiftUpdated: 'Shift updated successfully',
+      shiftDeleted: 'Shift deleted successfully',
+      settingsUpdated: 'Settings updated successfully',
+      smsConfigSaved: 'SMS configuration saved.',
+      smsTestSent: 'Test SMS sent.',
+      smsSent: 'SMS sent.',
+      smsSendFailed: 'Failed to send SMS.',
+      studentCreated: 'Student created successfully',
+      studentUpdated: 'Student updated successfully',
+      studentDeleted: 'Student deleted successfully',
+      userCreated: 'User created successfully',
+      userUpdated: 'User updated successfully',
+      userDeleted: 'User deleted successfully',
+      userApproved: 'Account approved successfully',
+      userRejected: 'Account request rejected',
+      userDeactivated: 'Account suspended: sessions revoked',
+      tenantCreated: 'Tenant created.',
+      packSaved: 'Pack saved.',
+      packDeleted: 'Pack deleted.',
+      gatewayConfigured: 'PayMe gateway configured.',
+      tenantSuspended: 'Tenant suspended',
+      tenantReactivated: 'Tenant reactivated',
+      paymentInitiated: 'Payment initiated. Confirm the transaction on your phone.',
+      paymentInitFailed: 'Payment could not be initiated.',
+      demoEnabled: 'Demo mode enabled',
+      demoDisabled: 'Demo mode disabled',
+      loginSuccess: 'Signed in successfully',
+      dashboardLoadError: 'Failed to load the dashboard. Please try again.',
+    },
   },
   fr: {
     // General
@@ -380,6 +449,11 @@ const translations = {
     demoAccounts: 'Comptes démo',
     demoAccountsDescription: 'Un compte par rôle est proposé sur la page de connexion.',
     demoAccountsEmpty: 'Aucun compte démo disponible.',
+
+    // Billing / SMS / Admin
+    billing: 'Facturation',
+    sms: 'SMS',
+    adminConsole: 'Console admin',
 
     // Profile
     profileDetails: 'Détails du Profil',
@@ -666,21 +740,129 @@ const translations = {
     completed: 'Terminées',
     ongoing: 'En cours',
     canceled: 'Annulées',
+
+    maxWeeklyHoursHint: 'Charge maximale d\'enseignement par enseignant et par semaine.',
+    maxConsecutiveHoursHint: 'Limite de sessions consécutives sans pause.',
+    generalSettingsPlaceholder: 'Les paramètres généraux de l\'application apparaîtront ici.',
+    apiKeyPlaceholder: 'Saisissez votre clé API',
+    maxChars: '11 caractères maximum',
+
+    room: 'Salle',
+    course: 'Cours',
+    teacher: 'Enseignant',
+
+    errors: {
+      generic: 'Une erreur est survenue. Veuillez réessayer.',
+      login: 'Erreur de connexion',
+      loginRetry: 'Erreur de connexion. Veuillez réessayer.',
+    },
+
+    toast: {
+      created: '{label} créé(e) avec succès',
+      updated: '{label} mis(e) à jour avec succès',
+      deleted: '{label} supprimé(e) avec succès',
+      roomBlockingCreated: 'Blocage de salle créé avec succès',
+      roomBlockingUpdated: 'Blocage de salle mis à jour avec succès',
+      roomBlockingDeleted: 'Blocage de salle supprimé avec succès',
+      teacherBlockingCreated: 'Blocage d\'enseignant créé avec succès',
+      teacherBlockingUpdated: 'Blocage d\'enseignant mis à jour avec succès',
+      teacherBlockingDeleted: 'Blocage d\'enseignant supprimé avec succès',
+      teacherBlockingApproved: 'Blocage d\'enseignant approuvé avec succès',
+      teacherBlockingRejected: 'Blocage d\'enseignant rejeté',
+      planningCreated: 'Planning créé avec succès',
+      planningUpdated: 'Planning mis à jour avec succès',
+      planningDeleted: 'Planning supprimé avec succès',
+      shiftsGenerated: '{count} cours générés.',
+      timetableOptimized: 'Emploi du temps optimisé.',
+      shiftCreated: 'Cours planifié créé avec succès',
+      shiftUpdated: 'Cours planifié mis à jour avec succès',
+      shiftDeleted: 'Cours planifié supprimé avec succès',
+      settingsUpdated: 'Paramètres mis à jour avec succès',
+      smsConfigSaved: 'Configuration SMS enregistrée.',
+      smsTestSent: 'SMS de test envoyé.',
+      smsSent: 'SMS envoyé.',
+      smsSendFailed: 'Échec de l\'envoi SMS.',
+      studentCreated: 'Étudiant créé avec succès',
+      studentUpdated: 'Étudiant mis à jour avec succès',
+      studentDeleted: 'Étudiant supprimé avec succès',
+      userCreated: 'Utilisateur créé avec succès',
+      userUpdated: 'Utilisateur mis à jour avec succès',
+      userDeleted: 'Utilisateur supprimé avec succès',
+      userApproved: 'Compte validé avec succès',
+      userRejected: 'Demande de compte rejetée',
+      userDeactivated: 'Compte suspendu : sessions révoquées',
+      tenantCreated: 'Tenant créé.',
+      packSaved: 'Pack enregistré.',
+      packDeleted: 'Pack supprimé.',
+      gatewayConfigured: 'Passerelle PayMe configurée.',
+      tenantSuspended: 'Tenant suspendu',
+      tenantReactivated: 'Tenant réactivé',
+      paymentInitiated: 'Paiement initié. Validez la transaction sur votre téléphone.',
+      paymentInitFailed: 'Le paiement n\'a pas pu être initié.',
+      demoEnabled: 'Mode démo activé',
+      demoDisabled: 'Mode démo désactivé',
+      loginSuccess: 'Connexion réussie',
+      dashboardLoadError: 'Impossible de charger le tableau de bord. Veuillez réessayer.',
+    },
   },
 };
+
+/**
+ * Traduction hors contexte React (loaders de routes, etc.) : lit la langue
+ * persistée et résout la même clé que `useTranslation().t`.
+ */
+export function translate(key: string, params?: Record<string, string | number>): string {
+  const language = getStoredLanguage();
+  const keys = key.split('.');
+
+  const lookup = (dict: any): string | undefined => {
+    let value: any = dict;
+    for (const k of keys) {
+      if (value && typeof value === 'object' && value[k] !== undefined) {
+        value = value[k];
+      } else {
+        return undefined;
+      }
+    }
+    return typeof value === 'string' ? value : undefined;
+  };
+
+  const interpolate = (text: string): string =>
+    params ? text.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`)) : text;
+
+  const value = lookup(translations[language]);
+  if (value !== undefined) return interpolate(value);
+
+  if (language !== 'en') {
+    const enValue = lookup(translations.en);
+    if (enValue !== undefined) return interpolate(enValue);
+  }
+
+  return key;
+}
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(getStoredLanguage);
 
-  const t = (key: string): string => {
+  const setLanguage = (lang: Language): void => {
+    setLanguageState(lang);
+    localStorage.setItem(STORAGE_KEY, lang);
+    document.documentElement.lang = lang;
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
 
     const lookup = (dict: any): string | undefined => {
@@ -695,12 +877,15 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       return typeof value === 'string' ? value : undefined;
     };
 
+    const interpolate = (text: string): string =>
+      params ? text.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`)) : text;
+
     const value = lookup(translations[language]);
-    if (value !== undefined) return value;
+    if (value !== undefined) return interpolate(value);
 
     if (language !== 'en') {
       const enValue = lookup(translations.en);
-      if (enValue !== undefined) return enValue;
+      if (enValue !== undefined) return interpolate(enValue);
     }
 
     return key;

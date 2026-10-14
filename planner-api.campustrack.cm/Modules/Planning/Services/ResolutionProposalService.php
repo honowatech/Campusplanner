@@ -71,7 +71,7 @@ class ResolutionProposalService
                 'room_building' => $room->building,
                 'room_floor' => $room->floor,
                 'room_capacity' => $room->capacity,
-                'description' => "Changer la salle pour {$room->name} ({$room->building})",
+                'description' => __('planning.proposals.change_room', ['room' => $room->name, 'building' => $room->building]),
             ];
         }
 
@@ -112,7 +112,7 @@ class ResolutionProposalService
                     'teacher_id' => $teacher->id,
                     'teacher_name' => $teacher->full_name,
                     'teacher_speciality' => $teacher->speciality,
-                    'description' => "Changer le professeur pour {$teacher->full_name}",
+                    'description' => __('planning.proposals.change_teacher', ['teacher' => $teacher->full_name]),
                 ];
             }
         }
@@ -125,7 +125,7 @@ class ResolutionProposalService
                     'teacher_id' => $teacher->id,
                     'teacher_name' => $teacher->full_name,
                     'teacher_speciality' => $teacher->speciality,
-                    'description' => "Changer le professeur pour {$teacher->full_name}",
+                    'description' => __('planning.proposals.change_teacher', ['teacher' => $teacher->full_name]),
                 ];
             }
         }
@@ -164,7 +164,7 @@ class ResolutionProposalService
                     'date' => $date,
                     'starting_hour' => $startTime,
                     'ending_hour' => $endTime,
-                    'description' => "Déplacer le cours au {$slot['label']}",
+                    'description' => __('planning.proposals.change_time', ['slot' => $slot['label']]),
                 ];
             }
 

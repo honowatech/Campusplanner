@@ -71,7 +71,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
     } else {
       setEditingId(null);
       const defaultDeptId =
-        user.role === 'hod' && user.department_id
+        user.role === 'responsable-departement' && user.department_id
           ? user.department_id
           : departments.length > 0
             ? departments[0].id
@@ -273,7 +273,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
               <select
                 required
                 id="class-department"
-                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'hod' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${user.role === 'responsable-departement' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                 value={formData.department_id}
                 onChange={(e) =>
                   setFormData({
@@ -281,7 +281,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
                     department_id: Number(e.target.value),
                   })
                 }
-                disabled={user.role === 'hod'}
+                disabled={user.role === 'responsable-departement'}
               >
                 <option value="" disabled>
                   {t('selectDept')}
@@ -292,7 +292,7 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
                   </option>
                 ))}
               </select>
-              {user.role === 'hod' && (
+              {user.role === 'responsable-departement' && (
                 <Lock
                   size={14}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"

@@ -49,6 +49,8 @@ export type User = {
   approved_at?: string;
   roles?: Role[];
   permissions?: string[];
+  features?: string[];
+  subscription?: SubscriptionSummary | null;
   created_at?: string;
   updated_at?: string;
   role?: UserRole;
@@ -445,11 +447,10 @@ export type ApiErrorResponse = {
 
 export type UserRole =
   | 'super-admin'
-  | 'administrateur'
   | 'professeur'
   | 'etudiant'
-  | 'admin'
-  | 'hod'
+  | 'administrateur'
+  | 'responsable-departement'
   | 'personnel-administratif';
 
 export type DashboardStats = {
@@ -483,4 +484,149 @@ export type DemoAccount = {
 export type DemoModeStatus = {
   enabled: boolean;
   accounts: DemoAccount[];
+};
+
+// ============================================================
+// SUBSCRIPTION / FEATURE GATING TYPES
+// ============================================================
+
+export type Feature = {
+  key: string;
+  label: string;
+  group: string;
+  description?: string;
+  enabled: boolean;
+};
+
+export type FeaturesPayload = {
+  features: Feature[];
+  groups: Record<string, string>;
+};
+
+export type Pack = {
+  id: number;
+  name: string;
+  tier: string;
+  slug: string;
+  price: number;
+  currency: string;
+  billing_period: 'monthly' | 'annual';
+  description?: string;
+  features: string[];
+};
+
+export type SubscriptionSummary = {
+  id: number;
+  status: string;
+  billing_period: string;
+  starts_at?: string;
+  ends_at?: string;
+  trial_ends_at?: string;
+  auto_renew: boolean;
+  pack: {
+    id: number;
+    name: string;
+    tier: string;
+    slug: string;
+    price: number;
+    currency: string;
+  } | null;
+};
+
+// ============================================================
+// BILLING / PAYMENT TYPES
+// ============================================================
+
+export type Payment = {
+  id: number;
+  tenant_id: number;
+  subscription_id?: number;
+  amount: number;
+  currency: string;
+  status: string;
+  gateway_reference?: string;
+  external_reference?: string;
+  payment_method?: string;
+  paid_at?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+// ============================================================
+// SMS TYPES
+// ============================================================
+
+export type SmsCredential = {
+  id: number;
+  provider: string;
+  user?: string;
+  sender_id?: string;
+  is_active: boolean;
+  balance_cached?: number;
+};
+
+export type SmsLog = {
+  id: number;
+  to: string;
+  message: string;
+  status: string;
+  provider_ref?: string;
+  error?: string;
+  created_at?: string;
+};
+
+// ============================================================
+// ADMIN / SUPER-ADMIN TYPES
+// ============================================================
+
+export type Tenant = {
+  id: number;
+  name: string;
+  slug: string;
+  status: string;
+  is_demo: boolean;
+  demo_mode: boolean;
+  billing_phone?: string;
+  users_count?: number;
+  created_at?: string;
+  subscriptions?: {
+    id: number;
+    status: string;
+    pack?: { id: number; name: string; tier: string } | null;
+  }[];
+};
+
+export type PaymentGatewayConfig = {
+  id: number;
+  provider: string;
+  user_name?: string;
+  app_id?: string;
+  endpoint?: string;
+  pay_type_id?: string;
+  client_fees_rate: number;
+  mode: 'sandbox' | 'live';
+  is_active: boolean;
+};
+
+export type AdminFeature = {
+  id: number;
+  key: string;
+  label: string;
+  group: string;
+  description?: string;
+  is_active: boolean;
+};
+
+export type AdminPack = {
+  id: number;
+  name: string;
+  slug: string;
+  tier?: string;
+  description?: string;
+  price: number;
+  currency: string;
+  billing_period: 'monthly' | 'annual';
+  is_active: boolean;
+  sort: number;
+  features: { id: number; key: string; label: string }[];
 };

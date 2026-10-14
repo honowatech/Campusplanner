@@ -56,9 +56,16 @@ class PlanningScopeTest extends TestCase
             'name' => 'Cours X', 'code' => 'CX', 'department_id' => $this->department->id,
         ]);
 
+        $otherCourse = Course::create([
+            'name' => 'Cours Y', 'code' => 'CY', 'department_id' => $this->department->id,
+        ]);
+
+        // Le professeur enseigne le cours « Cours X » (scope « matière »).
+        $teacher->courses()->attach($course->id);
+
         $date = now()->startOfWeek()->addWeek()->toDateString();
 
-        // Le professeur enseigne dans ownClass
+        // Shift de la matière du professeur, dans ownClass.
         $ownShift = ShiftPlanning::create([
             'planning_id' => $planning->id,
             'course_class_id' => $ownClass->id,
@@ -69,11 +76,11 @@ class PlanningScopeTest extends TestCase
             'ending_hour' => '10:00',
         ]);
 
-        // Autre shift, dans otherClass, enseigné par quelqu'un d'autre
+        // Autre shift, d'une AUTRE matière, dans otherClass, enseigné par quelqu'un d'autre.
         $otherShift = ShiftPlanning::create([
             'planning_id' => $planning->id,
             'course_class_id' => $otherClass->id,
-            'course_id' => $course->id,
+            'course_id' => $otherCourse->id,
             'teacher_id' => null,
             'date' => $date,
             'starting_hour' => '10:00',

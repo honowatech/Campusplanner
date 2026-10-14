@@ -11,7 +11,7 @@ const crud = createCrudHooks<Teacher, TeacherParams, CreateTeacherData, UpdateTe
   service: teacherService,
   queryKey: 'teachers',
   singleKey: 'teacher',
-  label: 'Enseignant',
+  label: 'teacher',
 });
 
 export const useTeachers = crud.useList;
