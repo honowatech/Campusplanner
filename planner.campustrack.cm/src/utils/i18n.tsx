@@ -1,11 +1,12 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import type { Language } from '@/src/lib/locale';
 import { STORAGE_KEY, getStoredLanguage } from '@/src/lib/locale';
+import { APP_NAME } from '@/src/lib/constants';
 
 const translations = {
   en: {
     // General
-    appName: (import.meta as any).env.VITE_APP_NAME,
+    appName: APP_NAME,
     dashboard: 'Dashboard',
     departments: 'Departments',
     classes: 'Classes',
@@ -389,7 +390,7 @@ const translations = {
   },
   fr: {
     // General
-    appName: (import.meta as any).env.VITE_APP_NAME,
+    appName: APP_NAME,
     dashboard: 'Tableau de Bord',
     departments: 'Départements',
     classes: 'Filières',

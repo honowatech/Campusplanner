@@ -19,6 +19,10 @@ export const API_BASE_URL: string = (
   ''
 ).replace(/\/+$/, '');
 
+/** Nom affiché de l'application : VITE_APP_NAME au build, sinon le nom du produit. */
+export const APP_NAME: string =
+  ((import.meta as any).env.VITE_APP_NAME as string | undefined) || 'Campus Planner';
+
 export const DEPARTMENTS = ['Computer Science', 'Mathematics', 'Physics', 'Literature', 'Arts'];
 
 export const SUBJECTS = [
