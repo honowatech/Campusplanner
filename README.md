@@ -25,6 +25,10 @@ The project is split into two independent Git repositories:
 - AI-assisted scheduling via a server-side Gemini proxy (the API key never reaches the browser).
 - **In progress** — multi-tenancy, subscription packs, Nexah SMS and MamoniPay (PayMe)
   payments. See [the implementation plan](PLAN_IMPLEMENTATION_SAAS_MULTITENANT.md).
+- **PayMe (MamoniPay) integration** — currently non-functional (wrong host, paths and
+  payloads). Audit in [docs/AUDIT_PAYME_2026-10-14.md](docs/AUDIT_PAYME_2026-10-14.md),
+  step-by-step fix plan with the real API contract in
+  [docs/FEUILLE_DE_ROUTE_PAYME.md](docs/FEUILLE_DE_ROUTE_PAYME.md).
 
 ---
 
