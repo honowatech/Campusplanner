@@ -29,20 +29,30 @@ class PaymentGatewayController extends Controller
         $validated = $request->validate([
             'user_name' => 'required|string|max:255',
             'password' => 'sometimes|nullable|string|max:255',
-            'app_id' => 'sometimes|nullable|string|max:255',
-            'endpoint' => 'sometimes|nullable|string|max:255',
-            'pay_type_id' => 'sometimes|nullable|string|max:255',
-            'client_fees_rate' => 'sometimes|numeric|min:0|max:1',
-            'mode' => 'sometimes|in:sandbox,live',
+            'endpoint' => [
+                'sometimes', 'nullable', 'string', 'max:255', 'url:https',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (is_string($value) && PaymeClient::isInvalidBaseUrl($value)) {
+                        $fail(__('admin.payment_gateway.invalid_endpoint'));
+                    }
+                },
+            ],
+            'client_fees_rate' => 'sometimes|nullable|integer|min:0|max:100',
+            'timeout_minutes' => 'sometimes|integer|min:2|max:60',
             'is_active' => 'sometimes|boolean',
         ]);
 
         $gateway = PaymentGateway::query()->firstOrNew(['provider' => 'payme']);
 
-        foreach (['user_name', 'app_id', 'endpoint', 'pay_type_id', 'client_fees_rate', 'mode', 'is_active'] as $field) {
+        foreach (['user_name', 'client_fees_rate', 'timeout_minutes', 'is_active'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $gateway->{$field} = $validated[$field];
             }
+        }
+
+        if (array_key_exists('endpoint', $validated)) {
+            $endpoint = trim((string) $validated['endpoint']);
+            $gateway->endpoint = $endpoint === '' ? null : rtrim($endpoint, '/');
         }
 
         if (! empty($validated['password'])) {
@@ -51,16 +61,53 @@ class PaymentGatewayController extends Controller
 
         $gateway->save();
 
-        // Invalide le JWT en cache (les crédences ont pu changer).
+        // Invalide le jeton en cache (les crédences ont pu changer).
         app(PaymeClient::class)->forgetToken($gateway);
 
         AuditService::record('payment_gateway.updated', $gateway, [], [
             'user_name' => $gateway->user_name,
-            'mode' => $gateway->mode,
+            'endpoint' => $gateway->endpoint,
+            'client_fees_rate' => $gateway->client_fees_rate,
+            'timeout_minutes' => $gateway->timeout_minutes,
             'is_active' => (bool) $gateway->is_active,
         ]);
 
         return $this->success(['gateway' => $this->payload($gateway)], __('admin.payment_gateway.updated'));
+    }
+
+    /**
+     * Teste la connexion avec les identifiants enregistrés : répond toujours
+     * avec le code HTTP, le message complet et l'URL réellement appelée.
+     */
+    public function test(): JsonResponse
+    {
+        $gateway = PaymentGateway::query()->where('provider', 'payme')->latest()->first();
+
+        if (! $gateway || blank($gateway->user_name) || blank($gateway->password)) {
+            return $this->success([
+                'ok' => false,
+                'status' => 0,
+                'message' => __('admin.payment_gateway.not_configured'),
+                'url' => null,
+            ], __('admin.payment_gateway.test_failed'));
+        }
+
+        $result = app(PaymeClient::class)->testConnection($gateway);
+
+        AuditService::record('payment_gateway.tested', $gateway, [], [
+            'ok' => $result['ok'],
+            'status' => $result['status'],
+            'url' => $result['url'],
+        ]);
+
+        return $this->success([
+            'ok' => $result['ok'],
+            'status' => $result['status'],
+            'message' => $result['message'],
+            'url' => $result['url'],
+            'effective_url' => $result['effective_url'],
+            'expires_at' => $result['expires_at'],
+        ], $result['ok'] ? __('admin.payment_gateway.test_ok') : __('admin.payment_gateway.test_failed'));
     }
 
     /**
@@ -76,11 +123,11 @@ class PaymentGatewayController extends Controller
             'id' => $gateway->id,
             'provider' => $gateway->provider,
             'user_name' => $gateway->user_name,
-            'app_id' => $gateway->app_id,
+            'has_password' => filled($gateway->password),
             'endpoint' => $gateway->endpoint,
-            'pay_type_id' => $gateway->pay_type_id,
+            'default_endpoint' => rtrim((string) config('payme.base_url'), '/'),
             'client_fees_rate' => $gateway->client_fees_rate,
-            'mode' => $gateway->mode,
+            'timeout_minutes' => $gateway->timeout_minutes ?: (int) config('payme.timeout_minutes', 15),
             'is_active' => $gateway->is_active,
         ];
     }

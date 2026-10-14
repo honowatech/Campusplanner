@@ -45,6 +45,27 @@ class PaymentController extends Controller
     }
 
     /**
+     * Le client renonce à attendre la confirmation (admin tenant, propriétaire
+     * du paiement uniquement). Le paiement reste revérifié une heure : l'invite
+     * peut encore être validée sur le téléphone.
+     */
+    public function cancel(Request $request, Payment $payment): JsonResponse
+    {
+        $tenant = $request->user()?->tenant;
+
+        abort_if(! $tenant, 403, __('admin.tenant.not_found'));
+        abort_if($payment->tenant_id !== $tenant->id, 404, __('admin.payments.not_found'));
+
+        if (! in_array($payment->status, ['pending', 'in_progress'], true)) {
+            return $this->error(['payment' => $payment], __('admin.payments.cannot_cancel'), 422);
+        }
+
+        $payment = app(PaymentService::class)->cancel($payment);
+
+        return $this->success(['payment' => $payment], __('admin.payments.cancelled'));
+    }
+
+    /**
      * Historique des paiements du tenant.
      */
     public function payments(Request $request): JsonResponse

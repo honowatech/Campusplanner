@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Api\Controllers\AiController;
 use App\Http\Api\Controllers\AdminFeatureController;
 use App\Http\Api\Controllers\AdminImpersonationController;
 use App\Http\Api\Controllers\AdminPackController;
 use App\Http\Api\Controllers\AdminPaymentController;
+use App\Http\Api\Controllers\AiController;
 use App\Http\Api\Controllers\AuditLogController;
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BillingController;
@@ -96,6 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:super-admin|administrateur'])->group(function () {
         Route::post('billing/checkout', [PaymentController::class, 'checkout']);
         Route::get('billing/payments', [PaymentController::class, 'payments']);
+        Route::post('billing/payments/{payment}/cancel', [PaymentController::class, 'cancel']);
     });
 
     // === PAIEMENTS (super-admin, agrégé) ===
@@ -115,6 +116,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('payment-gateway', [PaymentGatewayController::class, 'show']);
         Route::put('payment-gateway', [PaymentGatewayController::class, 'update']);
+        Route::post('payment-gateway/test', [PaymentGatewayController::class, 'test']);
 
         Route::get('packs', [AdminPackController::class, 'index']);
         Route::post('packs', [AdminPackController::class, 'store']);

@@ -4,34 +4,43 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | PayMe (MamoniPay)
+    | PayMe (MamoniPay) — API Partenaire
     |--------------------------------------------------------------------------
     |
-    | URL de base et chemins d'endpoints, conformes à la documentation
-    | MAMONIPAY_API.md. Les chemins incluent le préfixe `/api`.
+    | Contrat réel (cf. docs/FEUILLE_DE_ROUTE_PAYME.md §0) :
+    |   - une seule adresse de base, pas de sandbox, pas de `/v1` à la fin,
+    |     jamais l'adresse de la documentation (`/docs`) ;
+    |   - connexion `POST /v1/auth/login` { login, password } → data.access_token ;
+    |   - initiation `POST /v1/payments/init` ;
+    |   - vérification `POST /v1/payments/verify/{gateway_reference}`.
     |
-    | La configuration par tenant (marchand) vit dans `payment_gateways`
-    | (gérée par le super-admin) : `user_name`, `password` (chiffré) et
-    | l'éventuelle surcharge `endpoint` (base URL sandbox/live).
+    | Les identifiants du marchand (user_name, password chiffré) et la
+    | surcharge éventuelle de l'adresse de base vivent dans `payment_gateways`.
     |
     */
 
-    'sandbox_base_url' => env('PAYME_SANDBOX_BASE_URL', 'https://sandbox.mamonipay.me'),
+    'base_url' => env('PAYME_BASE_URL', 'https://console-v2.mamonipay.me/api'),
 
-    'live_base_url' => env('PAYME_LIVE_BASE_URL', 'https://mamonipay.me'),
+    // Délai HTTP (secondes) par requête.
+    'timeout' => (int) env('PAYME_TIMEOUT', 20),
 
-    'login_path' => env('PAYME_LOGIN_PATH', '/api/auth/login'),
+    'endpoints' => [
+        'login' => '/v1/auth/login',
+        'init' => '/v1/payments/init',
+        'verify' => '/v1/payments/verify/{reference}',
+    ],
 
-    'init_payment_path' => env('PAYME_INIT_PAYMENT_PATH', '/api/transaction/init_payment'),
+    // Délai (minutes) avant d'abandonner une demande sans confirmation :
+    // PayMe ne signale pas l'expiration. Surchargé par
+    // `payment_gateways.timeout_minutes` lorsqu'il est renseigné.
+    'timeout_minutes' => (int) env('PAYME_TIMEOUT_MINUTES', 15),
 
-    'payment_status_path' => env('PAYME_PAYMENT_STATUS_PATH', '/api/clients/transaction/payment_status'),
+    // Délai (minutes) au-delà duquel une demande jamais initiée chez PayMe
+    // (aucune gateway_reference) est abandonnée.
+    'uninitiated_timeout_minutes' => (int) env('PAYME_UNINITIATED_TIMEOUT_MINUTES', 2),
 
-    'timeout' => (int) env('PAYME_TIMEOUT', 15),
-
-    'token_ttl' => (int) env('PAYME_TOKEN_TTL', 50), // minutes
-
-    // Durée maximale du polling d'un paiement (minutes). Au-delà, le paiement
-    // est marqué « à vérifier manuellement » (cf. MAMONIPAY_API.md).
-    'polling_timeout' => (int) env('PAYME_POLLING_TIMEOUT', 15),
+    // Durée (minutes) pendant laquelle une demande expirée ou annulée est
+    // revérifiée : le client peut valider tard sur son téléphone.
+    'recovery_minutes' => (int) env('PAYME_RECOVERY_MINUTES', 60),
 
 ];

@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
-import { CreditCard, Check, RefreshCw, Crown } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { CreditCard, Check, RefreshCw, Crown, Clock, XCircle, FileText } from 'lucide-react';
 import { useSubscription, usePacks } from '@/src/hooks/useSubscription';
-import { usePayments, useCheckout } from '@/src/hooks/useBilling';
+import { usePayments, useCheckout, useCancelPayment, OPEN_PAYMENT_STATUSES } from '@/src/hooks/useBilling';
 import { Pack, Payment } from '@/src/lib/types';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { getLocale } from '@/src/lib/locale';
@@ -13,6 +13,82 @@ function formatAmount(amount: number, currency: string): string {
 function formatDate(iso?: string): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString(getLocale());
+}
+
+function gatewayStatusLabel(payment: Payment): string | null {
+  const raw = payment.gateway_status;
+  if (!raw) return null;
+  const labels: Record<string, string> = {
+    EXPIRED: 'Délai dépassé',
+    CANCELLED: 'Annulée par vous',
+  };
+  return labels[raw.toUpperCase()] ?? raw;
+}
+
+/** Compte à rebours (mm:ss) jusqu'à l'expiration d'une demande en cours. */
+function useCountdown(expiresAt?: string | null): string | null {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!expiresAt) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [expiresAt]);
+
+  if (!expiresAt) return null;
+  const remaining = Math.max(0, Math.floor((new Date(expiresAt).getTime() - now) / 1000));
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function PendingPaymentBanner({
+  payment,
+  onCancel,
+  cancelling,
+}: {
+  payment: Payment;
+  onCancel: () => void;
+  cancelling: boolean;
+}) {
+  const countdown = useCountdown(payment.metadata?.expires_at);
+  const timeout = payment.metadata?.timeout_minutes;
+
+  return (
+    <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex items-start gap-3 flex-1">
+          <Clock className="text-amber-600 mt-0.5 shrink-0" size={22} />
+          <div>
+            <p className="font-semibold text-amber-900">Paiement en attente de validation</p>
+            <p className="text-sm text-amber-800 mt-1">
+              Validez la demande de {formatAmount(payment.amount, payment.currency)} sur votre téléphone
+              {payment.metadata?.phone ? ` (${payment.metadata.phone})` : ''}. Le statut se met à jour automatiquement.
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              {countdown
+                ? `Temps restant : ${countdown}${timeout ? ` (délai de ${timeout} min)` : ''}`
+                : 'En attente de confirmation…'}
+              {payment.gateway_status ? ` · PayMe : ${payment.gateway_status}` : ''}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={cancelling}
+          className="px-4 py-2 border border-amber-300 text-amber-900 rounded-lg text-sm font-medium hover:bg-amber-100 disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          <XCircle size={16} />
+          {cancelling ? 'Annulation…' : 'Annuler la demande'}
+        </button>
+      </div>
+      <p className="text-xs text-amber-700 mt-3">
+        PayMe ne permet pas d’annuler une demande déjà envoyée : si vous validez sur votre téléphone après avoir annulé
+        ici, le paiement sera tout de même pris en compte pendant une heure.
+      </p>
+    </div>
+  );
 }
 
 function statusLabel(status: string): string {
@@ -36,8 +112,14 @@ function statusLabel(status: string): string {
 export function BillingManager() {
   const { data: subscription, isLoading: loadingSub } = useSubscription();
   const { data: packs, isLoading: loadingPacks } = usePacks();
-  const { data: payments, isLoading: loadingPayments } = usePayments();
+  const { data: payments, isLoading: loadingPayments, refetch: refetchPayments, isFetching } = usePayments();
   const checkout = useCheckout();
+  const cancelPayment = useCancelPayment();
+
+  const openPayment = useMemo(
+    () => (payments?.data as Payment[] | undefined)?.find((p) => OPEN_PAYMENT_STATUSES.includes(p.status)) ?? null,
+    [payments],
+  );
 
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [selectedPackId, setSelectedPackId] = useState<number | null>(null);
@@ -62,7 +144,7 @@ export function BillingManager() {
   }
 
   const handleCheckout = () => {
-    if (!selectedPackId || !phone.trim()) return;
+    if (!selectedPackId || !phone.trim() || openPayment) return;
     checkout.mutate({
       payload: { pack_id: selectedPackId, phone: phone.trim(), billing_period: billingPeriod },
       idempotencyKey: crypto.randomUUID(),
@@ -118,6 +200,15 @@ export function BillingManager() {
           <p className="text-gray-500">Aucun abonnement actif.</p>
         )}
       </div>
+
+      {/* Paiement en cours */}
+      {openPayment && (
+        <PendingPaymentBanner
+          payment={openPayment}
+          onCancel={() => cancelPayment.mutate(openPayment.id)}
+          cancelling={cancelPayment.isPending}
+        />
+      )}
 
       {/* Tarifs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -184,7 +275,7 @@ export function BillingManager() {
           />
           <button
             type="button"
-            disabled={!selectedPackId || !phone.trim() || checkout.isPending}
+            disabled={!selectedPackId || !phone.trim() || checkout.isPending || !!openPayment}
             onClick={handleCheckout}
             className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-secondary transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
@@ -200,11 +291,11 @@ export function BillingManager() {
           <h2 className="text-lg font-bold text-gray-900">Historique des paiements</h2>
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => refetchPayments()}
             className="text-gray-400 hover:text-gray-600"
             aria-label="Rafraîchir"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
           </button>
         </div>
         {loadingPayments ? (
@@ -220,6 +311,7 @@ export function BillingManager() {
                   <th className="py-2 pr-4 font-medium">Montant</th>
                   <th className="py-2 pr-4 font-medium">Statut</th>
                   <th className="py-2 pr-4 font-medium">Date</th>
+                  <th className="py-2 pr-4 font-medium">Reçu</th>
                 </tr>
               </thead>
               <tbody>
@@ -245,8 +337,29 @@ export function BillingManager() {
                       >
                         {statusLabel(payment.status)}
                       </span>
+                      {(gatewayStatusLabel(payment) || payment.metadata?.error) && (
+                        <p className="text-xs text-gray-500 mt-1" title={payment.metadata?.error ?? undefined}>
+                          {gatewayStatusLabel(payment)}
+                          {payment.provider ? ` · ${payment.provider}` : ''}
+                          {payment.status === 'failed' && payment.metadata?.error ? ` — ${payment.metadata.error}` : ''}
+                        </p>
+                      )}
                     </td>
                     <td className="py-2 pr-4 text-gray-600">{formatDate(payment.created_at)}</td>
+                    <td className="py-2 pr-4">
+                      {payment.status === 'paid' && payment.receipt_url ? (
+                        <a
+                          href={payment.receipt_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-medium"
+                        >
+                          <FileText size={14} /> Reçu
+                        </a>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

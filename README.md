@@ -25,10 +25,13 @@ The project is split into two independent Git repositories:
 - AI-assisted scheduling via a server-side Gemini proxy (the API key never reaches the browser).
 - **In progress** — multi-tenancy, subscription packs, Nexah SMS and MamoniPay (PayMe)
   payments. See [the implementation plan](PLAN_IMPLEMENTATION_SAAS_MULTITENANT.md).
-- **PayMe (MamoniPay) integration** — currently non-functional (wrong host, paths and
-  payloads). Audit in [docs/AUDIT_PAYME_2026-10-14.md](docs/AUDIT_PAYME_2026-10-14.md),
-  step-by-step fix plan with the real API contract in
-  [docs/FEUILLE_DE_ROUTE_PAYME.md](docs/FEUILLE_DE_ROUTE_PAYME.md).
+- **PayMe (MamoniPay) integration** — aligned with the real Partner API contract
+  (`https://console-v2.mamonipay.me/api`): login, init, verify by `gateway_reference`,
+  business refusals in HTTP 200, status normalisation, expiry/cancellation with late
+  recovery, super-admin "Test connection" button and `php artisan payme:doctor`.
+  Background: [docs/AUDIT_PAYME_2026-10-14.md](docs/AUDIT_PAYME_2026-10-14.md) and
+  [docs/FEUILLE_DE_ROUTE_PAYME.md](docs/FEUILLE_DE_ROUTE_PAYME.md); server requirements in
+  [docs/DEPLOIEMENT_PAYME.md](docs/DEPLOIEMENT_PAYME.md).
 
 ---
 
@@ -153,12 +156,17 @@ composer install --no-dev --optimize-autoloader --no-interaction
 php artisan migrate --force
 php artisan module:migrate --force
 php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan payme:doctor   # PayMe: address, DNS/TLS, login, token, scheduler — must be green before go-live
 
 # Frontend
 cd planner.campustrack.cm
 npm ci
 VITE_API_BASE_URL=https://planner-api.campustrack.cm VITE_APP_NAME="Campus Planner" npm run build
 ```
+
+The Laravel scheduler is mandatory: PayMe sends no notification, so payments are confirmed
+by the `payme-reconcile` task every minute (`* * * * * php artisan schedule:run`). No queue
+worker is required for payments. See [docs/DEPLOIEMENT_PAYME.md](docs/DEPLOIEMENT_PAYME.md).
 
 Serve `dist/` as a static SPA (fallback to `index.html`, HTTPS mandatory). Full details,
 including environment variables, CORS and background jobs, are in

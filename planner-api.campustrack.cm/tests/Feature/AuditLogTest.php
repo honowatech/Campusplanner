@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\AuditLog;
+use App\Enums\V1\PaymentStatus;
 use App\Models\Pack;
 use App\Models\Payment;
 use App\Models\PaymentGateway;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Enums\V1\PaymentStatus;
 use App\Services\PaymentService;
 use App\Services\TenantSubscriptionsService;
 use App\Support\FeatureRegistry;
@@ -33,13 +32,12 @@ class AuditLogTest extends TestCase
             'provider' => 'payme',
             'user_name' => 'merchant',
             'password' => 'secret',
-            'mode' => 'sandbox',
             'is_active' => true,
         ]);
 
         Http::fake([
-            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt']], 200),
-            '*/api/transaction/init_payment' => Http::response(['data' => ['gateway_reference' => 'GW-AUDIT-1']], 200),
+            'https://console-v2.mamonipay.me/api/v1/auth/login' => Http::response(['success' => true, 'data' => ['access_token' => 'jwt']], 200),
+            'https://console-v2.mamonipay.me/api/v1/payments/init' => Http::response(['success' => true, 'data' => ['gateway_reference' => 'GW-AUDIT-1', 'status' => 'Initiated']], 200),
         ]);
 
         $tenant = Tenant::firstOrCreate(['slug' => 'audit-pay'], ['name' => 'Audit Pay']);
@@ -58,13 +56,12 @@ class AuditLogTest extends TestCase
             'provider' => 'payme',
             'user_name' => 'merchant',
             'password' => 'secret',
-            'mode' => 'sandbox',
             'is_active' => true,
         ]);
 
         Http::fake([
-            '*/api/auth/login' => Http::response(['data' => ['token' => 'jwt']], 200),
-            '*/api/clients/transaction/payment_status' => Http::response(['data' => ['status' => 'SUCCESSFUL']], 200),
+            'https://console-v2.mamonipay.me/api/v1/auth/login' => Http::response(['success' => true, 'data' => ['access_token' => 'jwt']], 200),
+            'https://console-v2.mamonipay.me/api/v1/payments/verify/*' => Http::response(['success' => true, 'data' => ['status' => 'Successful']], 200),
         ]);
 
         $tenant = Tenant::firstOrCreate(['slug' => 'audit-cb'], ['name' => 'Audit CB']);

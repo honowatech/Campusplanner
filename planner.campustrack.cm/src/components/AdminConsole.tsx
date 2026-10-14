@@ -19,10 +19,11 @@ import {
   useUpdateFeature,
   usePaymentGateway,
   useUpdatePaymentGateway,
+  useTestPaymentGateway,
   useAdminPayments,
 } from '@/src/hooks/useAdmin';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
-import { Tenant, AdminPack, AdminFeature } from '@/src/lib/types';
+import { Tenant, AdminPack, AdminFeature, PaymentGatewayTestResult } from '@/src/lib/types';
 import { getLocale } from '@/src/lib/locale';
 
 type Tab = 'tenants' | 'packs' | 'features' | 'gateway' | 'payments';
@@ -316,64 +317,179 @@ function FeaturesTab() {
 function GatewayTab() {
   const { data: gateway, isLoading } = usePaymentGateway();
   const updateGateway = useUpdatePaymentGateway();
+  const testGateway = useTestPaymentGateway();
+  const [testResult, setTestResult] = useState<PaymentGatewayTestResult | null>(null);
+
+  const defaultEndpoint = gateway?.default_endpoint ?? 'https://console-v2.mamonipay.me/api';
 
   const [form, setForm] = useState({
     user_name: gateway?.user_name ?? '',
     password: '',
-    app_id: gateway?.app_id ?? '',
     endpoint: gateway?.endpoint ?? '',
-    pay_type_id: gateway?.pay_type_id ?? '',
-    mode: (gateway?.mode ?? 'sandbox') as 'sandbox' | 'live',
+    client_fees_rate: gateway?.client_fees_rate == null ? '' : String(gateway.client_fees_rate),
+    timeout_minutes: String(gateway?.timeout_minutes ?? 15),
+    is_active: gateway?.is_active ?? true,
   });
 
   if (isLoading) return <LoadingSpinner fullScreen={false} />;
 
+  const endpointLooksWrong = /\/docs(\/|$)|\/v\d+\/?$/i.test(form.endpoint.trim());
+  const feesRate = form.client_fees_rate.trim() === '' ? null : Number(form.client_fees_rate);
+  const feesInvalid = feesRate !== null && (!Number.isInteger(feesRate) || feesRate < 0 || feesRate > 100);
+  const timeout = Number(form.timeout_minutes);
+  const timeoutInvalid = !Number.isInteger(timeout) || timeout < 2 || timeout > 60;
+
   const handleSave = () => {
+    if (endpointLooksWrong || feesInvalid || timeoutInvalid) return;
+    setTestResult(null);
     updateGateway.mutate({
       user_name: form.user_name,
       password: form.password || undefined,
-      app_id: form.app_id || undefined,
-      endpoint: form.endpoint || undefined,
-      pay_type_id: form.pay_type_id || undefined,
-      mode: form.mode,
+      endpoint: form.endpoint.trim() || null,
+      client_fees_rate: feesRate,
+      timeout_minutes: timeout,
+      is_active: form.is_active,
     });
   };
 
+  const handleTest = () => {
+    setTestResult(null);
+    testGateway.mutate(undefined, { onSuccess: setTestResult });
+  };
+
+  const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm';
+
   return (
     <div>
-      <h2 className="text-lg font-bold text-gray-900 mb-4">Configuration PayMe (MamoniPay)</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Configuration PayMe (MamoniPay)</h2>
+      <p className="text-sm text-gray-500 mb-4">
+        Identifiants du compte marchand PayMe (API Partenaire). Enregistrez, puis testez la connexion avant toute
+        mise en production.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">User name</label>
-          <input value={form.user_name} onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Identifiant (login)</label>
+          <input
+            value={form.user_name}
+            onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))}
+            className={inputClass}
+            placeholder="237XXXXXXXXX ou e-mail"
+          />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Mot de passe</label>
-          <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="••••••••" />
+          <input
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+            className={inputClass}
+            placeholder={gateway?.has_password ? '•••••••• (inchangé si vide)' : '••••••••'}
+            autoComplete="new-password"
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Adresse de l’API</label>
+          <input
+            value={form.endpoint}
+            onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))}
+            className={`${inputClass} ${endpointLooksWrong ? 'border-red-400' : ''}`}
+            placeholder={defaultEndpoint}
+          />
+          <p className={`text-xs mt-1 ${endpointLooksWrong ? 'text-red-600' : 'text-gray-500'}`}>
+            {endpointLooksWrong
+              ? 'Adresse invalide : indiquez l’adresse de base de l’API, jamais l’adresse de la documentation (/docs) ni une adresse se terminant par /v1.'
+              : `Laissez vide pour utiliser ${defaultEndpoint}. Jamais l’adresse de la documentation (/docs), sans /v1 à la fin.`}
+          </p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">App ID</label>
-          <input value={form.app_id} onChange={(e) => setForm((f) => ({ ...f, app_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Frais portés par le client (%)</label>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            step={1}
+            value={form.client_fees_rate}
+            onChange={(e) => setForm((f) => ({ ...f, client_fees_rate: e.target.value }))}
+            className={`${inputClass} ${feesInvalid ? 'border-red-400' : ''}`}
+            placeholder="Réglage du compte marchand"
+          />
+          <p className="text-xs text-gray-500 mt-1">Entier 0–100. Vide = le réglage du compte marchand s’applique.</p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Pay type ID</label>
-          <input value={form.pay_type_id} onChange={(e) => setForm((f) => ({ ...f, pay_type_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Délai d’attente (minutes)</label>
+          <input
+            type="number"
+            min={2}
+            max={60}
+            step={1}
+            value={form.timeout_minutes}
+            onChange={(e) => setForm((f) => ({ ...f, timeout_minutes: e.target.value }))}
+            className={`${inputClass} ${timeoutInvalid ? 'border-red-400' : ''}`}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            2–60 min. PayMe ne signale pas l’expiration : passé ce délai, la demande est abandonnée.
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Endpoint (base URL)</label>
-          <input value={form.endpoint} onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="https://sandbox.mamonipay.me/api" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Mode</label>
-          <select value={form.mode} onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as 'sandbox' | 'live' }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="sandbox">Sandbox</option>
-            <option value="live">Live</option>
-          </select>
+        <div className="md:col-span-2 flex items-center gap-2">
+          <input
+            id="gateway-active"
+            type="checkbox"
+            checked={form.is_active}
+            onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+          />
+          <label htmlFor="gateway-active" className="text-sm text-gray-700">
+            Passerelle active
+          </label>
         </div>
       </div>
-      <button type="button" onClick={handleSave} disabled={updateGateway.isPending} className="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50">
-        Enregistrer
-      </button>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={updateGateway.isPending || !form.user_name.trim() || endpointLooksWrong || feesInvalid || timeoutInvalid}
+          className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50"
+        >
+          {updateGateway.isPending ? 'Enregistrement…' : 'Enregistrer'}
+        </button>
+        <button
+          type="button"
+          onClick={handleTest}
+          disabled={testGateway.isPending || !gateway?.has_password}
+          className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium disabled:opacity-50"
+          title={!gateway?.has_password ? 'Enregistrez d’abord les identifiants' : undefined}
+        >
+          {testGateway.isPending ? 'Test en cours…' : 'Tester la connexion'}
+        </button>
+      </div>
+      {testResult && (
+        <div
+          className={`mt-4 max-w-2xl rounded-lg border p-4 text-sm ${
+            testResult.ok ? 'border-green-200 bg-green-50 text-green-800' : 'border-red-200 bg-red-50 text-red-800'
+          }`}
+        >
+          <p className="font-semibold">
+            {testResult.ok ? 'Connexion réussie' : 'Connexion échouée'}
+            {testResult.status ? ` (HTTP ${testResult.status})` : ''}
+          </p>
+          <p className="mt-1 break-words">{testResult.message}</p>
+          {testResult.url && (
+            <p className="mt-1 font-mono text-xs break-all">
+              URL appelée : {testResult.url}
+              {testResult.effective_url ? ` → redirigée vers ${testResult.effective_url}` : ''}
+            </p>
+          )}
+          {testResult.ok && testResult.expires_at && (
+            <p className="mt-1 text-xs">Jeton valable jusqu’au {new Date(testResult.expires_at).toLocaleString(getLocale())}</p>
+          )}
+        </div>
+      )}
+      <div className="mt-6 max-w-2xl text-xs text-gray-500 space-y-1">
+        <p className="font-semibold text-gray-600">Limites de l’API PayMe</p>
+        <p>• Aucune notification : la confirmation repose sur la vérification active (page de paiement + planificateur chaque minute).</p>
+        <p>• Aucune annulation côté PayMe : « Annuler » clôt la demande ici ; l’invite peut rester sur le téléphone, d’où une revérification pendant une heure.</p>
+        <p>• Aucune expiration signalée : le délai configuré ci-dessus fait foi.</p>
+        <p>• Pas d’environnement de test ni de remboursement par l’API.</p>
+      </div>
     </div>
   );
 }

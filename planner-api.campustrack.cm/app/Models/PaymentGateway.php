@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Configuration PayMe (MamoniPay) de la plateforme, gérée par le super-admin.
- * Le mot de passe est chiffré (cast `encrypted`).
+ * Le mot de passe est chiffré (cast `encrypted`) et jamais sérialisé.
  */
 class PaymentGateway extends Model
 {
@@ -19,11 +19,9 @@ class PaymentGateway extends Model
         'provider',
         'user_name',
         'password',
-        'app_id',
         'endpoint',
-        'pay_type_id',
         'client_fees_rate',
-        'mode',
+        'timeout_minutes',
         'is_active',
     ];
 
@@ -32,9 +30,9 @@ class PaymentGateway extends Model
      *
      * @var list<string>
      */
-    // protected $hidden = [
-    //     'password',
-    // ];
+    protected $hidden = [
+        'password',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -45,7 +43,8 @@ class PaymentGateway extends Model
     {
         return [
             'password' => 'encrypted',
-            'client_fees_rate' => 'float',
+            'client_fees_rate' => 'integer',
+            'timeout_minutes' => 'integer',
             'is_active' => 'boolean',
         ];
     }

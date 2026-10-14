@@ -26,11 +26,16 @@ class Payment extends Model
         'currency',
         'status',
         'gateway_reference',
+        'gateway_status',
+        'provider',
+        'receipt_url',
         'external_reference',
         'idempotency_key',
         'payment_method',
         'metadata',
         'paid_at',
+        'checked_at',
+        'checks',
     ];
 
     /**
@@ -44,6 +49,8 @@ class Payment extends Model
             'amount' => 'float',
             'metadata' => 'array',
             'paid_at' => 'datetime',
+            'checked_at' => 'datetime',
+            'checks' => 'integer',
         ];
     }
 

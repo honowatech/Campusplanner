@@ -28,6 +28,9 @@ return [
         'initiated' => 'Paiement initié',
         'history_retrieved' => 'Historique des paiements récupéré',
         'retrieved' => 'Paiements récupérés',
+        'cancelled' => 'Demande de paiement annulée',
+        'cannot_cancel' => 'Ce paiement ne peut plus être annulé.',
+        'not_found' => 'Paiement introuvable.',
     ],
 
     'tenants' => [
@@ -61,6 +64,10 @@ return [
     'payment_gateway' => [
         'retrieved' => 'Passerelle récupérée',
         'updated' => 'Passerelle mise à jour',
+        'invalid_endpoint' => "Indiquer l'adresse de base de l'API (ex. https://console-v2.mamonipay.me/api), jamais l'adresse de la documentation (/docs) ni une adresse se terminant par /v1.",
+        'not_configured' => 'Identifiants PayMe non renseignés.',
+        'test_ok' => 'Connexion PayMe réussie',
+        'test_failed' => 'Connexion PayMe échouée',
     ],
 
     'onboarding' => [

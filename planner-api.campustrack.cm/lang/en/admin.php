@@ -28,6 +28,9 @@ return [
         'initiated' => 'Payment initiated',
         'history_retrieved' => 'Payment history retrieved',
         'retrieved' => 'Payments retrieved',
+        'cancelled' => 'Payment request cancelled',
+        'cannot_cancel' => 'This payment can no longer be cancelled.',
+        'not_found' => 'Payment not found.',
     ],
 
     'tenants' => [
@@ -61,6 +64,10 @@ return [
     'payment_gateway' => [
         'retrieved' => 'Payment gateway retrieved',
         'updated' => 'Payment gateway updated',
+        'invalid_endpoint' => 'Enter the API base address (e.g. https://console-v2.mamonipay.me/api), never the documentation address (/docs) nor an address ending with /v1.',
+        'not_configured' => 'PayMe credentials are not set.',
+        'test_ok' => 'PayMe connection successful',
+        'test_failed' => 'PayMe connection failed',
     ],
 
     'onboarding' => [

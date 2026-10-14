@@ -15,6 +15,12 @@ export const paymentService = {
     return res.data.data.payment;
   },
 
+  /** Le client renonce à attendre la confirmation (le paiement reste revérifié une heure). */
+  cancel: async (paymentId: number): Promise<Payment> => {
+    const res = await apiClient.post<ApiResponse<{ payment: Payment }>>(`/api/billing/payments/${paymentId}/cancel`);
+    return res.data.data.payment;
+  },
+
   list: async (): Promise<PaginatedResponse<Payment>> => {
     const res = await apiClient.get<ApiResponse<{ payments: PaginatedResponse<Payment> }>>(
       '/api/billing/payments',

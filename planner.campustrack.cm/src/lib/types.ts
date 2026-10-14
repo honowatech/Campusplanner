@@ -537,17 +537,37 @@ export type SubscriptionSummary = {
 // BILLING / PAYMENT TYPES
 // ============================================================
 
+export type PaymentMetadata = {
+  pack_id?: number;
+  billing_period?: string;
+  phone?: string;
+  timeout_minutes?: number;
+  expires_at?: string;
+  error?: string;
+  failed_at?: string;
+  recovered_at?: string;
+};
+
 export type Payment = {
   id: number;
   tenant_id: number;
-  subscription_id?: number;
+  subscription_id?: number | null;
   amount: number;
   currency: string;
   status: string;
-  gateway_reference?: string;
-  external_reference?: string;
-  payment_method?: string;
-  paid_at?: string;
+  gateway_reference?: string | null;
+  /** Statut brut PayMe (Initiated, Payment in progress, Successful, EXPIRED, CANCELLED…). */
+  gateway_status?: string | null;
+  /** Opérateur mobile money (ORANGE, MTN…). */
+  provider?: string | null;
+  /** Reçu PayMe après succès. */
+  receipt_url?: string | null;
+  external_reference?: string | null;
+  payment_method?: string | null;
+  metadata?: PaymentMetadata | null;
+  paid_at?: string | null;
+  checked_at?: string | null;
+  checks?: number;
   created_at?: string;
   updated_at?: string;
 };
@@ -599,13 +619,25 @@ export type Tenant = {
 export type PaymentGatewayConfig = {
   id: number;
   provider: string;
-  user_name?: string;
-  app_id?: string;
-  endpoint?: string;
-  pay_type_id?: string;
-  client_fees_rate: number;
-  mode: 'sandbox' | 'live';
+  user_name?: string | null;
+  has_password: boolean;
+  /** Adresse de base de l'API PayMe (vide = valeur par défaut). */
+  endpoint?: string | null;
+  default_endpoint: string;
+  /** Part des frais portée par le client, en % (0–100) ; null = réglage du compte marchand. */
+  client_fees_rate: number | null;
+  /** Délai (minutes) avant d'abandonner une demande sans confirmation. */
+  timeout_minutes: number;
   is_active: boolean;
+};
+
+export type PaymentGatewayTestResult = {
+  ok: boolean;
+  status: number;
+  message: string;
+  url: string | null;
+  effective_url?: string | null;
+  expires_at?: string | null;
 };
 
 export type AdminFeature = {
