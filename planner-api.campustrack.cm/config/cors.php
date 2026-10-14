@@ -19,11 +19,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'https://planner.campustrack.cm',
-    ],
+    // Origines du front-end, séparées par des virgules dans CORS_ALLOWED_ORIGINS
+    // (préproduction : https://preplanner.campustrack.cm) ; valeurs par défaut ci-dessous.
+    'allowed_origins' => array_values(array_filter(array_map('trim', explode(',', (string) env(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000,https://planner.campustrack.cm'
+    ))))),
 
     'allowed_origins_patterns' => [],
 
