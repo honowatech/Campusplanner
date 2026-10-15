@@ -8,6 +8,7 @@ use App\Services\PaymentService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -141,6 +142,18 @@ class PaymeDoctor extends Command
 
     private function checkPrerequisites(): void
     {
+        $missing = [];
+        foreach (['payment_gateways' => ['timeout_minutes', 'client_fees_rate'], 'payments' => ['gateway_status', 'provider', 'receipt_url', 'checked_at', 'checks']] as $table => $columns) {
+            foreach ($columns as $column) {
+                if (! Schema::hasColumn($table, $column)) {
+                    $missing[] = $table.'.'.$column;
+                }
+            }
+        }
+        $missing === []
+            ? $this->ok('Schéma à jour (migration 2026_10_14 appliquée)')
+            : $this->ko('Schéma incomplet, colonnes manquantes : '.implode(', ', $missing).' → exécuter `php artisan migrate --force`.');
+
         version_compare(PHP_VERSION, '8.2.0', '>=')
             ? $this->ok('PHP '.PHP_VERSION)
             : $this->ko('PHP '.PHP_VERSION.' : 8.2 minimum requis');

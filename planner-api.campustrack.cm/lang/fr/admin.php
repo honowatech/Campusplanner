@@ -31,6 +31,7 @@ return [
         'cancelled' => 'Demande de paiement annulée',
         'cannot_cancel' => 'Ce paiement ne peut plus être annulé.',
         'not_found' => 'Paiement introuvable.',
+        'storage_error' => "Enregistrement du paiement impossible : la base de données n'est pas à jour (exécuter php artisan migrate).",
     ],
 
     'tenants' => [

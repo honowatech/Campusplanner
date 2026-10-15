@@ -7,8 +7,10 @@ use App\Models\Pack;
 use App\Models\Payment;
 use App\Services\PaymentService;
 use App\Traits\HttpResponses;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -33,13 +35,23 @@ class PaymentController extends Controller
 
         $pack = Pack::query()->active()->findOrFail($validated['pack_id']);
 
-        $payment = app(PaymentService::class)->checkout(
-            $tenant,
-            $pack,
-            $validated['phone'],
-            $validated['billing_period'] ?? null,
-            $request->header('Idempotency-Key'),
-        );
+        try {
+            $payment = app(PaymentService::class)->checkout(
+                $tenant,
+                $pack,
+                $validated['phone'],
+                $validated['billing_period'] ?? null,
+                $request->header('Idempotency-Key'),
+            );
+        } catch (\RuntimeException $e) {
+            // Passerelle absente/inactive, tenant démo, adresse PayMe invalide :
+            // une erreur de configuration explicite, pas une 500 anonyme.
+            return $this->error(null, $e->getMessage(), 422);
+        } catch (QueryException $e) {
+            Log::error('PayMe : erreur SQL au checkout (migration manquante ?).', ['error' => $e->getMessage()]);
+
+            return $this->error(null, __('admin.payments.storage_error'), 500);
+        }
 
         return $this->success(['payment' => $payment], __('admin.payments.initiated'), 201);
     }

@@ -31,6 +31,7 @@ return [
         'cancelled' => 'Payment request cancelled',
         'cannot_cancel' => 'This payment can no longer be cancelled.',
         'not_found' => 'Payment not found.',
+        'storage_error' => 'Could not store the payment: the database is out of date (run php artisan migrate).',
     ],
 
     'tenants' => [

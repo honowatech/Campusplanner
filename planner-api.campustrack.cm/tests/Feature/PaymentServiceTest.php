@@ -553,6 +553,19 @@ class PaymentServiceTest extends TestCase
         app(PaymentService::class)->checkout($demo, $this->pack(), '237690000009');
     }
 
+    /** @test */
+    public function checkout_endpoint_returns_422_when_no_gateway_is_active(): void
+    {
+        Http::fake();
+        $admin = User::factory()->create(['tenant_id' => $this->defaultTenantId]);
+        $admin->assignRole('administrateur');
+
+        $this->actingAs($admin)->postJson('/api/billing/checkout', ['pack_id' => $this->pack()->id, 'phone' => '237690000000'])
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Aucune passerelle de paiement active.');
+        Http::assertNothingSent();
+    }
+
     // ── 12. Configuration ─────────────────────────────────────────────────
 
     private function superAdmin(): User
