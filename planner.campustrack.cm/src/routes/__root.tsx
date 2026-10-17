@@ -22,6 +22,9 @@ function roleLabelKey(role?: string): string {
   return (role && ROLE_LABEL_KEYS[role]) || 'hodRole';
 }
 
+// Pages accessibles sans session (connexion et inscription libre-service).
+const PUBLIC_ROUTES = ['/login', '/signup'];
+
 export const Route = createRootRoute({
   component: RootComponent,
 });
@@ -37,8 +40,7 @@ function RootComponent() {
   const toggleLanguage = () => setLanguage(language === 'en' ? 'fr' : 'en');
 
   useEffect(() => {
-    const publicRoutes = ['/login'];
-    const isPublicRoute = publicRoutes.includes(location.pathname);
+    const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
     if (!auth.isAuthenticated && !isPublicRoute) {
       navigate({ to: '/login' });
@@ -50,6 +52,12 @@ function RootComponent() {
       return;
     }
 
+    // La page d'inscription redirige elle-même (vers le paiement de la
+    // formule choisie) une fois l'école créée.
+    if (auth.isAuthenticated && location.pathname === '/signup') {
+      return;
+    }
+
     // Garde de rôle : redirige vers le tableau de bord si la permission
     // requise pour la page est absente (l'API renvoie de toute façon 403).
     if (auth.isAuthenticated && !canAccessRoute(auth.user, location.pathname)) {
@@ -57,7 +65,9 @@ function RootComponent() {
     }
   }, [auth.isAuthenticated, auth.user, location.pathname, navigate]);
 
-  if (location.pathname === '/login' && !auth.isAuthenticated) {
+  // `/signup` reste dans le layout public même une fois la session ouverte :
+  // changer de layout remonterait la page et perdrait sa redirection.
+  if (location.pathname === '/signup' || (PUBLIC_ROUTES.includes(location.pathname) && !auth.isAuthenticated)) {
     return (
       <>
         <Outlet />

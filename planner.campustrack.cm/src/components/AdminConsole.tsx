@@ -19,10 +19,11 @@ import {
   useUpdateFeature,
   usePaymentGateway,
   useUpdatePaymentGateway,
+  useTestPaymentGateway,
   useAdminPayments,
 } from '@/src/hooks/useAdmin';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
-import { Tenant, AdminPack, AdminFeature } from '@/src/lib/types';
+import { Tenant, AdminPack, AdminFeature, PaymentGatewayConfig } from '@/src/lib/types';
 import { getLocale } from '@/src/lib/locale';
 
 type Tab = 'tenants' | 'packs' | 'features' | 'gateway' | 'payments';
@@ -315,65 +316,91 @@ function FeaturesTab() {
 
 function GatewayTab() {
   const { data: gateway, isLoading } = usePaymentGateway();
+
+  if (isLoading) return <LoadingSpinner fullScreen={false} />;
+
+  // Monté une fois la configuration chargée : le formulaire part des bonnes valeurs.
+  return <GatewayForm gateway={gateway ?? null} />;
+}
+
+function GatewayForm({ gateway }: { gateway: PaymentGatewayConfig | null }) {
   const updateGateway = useUpdatePaymentGateway();
+  const testGateway = useTestPaymentGateway();
+  const defaultEndpoint = gateway?.default_endpoint ?? 'https://console-v2.mamonipay.me/api';
 
   const [form, setForm] = useState({
     user_name: gateway?.user_name ?? '',
     password: '',
-    app_id: gateway?.app_id ?? '',
     endpoint: gateway?.endpoint ?? '',
-    pay_type_id: gateway?.pay_type_id ?? '',
-    mode: (gateway?.mode ?? 'sandbox') as 'sandbox' | 'live',
+    client_fees_rate: gateway?.client_fees_rate != null ? String(gateway.client_fees_rate) : '',
+    timeout_minutes: String(gateway?.timeout_minutes ?? 15),
+    is_active: gateway?.is_active ?? true,
   });
-
-  if (isLoading) return <LoadingSpinner fullScreen={false} />;
 
   const handleSave = () => {
     updateGateway.mutate({
       user_name: form.user_name,
       password: form.password || undefined,
-      app_id: form.app_id || undefined,
-      endpoint: form.endpoint || undefined,
-      pay_type_id: form.pay_type_id || undefined,
-      mode: form.mode,
+      endpoint: form.endpoint.trim() || null,
+      client_fees_rate: form.client_fees_rate === '' ? null : Number(form.client_fees_rate),
+      timeout_minutes: Number(form.timeout_minutes) || 15,
+      is_active: form.is_active,
     });
   };
 
+  const result = testGateway.data;
+
   return (
     <div>
-      <h2 className="text-lg font-bold text-gray-900 mb-4">Configuration PayMe (MamoniPay)</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Configuration PayMe (MamoniPay)</h2>
+      <p className="text-sm text-gray-500 mb-4 max-w-2xl">
+        Réglage unique de la plateforme : une fois enregistré et testé, les écoles s’inscrivent, paient et
+        sont activées automatiquement, sans intervention.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">User name</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Identifiant (237… ou email)</label>
           <input value={form.user_name} onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Mot de passe</label>
-          <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="••••••••" />
+          <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder={gateway?.has_password ? 'Inchangé si vide' : '••••••••'} />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Adresse de l’API</label>
+          <input value={form.endpoint} onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder={defaultEndpoint} />
+          <p className="mt-1 text-xs text-gray-500">
+            Vide = {defaultEndpoint}. Jamais l’adresse de la documentation (/docs) ni un suffixe /v1.
+          </p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">App ID</label>
-          <input value={form.app_id} onChange={(e) => setForm((f) => ({ ...f, app_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Frais à la charge du client (%)</label>
+          <input type="number" min={0} max={100} value={form.client_fees_rate} onChange={(e) => setForm((f) => ({ ...f, client_fees_rate: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Réglage du compte marchand" />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Pay type ID</label>
-          <input value={form.pay_type_id} onChange={(e) => setForm((f) => ({ ...f, pay_type_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Délai de validation (minutes)</label>
+          <input type="number" min={2} max={60} value={form.timeout_minutes} onChange={(e) => setForm((f) => ({ ...f, timeout_minutes: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Endpoint (base URL)</label>
-          <input value={form.endpoint} onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="https://sandbox.mamonipay.me/api" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Mode</label>
-          <select value={form.mode} onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as 'sandbox' | 'live' }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="sandbox">Sandbox</option>
-            <option value="live">Live</option>
-          </select>
-        </div>
+        <label className="flex items-center gap-2 text-sm text-gray-700 md:col-span-2">
+          <input type="checkbox" checked={form.is_active} onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))} />
+          Paiement en ligne actif
+        </label>
       </div>
-      <button type="button" onClick={handleSave} disabled={updateGateway.isPending} className="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50">
-        Enregistrer
-      </button>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button type="button" onClick={handleSave} disabled={updateGateway.isPending} className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50">
+          Enregistrer
+        </button>
+        <button type="button" onClick={() => testGateway.mutate()} disabled={testGateway.isPending || !gateway} className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+          {testGateway.isPending ? 'Test en cours…' : 'Tester la connexion'}
+        </button>
+      </div>
+      {result && (
+        <div className={`mt-4 max-w-2xl p-4 rounded-lg border text-sm ${result.ok ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+          <p className="font-semibold">{result.ok ? 'Connexion réussie' : 'Connexion refusée'}</p>
+          <p className="mt-1 break-words">{result.message}</p>
+          {result.url && <p className="mt-1 font-mono text-xs break-all">{result.url}</p>}
+        </div>
+      )}
     </div>
   );
 }

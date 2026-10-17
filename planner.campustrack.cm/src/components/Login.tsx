@@ -12,7 +12,8 @@ import { UserRole } from '@/src/lib/types';
 import type { AxiosError } from 'axios';
 import { useRegister } from '@/src/hooks/useUsers';
 import { useDemoMode } from '@/src/hooks/useDemoMode';
-import { UserPlus, CheckCircle2 } from 'lucide-react';
+import { UserPlus, CheckCircle2, Building2 } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 function roleLabel(role: string, t: (key: string) => string): string {
   switch (role) {
@@ -451,6 +452,23 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Inscription libre-service d'une école (sans validation super-admin) */}
+          {mode === 'login' && (
+            <Link
+              to="/signup"
+              className="mb-4 flex items-center justify-between gap-3 w-full px-4 py-3 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition-colors"
+            >
+              <span className="flex items-center gap-3">
+                <Building2 size={20} className="text-primary shrink-0" />
+                <span className="text-left">
+                  <span className="block text-xs text-gray-500">{t('signup.ctaHint')}</span>
+                  <span className="block text-sm font-semibold text-primary">{t('signup.cta')}</span>
+                </span>
+              </span>
+              <span aria-hidden className="text-primary">→</span>
+            </Link>
           )}
 
           {mode === 'login' && (

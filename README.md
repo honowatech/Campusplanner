@@ -21,14 +21,19 @@ The project is split into two independent Git repositories:
 - Role-based access control (`super-admin`, `administrateur`, `responsable-departement`,
   `personnel-administratif`, `professeur`, `etudiant`).
 - Admin dashboard with cached statistics.
-- Account registration with super-admin approval workflow.
+- **Self-service school onboarding** — any school creates its space at `/signup`
+  (school + admin account, signed in immediately, free trial), picks a plan, pays by mobile
+  money and gets the plan activated automatically: no super-admin action at any step.
+- Individual account registration (staff of an existing school) with approval workflow.
 - AI-assisted scheduling via a server-side Gemini proxy (the API key never reaches the browser).
 - **In progress** — multi-tenancy, subscription packs, Nexah SMS and MamoniPay (PayMe)
   payments. See [the implementation plan](PLAN_IMPLEMENTATION_SAAS_MULTITENANT.md).
-- **PayMe (MamoniPay) integration** — currently non-functional (wrong host, paths and
-  payloads). Audit in [docs/AUDIT_PAYME_2026-10-14.md](docs/AUDIT_PAYME_2026-10-14.md),
-  step-by-step fix plan with the real API contract in
-  [docs/FEUILLE_DE_ROUTE_PAYME.md](docs/FEUILLE_DE_ROUTE_PAYME.md).
+- **PayMe (MamoniPay) payments** — aligned on the real Partner API contract
+  ([docs/FEUILLE_DE_ROUTE_PAYME.md](docs/FEUILLE_DE_ROUTE_PAYME.md) §§ 1–5): active
+  verification (the billing page polls, the scheduler reconciles every minute), expiry,
+  cancellation, recovery of late validations, connection test in the super-admin console.
+  The `payme:doctor` command (§ 6) is not implemented yet. Audit:
+  [docs/AUDIT_PAYME_2026-10-14.md](docs/AUDIT_PAYME_2026-10-14.md).
 
 ---
 
@@ -159,6 +164,20 @@ cd planner.campustrack.cm
 npm ci
 VITE_API_BASE_URL=https://planner-api.campustrack.cm VITE_APP_NAME="Campus Planner" npm run build
 ```
+
+**Required once for self-service payments:**
+
+1. Cron entry running the Laravel scheduler every minute (PayMe sends no notification:
+   pending payments are reconciled by the scheduler, subscriptions expire hourly). No queue
+   worker is needed for payments.
+
+   ```
+   * * * * * cd /path/to/planner-api.campustrack.cm && php artisan schedule:run >> /dev/null 2>&1
+   ```
+
+2. Super-admin console → *PayMe* tab: enter the merchant credentials (API address defaults to
+   `https://console-v2.mamonipay.me/api`), save, then **Test the connection**.
+3. `php artisan packs:seed` (plans and features) if the catalogue is empty.
 
 Serve `dist/` as a static SPA (fallback to `index.html`, HTTPS mandatory). Full details,
 including environment variables, CORS and background jobs, are in

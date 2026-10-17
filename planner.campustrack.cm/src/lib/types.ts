@@ -544,10 +544,22 @@ export type Payment = {
   amount: number;
   currency: string;
   status: string;
+  gateway_status?: string | null;
   gateway_reference?: string;
   external_reference?: string;
   payment_method?: string;
+  provider?: string | null;
+  receipt_url?: string | null;
+  metadata?: {
+    pack_id?: number;
+    pack_name?: string;
+    billing_period?: string;
+    phone?: string;
+    timeout_minutes?: number;
+    error?: string;
+  } | null;
   paid_at?: string;
+  checked_at?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -600,12 +612,19 @@ export type PaymentGatewayConfig = {
   id: number;
   provider: string;
   user_name?: string;
-  app_id?: string;
-  endpoint?: string;
-  pay_type_id?: string;
-  client_fees_rate: number;
-  mode: 'sandbox' | 'live';
+  endpoint?: string | null;
+  default_endpoint: string;
+  client_fees_rate: number | null;
+  timeout_minutes: number;
+  has_password: boolean;
   is_active: boolean;
+};
+
+export type GatewayTestResult = {
+  ok: boolean;
+  status: number | null;
+  message: string;
+  url: string | null;
 };
 
 export type AdminFeature = {

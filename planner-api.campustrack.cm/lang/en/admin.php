@@ -28,6 +28,10 @@ return [
         'initiated' => 'Payment initiated',
         'history_retrieved' => 'Payment history retrieved',
         'retrieved' => 'Payments retrieved',
+        'canceled' => 'Payment request canceled',
+        'demo_disabled' => 'Real payments are disabled on the demo tenant.',
+        'gateway_unavailable' => 'Online payment is temporarily unavailable. Please try again later.',
+        'already_pending' => 'A payment is already awaiting confirmation on your phone. Confirm it or cancel it before starting a new one.',
     ],
 
     'tenants' => [
@@ -61,6 +65,8 @@ return [
     'payment_gateway' => [
         'retrieved' => 'Payment gateway retrieved',
         'updated' => 'Payment gateway updated',
+        'missing' => 'No PayMe configuration saved.',
+        'invalid_endpoint' => 'Enter the API base address (e.g. https://console-v2.mamonipay.me/api), never the documentation address nor a version suffix (/v1).',
     ],
 
     'onboarding' => [

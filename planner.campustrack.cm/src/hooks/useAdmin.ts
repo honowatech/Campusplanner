@@ -144,6 +144,13 @@ export function useUpdatePaymentGateway() {
   });
 }
 
+export function useTestPaymentGateway() {
+  return useMutation({
+    mutationFn: adminService.testGateway,
+    onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
+  });
+}
+
 export function useAdminPayments() {
   return useQuery<PaginatedResponse<Payment>>({
     queryKey: ADMIN_QUERY_KEYS.payments,

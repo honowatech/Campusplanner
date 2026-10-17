@@ -79,7 +79,7 @@ class DemoTenantTest extends TestCase
         $pack = Pack::where('slug', 'premium-monthly')->firstOrFail();
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('démo');
+        $this->expectExceptionMessage(__('admin.payments.demo_disabled'));
 
         app(PaymentService::class)->checkout($demo, $pack, '237600000000');
     }

@@ -78,9 +78,14 @@ apiClient.interceptors.response.use(
     // /auth-user et les routes d'authentification gèrent déjà leur état :
     // un 401 ici vient d'une session expirée côté API.
     const isAuthRoute =
-      url.includes('/login') || url.includes('/register') || url.includes('/auth-user');
+      url.includes('/login') ||
+      url.includes('/register') ||
+      url.includes('/onboarding') ||
+      url.includes('/auth-user');
 
-    if (status === 401 && !isAuthRoute && window.location.pathname !== '/login') {
+    const isPublicPage = ['/login', '/signup'].includes(window.location.pathname);
+
+    if (status === 401 && !isAuthRoute && !isPublicPage) {
       // L'état d'auth est reconstruit au chargement depuis le cookie de session
       window.location.assign('/login');
     }

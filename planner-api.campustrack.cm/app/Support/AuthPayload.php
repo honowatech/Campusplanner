@@ -21,13 +21,16 @@ class AuthPayload
         return TenantContext::run($user->tenant_id, function () use ($user) {
             $user->load('roles');
             $user->setRelation('permissions', $user->getAllPermissions());
-            $user->setRelation('features', FeatureRegistry::enabledForUser($user));
+            // Les relations sont enveloppées dans des collections : Eloquent
+            // n'exporte pas une relation de type tableau brut dans toArray().
+            $user->setRelation('features', collect(FeatureRegistry::enabledForUser($user)));
 
             $tenant = $user->tenant;
-
-            $user->setRelation('subscription', $tenant
+            $subscription = $tenant
                 ? app(TenantSubscriptionsService::class)->currentSummary($tenant)
-                : null);
+                : null;
+
+            $user->setRelation('subscription', $subscription !== null ? collect($subscription) : null);
 
             return $user;
         });

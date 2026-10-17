@@ -27,8 +27,47 @@ export function useCheckout() {
 
       if (payment.status === 'in_progress') {
         toast.success(t('toast.paymentInitiated'));
-      } else {
-        toast.error(t('toast.paymentInitFailed'));
+      } else if (payment.status === 'failed') {
+        toast.error(payment.metadata?.error || t('toast.paymentInitFailed'));
+      }
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error as unknown as AxiosError));
+    },
+  });
+}
+
+const AWAITING_STATUSES = ['pending', 'in_progress'];
+
+export function isAwaitingPayment(payment?: Payment | null): boolean {
+  return Boolean(payment && AWAITING_STATUSES.includes(payment.status));
+}
+
+/**
+ * Suit un paiement jusqu'à sa conclusion : PayMe n'envoie aucune notification,
+ * l'API revérifie la transaction à chaque appel (toutes les 4 s ici).
+ */
+export function usePaymentStatus(id: number | null) {
+  return useQuery<Payment>({
+    queryKey: ['payment', id],
+    queryFn: () => paymentService.get(id as number),
+    enabled: id !== null,
+    refetchInterval: (query) => (isAwaitingPayment(query.state.data) || !query.state.data ? 4_000 : false),
+    refetchIntervalInBackground: true,
+  });
+}
+
+export function useCancelPayment() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (id: number) => paymentService.cancel(id),
+    onSuccess: (payment) => {
+      queryClient.setQueryData(['payment', payment.id], payment);
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      if (payment.status !== 'paid') {
+        toast.info(t('toast.paymentCancelled'));
       }
     },
     onError: (error) => {

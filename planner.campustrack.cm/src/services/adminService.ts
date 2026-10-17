@@ -4,6 +4,7 @@ import {
   AdminPack,
   AdminFeature,
   PaymentGatewayConfig,
+  GatewayTestResult,
   Payment,
   ApiResponse,
   PaginatedResponse,
@@ -34,11 +35,9 @@ export type PackPayload = {
 export type GatewayPayload = {
   user_name: string;
   password?: string;
-  app_id?: string;
-  endpoint?: string;
-  pay_type_id?: string;
-  client_fees_rate?: number;
-  mode?: 'sandbox' | 'live';
+  endpoint?: string | null;
+  client_fees_rate?: number | null;
+  timeout_minutes?: number;
   is_active?: boolean;
 };
 
@@ -106,6 +105,11 @@ export const adminService = {
   updateGateway: async (data: GatewayPayload): Promise<PaymentGatewayConfig> => {
     const res = await apiClient.put<ApiResponse<{ gateway: PaymentGatewayConfig }>>('/api/admin/payment-gateway', data);
     return res.data.data.gateway;
+  },
+
+  testGateway: async (): Promise<GatewayTestResult> => {
+    const res = await apiClient.post<ApiResponse<GatewayTestResult>>('/api/admin/payment-gateway/test');
+    return res.data.data;
   },
 
   // Payments (super-admin aggregate)

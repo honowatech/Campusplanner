@@ -14,6 +14,7 @@ import { Route as TimetablesRouteImport } from './routes/timetables'
 import { Route as TeachersRouteImport } from './routes/teachers'
 import { Route as StudentsRouteImport } from './routes/students'
 import { Route as SmsRouteImport } from './routes/sms'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -50,6 +51,11 @@ const StudentsRoute = StudentsRouteImport.update({
 const SmsRoute = SmsRouteImport.update({
   id: '/sms',
   path: '/sms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/sms': typeof SmsRoute
   '/students': typeof StudentsRoute
   '/teachers': typeof TeachersRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/signup'
     | '/sms'
     | '/students'
     | '/teachers'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/signup'
     | '/sms'
     | '/students'
     | '/teachers'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms'
     | '/settings'
+    | '/signup'
     | '/sms'
     | '/students'
     | '/teachers'
@@ -243,6 +255,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RoomsRoute: typeof RoomsRoute
   SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
   SmsRoute: typeof SmsRoute
   StudentsRoute: typeof StudentsRoute
   TeachersRoute: typeof TeachersRoute
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/sms'
       fullPath: '/sms'
       preLoaderRoute: typeof SmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -387,6 +407,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RoomsRoute: RoomsRoute,
   SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
   SmsRoute: SmsRoute,
   StudentsRoute: StudentsRoute,
   TeachersRoute: TeachersRoute,
