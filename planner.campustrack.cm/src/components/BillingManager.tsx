@@ -90,8 +90,12 @@ export function BillingManager() {
             <div className="flex items-center space-x-3">
               <Crown className="text-amber-500" size={28} />
               <div>
-                <p className="font-bold text-gray-900">{subscription.pack?.name ?? 'Essai gratuit'}</p>
-                <p className="text-sm text-gray-500 capitalize">{statusLabel(subscription.status)}</p>
+                <p className="font-bold text-gray-900">
+                  {subscription.pack?.name ?? 'Essai gratuit'}
+                </p>
+                <p className="text-sm text-gray-500 capitalize">
+                  {statusLabel(subscription.status)}
+                </p>
               </div>
             </div>
             <div className="text-sm text-gray-600">
@@ -130,7 +134,9 @@ export function BillingManager() {
                 type="button"
                 onClick={() => setBillingPeriod(period)}
                 className={`px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                  billingPeriod === period ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'
+                  billingPeriod === period
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 {period === 'monthly' ? 'Mensuel' : 'Annuel'}
@@ -160,9 +166,13 @@ export function BillingManager() {
                   </span>
                 )}
                 <p className="font-bold text-gray-900 capitalize">{pack.name}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{formatAmount(pack.price, pack.currency)}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  {formatAmount(pack.price, pack.currency)}
+                </p>
                 <p className="text-xs text-gray-500 capitalize">/ {pack.billing_period}</p>
-                <p className="text-sm text-gray-600 mt-3">{pack.features.length} fonctionnalités incluses</p>
+                <p className="text-sm text-gray-600 mt-3">
+                  {pack.features.length} fonctionnalités incluses
+                </p>
                 {selected && (
                   <span className="absolute bottom-3 right-3 text-primary">
                     <Check size={20} />

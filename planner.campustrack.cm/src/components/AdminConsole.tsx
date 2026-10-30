@@ -50,7 +50,9 @@ export function AdminConsole() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Administration plateforme</h1>
-          <p className="text-gray-500 text-sm">Gestion des tenants, packs et configuration PayMe.</p>
+          <p className="text-gray-500 text-sm">
+            Gestion des tenants, packs et configuration PayMe.
+          </p>
         </div>
       </div>
 
@@ -61,7 +63,9 @@ export function AdminConsole() {
             type="button"
             onClick={() => setTab(id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === id ? 'bg-primary text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              tab === id
+                ? 'bg-primary text-white'
+                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
             <Icon size={16} />
@@ -88,7 +92,13 @@ function TenantsTab() {
   const reactivateTenant = useReactivateTenant();
 
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', slug: '', admin_name: '', admin_email: '', admin_password: '' });
+  const [form, setForm] = useState({
+    name: '',
+    slug: '',
+    admin_name: '',
+    admin_email: '',
+    admin_password: '',
+  });
 
   if (isLoading) return <LoadingSpinner fullScreen={false} />;
 
@@ -157,13 +167,16 @@ function TenantsTab() {
           {(tenants?.data ?? []).map((tenant: Tenant) => (
             <tr key={tenant.id} className="border-b border-gray-50">
               <td className="py-2 pr-4 text-gray-900 font-medium">
-                {tenant.name} {tenant.is_demo && <span className="text-xs text-amber-600">(démo)</span>}
+                {tenant.name}{' '}
+                {tenant.is_demo && <span className="text-xs text-amber-600">(démo)</span>}
               </td>
               <td className="py-2 pr-4 text-gray-600">{tenant.slug}</td>
               <td className="py-2 pr-4">
                 <span
                   className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                    tenant.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    tenant.status === 'active'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
                   }`}
                 >
                   {tenant.status}
@@ -243,15 +256,46 @@ function PacksTab() {
 
       {showForm && (
         <div className="mb-6 p-4 rounded-lg bg-gray-50 border border-gray-200 grid grid-cols-2 md:grid-cols-5 gap-3">
-          <input placeholder="Nom" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-          <input placeholder="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-          <input placeholder="Tier" value={form.tier} onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value }))} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-          <input type="number" placeholder="Prix" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) }))} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-          <select value={form.billing_period} onChange={(e) => setForm((f) => ({ ...f, billing_period: e.target.value as 'monthly' | 'annual' }))} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <input
+            placeholder="Nom"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <input
+            placeholder="Slug"
+            value={form.slug}
+            onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <input
+            placeholder="Tier"
+            value={form.tier}
+            onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value }))}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <input
+            type="number"
+            placeholder="Prix"
+            value={form.price}
+            onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) }))}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <select
+            value={form.billing_period}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, billing_period: e.target.value as 'monthly' | 'annual' }))
+            }
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
             <option value="monthly">Mensuel</option>
             <option value="annual">Annuel</option>
           </select>
-          <button type="button" onClick={handleSave} className="col-span-2 md:col-span-5 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="col-span-2 md:col-span-5 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium"
+          >
             Enregistrer
           </button>
         </div>
@@ -294,17 +338,24 @@ function FeaturesTab() {
       <h2 className="text-lg font-bold text-gray-900 mb-4">Fonctionnalités</h2>
       <div className="space-y-2">
         {(features ?? []).map((feature: AdminFeature) => (
-          <div key={feature.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-gray-200">
+          <div
+            key={feature.id}
+            className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-gray-200"
+          >
             <div>
               <p className="text-sm font-medium text-gray-900">{feature.label}</p>
               <p className="text-xs text-gray-500">{feature.key}</p>
             </div>
             <button
               type="button"
-              onClick={() => updateFeature.mutate({ id: feature.id, data: { is_active: !feature.is_active } })}
+              onClick={() =>
+                updateFeature.mutate({ id: feature.id, data: { is_active: !feature.is_active } })
+              }
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${feature.is_active ? 'bg-secondary' : 'bg-gray-200'}`}
             >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${feature.is_active ? 'translate-x-6' : 'translate-x-1'}`} />
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${feature.is_active ? 'translate-x-6' : 'translate-x-1'}`}
+              />
             </button>
           </div>
         ))}
@@ -345,33 +396,67 @@ function GatewayTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">User name</label>
-          <input value={form.user_name} onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input
+            value={form.user_name}
+            onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Mot de passe</label>
-          <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="••••••••" />
+          <input
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            placeholder="••••••••"
+          />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">App ID</label>
-          <input value={form.app_id} onChange={(e) => setForm((f) => ({ ...f, app_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input
+            value={form.app_id}
+            onChange={(e) => setForm((f) => ({ ...f, app_id: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Pay type ID</label>
-          <input value={form.pay_type_id} onChange={(e) => setForm((f) => ({ ...f, pay_type_id: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input
+            value={form.pay_type_id}
+            onChange={(e) => setForm((f) => ({ ...f, pay_type_id: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Endpoint (base URL)</label>
-          <input value={form.endpoint} onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="https://sandbox.mamonipay.me/api" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Endpoint (base URL)
+          </label>
+          <input
+            value={form.endpoint}
+            onChange={(e) => setForm((f) => ({ ...f, endpoint: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            placeholder="https://sandbox.mamonipay.me/api"
+          />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Mode</label>
-          <select value={form.mode} onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as 'sandbox' | 'live' }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <select
+            value={form.mode}
+            onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as 'sandbox' | 'live' }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
             <option value="sandbox">Sandbox</option>
             <option value="live">Live</option>
           </select>
         </div>
       </div>
-      <button type="button" onClick={handleSave} disabled={updateGateway.isPending} className="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50">
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={updateGateway.isPending}
+        className="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50"
+      >
         Enregistrer
       </button>
     </div>
@@ -402,9 +487,15 @@ function PaymentsTab() {
             {payments.data.map((payment) => (
               <tr key={payment.id} className="border-b border-gray-50">
                 <td className="py-2 pr-4 text-gray-900 font-medium">{payment.tenant_id}</td>
-                <td className="py-2 pr-4 text-gray-900">{formatAmount(payment.amount, payment.currency)}</td>
+                <td className="py-2 pr-4 text-gray-900">
+                  {formatAmount(payment.amount, payment.currency)}
+                </td>
                 <td className="py-2 pr-4 text-gray-600">{payment.status}</td>
-                <td className="py-2 pr-4 text-gray-600">{payment.created_at ? new Date(payment.created_at).toLocaleDateString(getLocale()) : '—'}</td>
+                <td className="py-2 pr-4 text-gray-600">
+                  {payment.created_at
+                    ? new Date(payment.created_at).toLocaleDateString(getLocale())
+                    : '—'}
+                </td>
               </tr>
             ))}
           </tbody>

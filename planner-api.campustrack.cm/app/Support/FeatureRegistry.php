@@ -7,6 +7,7 @@ use App\Models\Pack;
 use App\Models\Tenant;
 use App\Models\TenantSubscription;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -111,7 +112,7 @@ class FeatureRegistry
     /**
      * Fonctionnalités actives (modèles).
      */
-    public static function allActive(): \Illuminate\Support\Collection
+    public static function allActive(): Collection
     {
         return Feature::query()->where('is_active', true)->orderBy('id')->get();
     }

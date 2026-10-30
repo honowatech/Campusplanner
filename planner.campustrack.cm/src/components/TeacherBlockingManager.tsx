@@ -368,7 +368,12 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="teacher-blocking-teacher" className="block text-sm font-medium text-gray-700 mb-1">{t('teacher')}</label>
+            <label
+              htmlFor="teacher-blocking-teacher"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('teacher')}
+            </label>
             <select
               required
               id="teacher-blocking-teacher"
@@ -387,7 +392,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="teacher-blocking-start-datetime" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-blocking-start-datetime"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('startDateTime')}
               </label>
               <input
@@ -400,7 +408,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="teacher-blocking-end-datetime" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-blocking-end-datetime"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('endDateTime')}
               </label>
               <input
@@ -415,7 +426,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label htmlFor="teacher-blocking-type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="teacher-blocking-type"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('blockingType')}
             </label>
             <select
@@ -438,7 +452,12 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label htmlFor="teacher-blocking-reason" className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
+            <label
+              htmlFor="teacher-blocking-reason"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('reason')}
+            </label>
             <textarea
               required
               id="teacher-blocking-reason"
@@ -478,7 +497,10 @@ export const TeacherBlockingManager: React.FC<TeacherBlockingManagerProps> = ({
             <strong>{blockingToReject && getTeacherName(blockingToReject.teacher_id)}</strong>
           </p>
           <div>
-            <label htmlFor="teacher-blocking-rejection-reason" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="teacher-blocking-rejection-reason"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('rejectionReason')}
             </label>
             <textarea

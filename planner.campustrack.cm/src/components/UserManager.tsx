@@ -343,7 +343,9 @@ export const UserManager: React.FC<UserManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="user-name" className="block text-sm font-medium text-gray-700 mb-1">{t('fullName')}</label>
+            <label htmlFor="user-name" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('fullName')}
+            </label>
             <input
               required
               id="user-name"
@@ -354,7 +356,9 @@ export const UserManager: React.FC<UserManagerProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="user-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+            <label htmlFor="user-email" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('email')}
+            </label>
             <input
               required
               id="user-email"
@@ -367,7 +371,9 @@ export const UserManager: React.FC<UserManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="user-role" className="block text-sm font-medium text-gray-700 mb-1">{t('role')}</label>
+              <label htmlFor="user-role" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('role')}
+              </label>
               <select
                 required
                 id="user-role"
@@ -383,7 +389,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
               </select>
             </div>
             <div>
-              <label htmlFor="user-department" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="user-department"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('department')}
               </label>
               <select
@@ -410,7 +419,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
           {!editingUser && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="user-password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="user-password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('password')}
                 </label>
                 <input
@@ -425,7 +437,10 @@ export const UserManager: React.FC<UserManagerProps> = ({
                 />
               </div>
               <div>
-                <label htmlFor="user-password-confirmation" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="user-password-confirmation"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('confirmPassword')}
                 </label>
                 <input

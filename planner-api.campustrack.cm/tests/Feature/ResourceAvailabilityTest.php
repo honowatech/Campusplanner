@@ -305,7 +305,7 @@ class ResourceAvailabilityTest extends TestCase
         $response = $this->postJson('/api/rooms/search-available', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['start_datetime', 'end_datetime']);
+            ->assertJsonValidationErrors(['start_datetime', 'end_datetime'], 'data');
     }
 
     /** @test */
@@ -316,6 +316,6 @@ class ResourceAvailabilityTest extends TestCase
         $response = $this->postJson('/api/teachers/search-available', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['start_datetime', 'end_datetime']);
+            ->assertJsonValidationErrors(['start_datetime', 'end_datetime'], 'data');
     }
 }

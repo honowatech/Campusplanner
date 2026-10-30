@@ -366,7 +366,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="teacher-detail-first-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-detail-first-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('firstName')}
               </label>
               <input
@@ -379,7 +382,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="teacher-detail-last-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-detail-last-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('lastName')}
               </label>
               <input
@@ -393,7 +399,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="teacher-detail-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label
+                  htmlFor="teacher-detail-email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t('email')}
+                </label>
                 <input
                   id="teacher-detail-email"
                   required
@@ -404,7 +415,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 />
               </div>
               <div>
-                <label htmlFor="teacher-detail-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="teacher-detail-phone"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('phoneNumber')}
                 </label>
                 <input
@@ -419,7 +433,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="teacher-detail-department" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="teacher-detail-department"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('department')}
                 </label>
                 <div className="relative">
@@ -450,7 +467,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
                 </div>
               </div>
               <div>
-                <label htmlFor="teacher-detail-color" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="teacher-detail-color"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('colorTag')}
                 </label>
                 <div className="flex items-center space-x-2">
@@ -465,7 +485,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               </div>
             </div>
             <div>
-              <label htmlFor="teacher-detail-speciality" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-detail-speciality"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('speciality')}
               </label>
               <input
@@ -666,7 +689,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="teacher-first-name" className="block text-sm font-medium text-gray-700 mb-1">{t('firstName')}</label>
+            <label
+              htmlFor="teacher-first-name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('firstName')}
+            </label>
             <input
               id="teacher-first-name"
               required
@@ -677,7 +705,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="teacher-last-name" className="block text-sm font-medium text-gray-700 mb-1">{t('lastName')}</label>
+            <label
+              htmlFor="teacher-last-name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('lastName')}
+            </label>
             <input
               id="teacher-last-name"
               required
@@ -689,7 +722,12 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="teacher-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+              <label
+                htmlFor="teacher-email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('email')}
+              </label>
               <input
                 id="teacher-email"
                 required
@@ -700,7 +738,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="teacher-phone" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-phone"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('phoneNumber')}
               </label>
               <input
@@ -715,7 +756,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="teacher-department" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-department"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('department')}
               </label>
               <div className="relative">
@@ -746,7 +790,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
               </div>
             </div>
             <div>
-              <label htmlFor="teacher-color" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="teacher-color"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('colorTag')}
               </label>
               <div className="flex items-center space-x-2">
@@ -761,7 +808,10 @@ export const TeacherManager: React.FC<TeacherManagerProps> = ({
             </div>
           </div>
           <div>
-            <label htmlFor="teacher-speciality" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="teacher-speciality"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('speciality')}
             </label>
             <input

@@ -7,7 +7,6 @@ use App\Models\Pack;
 use App\Models\Payment;
 use App\Models\PaymentGateway;
 use App\Models\Tenant;
-use App\Services\AuditService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -37,9 +36,9 @@ class PaymentService
         ?string $billingPeriod = null,
         ?string $idempotencyKey = null,
     ): Payment {
-        // if ($tenant->is_demo) {
-        //     throw new \RuntimeException('Les paiements réels sont désactivés sur le tenant démo.');
-        // }
+        if ($tenant->is_demo) {
+            throw new \RuntimeException('Les paiements réels sont désactivés sur le tenant démo.');
+        }
 
         $gateway = PaymentGateway::active();
 

@@ -266,7 +266,10 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
           </div>
 
           <div>
-            <label htmlFor="class-department" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="class-department"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('department')}
             </label>
             <div className="relative">
@@ -303,7 +306,9 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="class-level" className="block text-sm font-medium text-gray-700 mb-1">{t('level')}</label>
+              <label htmlFor="class-level" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('level')}
+              </label>
               <input
                 required
                 id="class-level"
@@ -315,7 +320,10 @@ export const StudentGroupManager: React.FC<StudentGroupManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="class-capacity" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="class-capacity"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('numStudents')}
               </label>
               <input

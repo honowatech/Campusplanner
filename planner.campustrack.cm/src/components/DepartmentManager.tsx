@@ -258,7 +258,10 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="department-detail-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="department-detail-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('deptName')}
               </label>
               <input
@@ -272,7 +275,10 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="department-detail-code" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="department-detail-code"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('deptCode')}
               </label>
               <input
@@ -291,7 +297,10 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="department-detail-head" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="department-detail-head"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('headOfDept')}
               </label>
               <select
@@ -445,7 +454,12 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="department-name" className="block text-sm font-medium text-gray-700 mb-1">{t('deptName')}</label>
+            <label
+              htmlFor="department-name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('deptName')}
+            </label>
             <input
               id="department-name"
               required
@@ -457,7 +471,12 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="department-code" className="block text-sm font-medium text-gray-700 mb-1">{t('deptCode')}</label>
+            <label
+              htmlFor="department-code"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('deptCode')}
+            </label>
             <input
               id="department-code"
               required
@@ -469,7 +488,10 @@ export const DepartmentManager: React.FC<DepartmentManagerProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="department-head" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="department-head"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('headOfDept')}
             </label>
             <select

@@ -6,7 +6,14 @@ import {
   PackPayload,
   GatewayPayload,
 } from '@/src/services/adminService';
-import { Tenant, AdminPack, AdminFeature, PaymentGatewayConfig, Payment, PaginatedResponse } from '@/src/lib/types';
+import {
+  Tenant,
+  AdminPack,
+  AdminFeature,
+  PaymentGatewayConfig,
+  Payment,
+  PaginatedResponse,
+} from '@/src/lib/types';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/src/services/api';
 import type { AxiosError } from 'axios';
