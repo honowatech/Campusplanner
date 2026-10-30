@@ -56,8 +56,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
-// Onboarding public : inscription d'une école (tenant + admin initial).
+// Onboarding public en libre-service : inscription d'une école (tenant +
+// admin initial connecté d'office + essai gratuit), sans validation super-admin.
 Route::post('/onboarding', [OnboardingController::class, 'register'])->middleware('throttle:5,1');
+
+// Formules d'abonnement (publiques : affichées sur la page d'inscription).
+Route::get('packs', [BillingController::class, 'packs']);
 
 // Mode démo : état + connexion sans mot de passe (public, nécessaire pour la
 // page de connexion non authentifiée). L'activation/désactivation est réservée
@@ -85,7 +89,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // === FONCTIONNALITÉS & FACTURATION (abonnement) ===
     Route::get('features', [FeatureController::class, 'index']);
-    Route::get('packs', [BillingController::class, 'packs']);
     Route::get('billing/subscription', [BillingController::class, 'subscription']);
 
     // === JOURNAL D'AUDIT (admin tenant & super-admin) ===
@@ -96,6 +99,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:super-admin|administrateur'])->group(function () {
         Route::post('billing/checkout', [PaymentController::class, 'checkout']);
         Route::get('billing/payments', [PaymentController::class, 'payments']);
+        Route::get('billing/payments/{payment}', [PaymentController::class, 'show'])->whereNumber('payment');
+        Route::post('billing/payments/{payment}/cancel', [PaymentController::class, 'cancel'])->whereNumber('payment');
     });
 
     // === PAIEMENTS (super-admin, agrégé) ===
@@ -115,6 +120,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('payment-gateway', [PaymentGatewayController::class, 'show']);
         Route::put('payment-gateway', [PaymentGatewayController::class, 'update']);
+        Route::post('payment-gateway/test', [PaymentGatewayController::class, 'test']);
 
         Route::get('packs', [AdminPackController::class, 'index']);
         Route::post('packs', [AdminPackController::class, 'store']);

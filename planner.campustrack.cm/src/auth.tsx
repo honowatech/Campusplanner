@@ -1,6 +1,7 @@
 import { User, UserRole, Role, Permission, SubscriptionSummary } from '@/src/lib/types';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '@/src/services/api';
+import { onboardingService, SchoolSignupPayload } from '@/src/services/onboardingService';
 import { AxiosError } from 'axios';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { useTranslation } from '@/src/utils/i18n';
@@ -52,6 +53,7 @@ export type AuthState = {
   apiError: string | null;
   loginWithApi: (email: string, password: string, role?: UserRole) => Promise<void>;
   demoLogin: (role: string) => Promise<void>;
+  signupSchool: (payload: SchoolSignupPayload) => Promise<{ intendedPackId: number | null }>;
   logout: () => Promise<void>;
   clearApiError: () => void;
   refreshUser: () => Promise<void>;
@@ -165,6 +167,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Inscription libre-service d'une école : l'API crée l'espace et ouvre
+  // directement la session de l'administrateur (aucune validation requise).
+  const signupSchool = async (
+    payload: SchoolSignupPayload,
+  ): Promise<{ intendedPackId: number | null }> => {
+    setApiError(null);
+    const result = await onboardingService.signup(payload);
+    setUser(convertApiUserToUser(result.user as unknown as ApiUserWithRoles, 'administrateur'));
+    setIsAuthenticated(true);
+    localStorage.setItem('show-login-toast', 'true');
+    return { intendedPackId: result.intended_pack_id };
+  };
+
   const logout = async (): Promise<void> => {
     try {
       await apiClient.post('/api/logout', {});
@@ -205,6 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         apiError,
         loginWithApi,
         demoLogin,
+        signupSchool,
         logout,
         clearApiError,
         refreshUser,

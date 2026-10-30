@@ -28,6 +28,10 @@ return [
         'initiated' => 'Paiement initié',
         'history_retrieved' => 'Historique des paiements récupéré',
         'retrieved' => 'Paiements récupérés',
+        'canceled' => 'Demande de paiement annulée',
+        'demo_disabled' => 'Les paiements réels sont désactivés sur le tenant démo.',
+        'gateway_unavailable' => 'Le paiement en ligne est momentanément indisponible. Réessayez plus tard.',
+        'already_pending' => 'Un paiement attend déjà votre validation sur votre téléphone. Validez-le ou annulez-le avant d\'en lancer un nouveau.',
     ],
 
     'tenants' => [
@@ -61,6 +65,8 @@ return [
     'payment_gateway' => [
         'retrieved' => 'Passerelle récupérée',
         'updated' => 'Passerelle mise à jour',
+        'missing' => 'Aucune configuration PayMe enregistrée.',
+        'invalid_endpoint' => 'Indiquez l\'adresse de base de l\'API (ex. https://console-v2.mamonipay.me/api), jamais l\'adresse de la documentation ni un suffixe de version (/v1).',
     ],
 
     'onboarding' => [

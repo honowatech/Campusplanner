@@ -29,17 +29,22 @@ class PaymentGatewayController extends Controller
         $validated = $request->validate([
             'user_name' => 'required|string|max:255',
             'password' => 'sometimes|nullable|string|max:255',
-            'app_id' => 'sometimes|nullable|string|max:255',
-            'endpoint' => 'sometimes|nullable|string|max:255',
-            'pay_type_id' => 'sometimes|nullable|string|max:255',
-            'client_fees_rate' => 'sometimes|numeric|min:0|max:1',
-            'mode' => 'sometimes|in:sandbox,live',
+            'endpoint' => [
+                'sometimes', 'nullable', 'url:https', 'max:255',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (is_string($value) && PaymeClient::isInvalidBaseUrl($value)) {
+                        $fail(__('admin.payment_gateway.invalid_endpoint'));
+                    }
+                },
+            ],
+            'client_fees_rate' => 'sometimes|nullable|integer|min:0|max:100',
+            'timeout_minutes' => 'sometimes|integer|min:2|max:60',
             'is_active' => 'sometimes|boolean',
         ]);
 
         $gateway = PaymentGateway::query()->firstOrNew(['provider' => 'payme']);
 
-        foreach (['user_name', 'app_id', 'endpoint', 'pay_type_id', 'client_fees_rate', 'mode', 'is_active'] as $field) {
+        foreach (['user_name', 'endpoint', 'client_fees_rate', 'timeout_minutes', 'is_active'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $gateway->{$field} = $validated[$field];
             }
@@ -56,11 +61,28 @@ class PaymentGatewayController extends Controller
 
         AuditService::record('payment_gateway.updated', $gateway, [], [
             'user_name' => $gateway->user_name,
-            'mode' => $gateway->mode,
+            'endpoint' => $gateway->endpoint,
             'is_active' => (bool) $gateway->is_active,
         ]);
 
         return $this->success(['gateway' => $this->payload($gateway)], __('admin.payment_gateway.updated'));
+    }
+
+    /**
+     * Teste la connexion PayMe avec les identifiants enregistrés (login, sans
+     * rien débiter) et renvoie l'URL réellement appelée.
+     */
+    public function test(): JsonResponse
+    {
+        $gateway = PaymentGateway::active() ?? PaymentGateway::query()->latest()->first();
+
+        if (! $gateway) {
+            return $this->error(['ok' => false, 'status' => null, 'message' => __('admin.payment_gateway.missing'), 'url' => null], __('admin.payment_gateway.missing'), 404);
+        }
+
+        $result = app(PaymeClient::class)->testConnection($gateway);
+
+        return $this->success($result, $result['message']);
     }
 
     /**
@@ -76,11 +98,11 @@ class PaymentGatewayController extends Controller
             'id' => $gateway->id,
             'provider' => $gateway->provider,
             'user_name' => $gateway->user_name,
-            'app_id' => $gateway->app_id,
             'endpoint' => $gateway->endpoint,
-            'pay_type_id' => $gateway->pay_type_id,
+            'default_endpoint' => config('payme.base_url'),
             'client_fees_rate' => $gateway->client_fees_rate,
-            'mode' => $gateway->mode,
+            'timeout_minutes' => $gateway->timeoutMinutes(),
+            'has_password' => filled($gateway->password),
             'is_active' => $gateway->is_active,
         ];
     }

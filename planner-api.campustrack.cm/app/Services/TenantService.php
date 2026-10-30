@@ -23,7 +23,7 @@ class TenantService
      * Crée un tenant, sème ses rôles, crée le compte admin initial et démarre
      * l'essai gratuit. Retourne le tenant créé.
      *
-     * @param  array{name: string, slug: string, admin_name: string, admin_email: string, admin_password: string, trial_days?: int}  $data
+     * @param  array{name: string, slug: string, admin_name: string, admin_email: string, admin_password: string, trial_days?: int, billing_phone?: string|null, settings?: array<string, mixed>|null}  $data
      */
     public function create(array $data): Tenant
     {
@@ -33,6 +33,8 @@ class TenantService
                 'slug' => Str::slug($data['slug']),
                 'status' => 'active',
                 'is_demo' => false,
+                'billing_phone' => $data['billing_phone'] ?? null,
+                'settings' => $data['settings'] ?? null,
             ]);
 
             RoleCatalog::seedTenantRoles($tenant->id);

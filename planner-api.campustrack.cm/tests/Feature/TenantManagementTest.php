@@ -72,7 +72,10 @@ class TenantManagementTest extends TestCase
     /** @test */
     public function public_onboarding_creates_a_tenant(): void
     {
-        $this->postJson('/api/onboarding', $this->tenantPayload(['slug' => 'ecole-onboarding']))
+        $this->postJson('/api/onboarding', $this->tenantPayload([
+            'slug' => 'ecole-onboarding',
+            'admin_password_confirmation' => 'password123',
+        ]))
             ->assertStatus(201);
 
         $this->assertNotNull(Tenant::where('slug', 'ecole-onboarding')->first());
@@ -105,7 +108,6 @@ class TenantManagementTest extends TestCase
         $this->putJson('/api/admin/payment-gateway', [
             'user_name' => 'merchant',
             'password' => 'secret',
-            'mode' => 'sandbox',
             'is_active' => true,
         ])->assertOk();
     }

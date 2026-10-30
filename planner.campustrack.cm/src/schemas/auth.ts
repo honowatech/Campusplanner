@@ -42,3 +42,24 @@ export const registerSchema = z
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+// Inscription libre-service d'une école (tenant + compte administrateur)
+export const schoolSignupSchema = z
+  .object({
+    name: z.string().min(2, "Le nom de l'établissement est requis"),
+    admin_name: z.string().min(2, 'Votre nom est requis'),
+    admin_email: z.string().min(1, "L'email est requis").email("Format d'email invalide"),
+    phone: z
+      .string()
+      .regex(/^[+\d\s().-]{9,20}$/, 'Numéro de téléphone invalide')
+      .optional()
+      .or(z.literal('')),
+    admin_password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+    admin_password_confirmation: z.string().min(1, 'La confirmation du mot de passe est requise'),
+  })
+  .refine((data) => data.admin_password === data.admin_password_confirmation, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['admin_password_confirmation'],
+  });
+
+export type SchoolSignupFormData = z.infer<typeof schoolSignupSchema>;
