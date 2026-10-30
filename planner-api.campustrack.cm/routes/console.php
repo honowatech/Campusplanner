@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Schedule;
 use App\Jobs\PaymeReconciliationJob;
+use Illuminate\Support\Facades\Schedule;
 
 /*
 |--------------------------------------------------------------------------

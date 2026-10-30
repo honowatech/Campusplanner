@@ -16,12 +16,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TenantSubscription extends Model
 {
     public const STATUS_TRIAL = 'trial';
+
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_EXPIRED = 'expired';
+
     public const STATUS_CANCELED = 'canceled';
+
     public const STATUS_PAST_DUE = 'past_due';
 
     public const PERIOD_MONTHLY = 'monthly';
+
     public const PERIOD_ANNUAL = 'annual';
 
     /**

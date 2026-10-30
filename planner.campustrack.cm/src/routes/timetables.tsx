@@ -151,7 +151,10 @@ function TimetablesPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="period-start-date" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="period-start-date"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('startDate')}
               </label>
               <input
@@ -169,7 +172,12 @@ function TimetablesPage() {
               />
             </div>
             <div>
-              <label htmlFor="period-end-date" className="block text-sm font-medium text-gray-700 mb-1">{t('endDate')}</label>
+              <label
+                htmlFor="period-end-date"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('endDate')}
+              </label>
               <input
                 required
                 id="period-end-date"

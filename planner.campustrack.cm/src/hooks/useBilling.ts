@@ -19,8 +19,13 @@ export function useCheckout() {
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: ({ payload, idempotencyKey }: { payload: CheckoutPayload; idempotencyKey?: string }) =>
-      paymentService.checkout(payload, idempotencyKey),
+    mutationFn: ({
+      payload,
+      idempotencyKey,
+    }: {
+      payload: CheckoutPayload;
+      idempotencyKey?: string;
+    }) => paymentService.checkout(payload, idempotencyKey),
     onSuccess: (payment) => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['subscription'] });

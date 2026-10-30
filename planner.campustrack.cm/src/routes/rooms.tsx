@@ -19,7 +19,12 @@ function RoomsPage() {
   const debouncedSearch = useDebouncedValue(search);
   const { user } = useAuth();
   const readOnly = !hasAnyPermission(user?.permissions, ['rooms.manage']);
-  const { data: rooms, isLoading, isError, refetch } = useRooms({
+  const {
+    data: rooms,
+    isLoading,
+    isError,
+    refetch,
+  } = useRooms({
     page,
     search: debouncedSearch || undefined,
   });

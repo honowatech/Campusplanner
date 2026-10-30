@@ -32,7 +32,12 @@ function DepartmentsPage() {
     'departments.edit',
     'departments.delete',
   ]);
-  const { data: departments, isLoading: departmentsLoading, isError: departmentsError, refetch: refetchDepartments } = useDepartments({
+  const {
+    data: departments,
+    isLoading: departmentsLoading,
+    isError: departmentsError,
+    refetch: refetchDepartments,
+  } = useDepartments({
     page,
     search: debouncedSearch || undefined,
   });

@@ -20,7 +20,12 @@ function ClassesPage() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
   const readOnly = !hasAnyPermission(auth.user?.permissions, ['classes.manage']);
-  const { data: classes, isLoading: groupsLoading, isError: classesError, refetch: refetchClasses } = useClasses({
+  const {
+    data: classes,
+    isLoading: groupsLoading,
+    isError: classesError,
+    refetch: refetchClasses,
+  } = useClasses({
     page,
     search: debouncedSearch || undefined,
   });

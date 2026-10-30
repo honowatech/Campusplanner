@@ -133,7 +133,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Max Hours Per Week */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label htmlFor="max-weekly-hours" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label
+                        htmlFor="max-weekly-hours"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
                         {t('maxWeeklyHours')}
                       </label>
                       <input
@@ -147,14 +150,15 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                           handleNumberChange('maxWeeklyHoursPerTeacher', e.target.value)
                         }
                       />
-                      <p className="text-xs text-gray-500 mt-2">
-                        {t('maxWeeklyHoursHint')}
-                      </p>
+                      <p className="text-xs text-gray-500 mt-2">{t('maxWeeklyHoursHint')}</p>
                     </div>
 
                     {/* Max Consecutive Hours */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label htmlFor="max-consecutive-hours" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label
+                        htmlFor="max-consecutive-hours"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
                         {t('maxConsecutiveHours')}
                       </label>
                       <input
@@ -166,14 +170,15 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                         value={localSettings?.maxConsecutiveHours}
                         onChange={(e) => handleNumberChange('maxConsecutiveHours', e.target.value)}
                       />
-                      <p className="text-xs text-gray-500 mt-2">
-                        {t('maxConsecutiveHoursHint')}
-                      </p>
+                      <p className="text-xs text-gray-500 mt-2">{t('maxConsecutiveHoursHint')}</p>
                     </div>
 
                     {/* Max Daily Hours (Teacher) */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label htmlFor="max-daily-hours-teacher" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label
+                        htmlFor="max-daily-hours-teacher"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
                         {t('maxDailyHoursTeacher')}
                       </label>
                       <input
@@ -191,7 +196,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     {/* Max Daily Hours (Class) */}
                     <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:border-indigo-100 transition-colors">
-                      <label htmlFor="max-daily-hours-class" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label
+                        htmlFor="max-daily-hours-class"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
                         {t('maxDailyHoursClass')}
                       </label>
                       <input
@@ -262,7 +270,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                   <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-6">
                     <div>
-                      <label htmlFor="sms-api-key" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label
+                        htmlFor="sms-api-key"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
                         {t('apiKey')}
                       </label>
                       <div className="relative">
@@ -279,7 +290,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="sms-sender-id" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label
+                          htmlFor="sms-sender-id"
+                          className="block text-sm font-semibold text-gray-700 mb-2"
+                        >
                           {t('senderId')}
                         </label>
                         <input
@@ -295,7 +309,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onUp
                       </div>
 
                       <div>
-                        <label htmlFor="sms-balance" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label
+                          htmlFor="sms-balance"
+                          className="block text-sm font-semibold text-gray-700 mb-2"
+                        >
                           {t('smsBalance')}
                         </label>
                         <div className="relative">

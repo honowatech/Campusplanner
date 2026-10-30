@@ -31,7 +31,12 @@ function TeachersPage() {
     'teachers.view.all',
     'teachers.manage.department',
   ]);
-  const { data: teachers, isLoading: teachersLoading, isError: teachersError, refetch: refetchTeachers } = useTeachers({
+  const {
+    data: teachers,
+    isLoading: teachersLoading,
+    isError: teachersError,
+    refetch: refetchTeachers,
+  } = useTeachers({
     page,
     search: debouncedSearch || undefined,
     department_id: filterDept ? Number(filterDept) : undefined,

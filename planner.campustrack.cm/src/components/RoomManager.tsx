@@ -173,7 +173,9 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">{t('roomName')}</label>
+            <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('roomName')}
+            </label>
             <input
               required
               id="room-name"
@@ -185,7 +187,9 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="room-code" className="block text-sm font-medium text-gray-700 mb-1">{t('roomCode')}</label>
+            <label htmlFor="room-code" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('roomCode')}
+            </label>
             <input
               required
               id="room-code"
@@ -198,7 +202,10 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="room-capacity" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="room-capacity"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('capacity')}
               </label>
               <input
@@ -217,7 +224,9 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="room-type" className="block text-sm font-medium text-gray-700 mb-1">{t('type')}</label>
+              <label htmlFor="room-type" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('type')}
+              </label>
               <select
                 id="room-type"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -239,7 +248,9 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
             </div>
           </div>
           <div>
-            <label htmlFor="room-building" className="block text-sm font-medium text-gray-700 mb-1">{t('building')}</label>
+            <label htmlFor="room-building" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('building')}
+            </label>
             <input
               required
               id="room-building"

@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"!src/routeTree.gen.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"!src/routeTree.gen.ts\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
@@ -48,5 +48,9 @@
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.70.1",
     "vite": "^6.2.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100
   }
 }

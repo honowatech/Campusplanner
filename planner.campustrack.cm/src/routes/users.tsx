@@ -26,7 +26,12 @@ function UsersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
-  const { data: appUsers, isLoading: usersLoading, isError: usersError, refetch: refetchUsers } = useUsers({
+  const {
+    data: appUsers,
+    isLoading: usersLoading,
+    isError: usersError,
+    refetch: refetchUsers,
+  } = useUsers({
     page,
     search: debouncedSearch || undefined,
   });

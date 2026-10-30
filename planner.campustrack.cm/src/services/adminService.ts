@@ -45,7 +45,10 @@ export type GatewayPayload = {
 export const adminService = {
   // Tenants
   listTenants: async (): Promise<PaginatedResponse<Tenant>> => {
-    const res = await apiClient.get<ApiResponse<{ tenants: PaginatedResponse<Tenant> }>>('/api/admin/tenants');
+    const res =
+      await apiClient.get<ApiResponse<{ tenants: PaginatedResponse<Tenant> }>>(
+        '/api/admin/tenants',
+      );
     return res.data.data.tenants;
   },
 
@@ -55,12 +58,16 @@ export const adminService = {
   },
 
   suspendTenant: async (id: number): Promise<Tenant> => {
-    const res = await apiClient.post<ApiResponse<{ tenant: Tenant }>>(`/api/admin/tenants/${id}/suspend`);
+    const res = await apiClient.post<ApiResponse<{ tenant: Tenant }>>(
+      `/api/admin/tenants/${id}/suspend`,
+    );
     return res.data.data.tenant;
   },
 
   reactivateTenant: async (id: number): Promise<Tenant> => {
-    const res = await apiClient.post<ApiResponse<{ tenant: Tenant }>>(`/api/admin/tenants/${id}/reactivate`);
+    const res = await apiClient.post<ApiResponse<{ tenant: Tenant }>>(
+      `/api/admin/tenants/${id}/reactivate`,
+    );
     return res.data.data.tenant;
   },
 
@@ -76,7 +83,10 @@ export const adminService = {
   },
 
   updatePack: async (id: number, data: PackPayload): Promise<AdminPack> => {
-    const res = await apiClient.put<ApiResponse<{ pack: AdminPack }>>(`/api/admin/packs/${id}`, data);
+    const res = await apiClient.put<ApiResponse<{ pack: AdminPack }>>(
+      `/api/admin/packs/${id}`,
+      data,
+    );
     return res.data.data.pack;
   },
 
@@ -86,12 +96,19 @@ export const adminService = {
 
   // Features
   listFeatures: async (): Promise<AdminFeature[]> => {
-    const res = await apiClient.get<ApiResponse<{ features: AdminFeature[] }>>('/api/admin/features');
+    const res =
+      await apiClient.get<ApiResponse<{ features: AdminFeature[] }>>('/api/admin/features');
     return res.data.data.features;
   },
 
-  updateFeature: async (id: number, data: { label?: string; is_active?: boolean }): Promise<AdminFeature> => {
-    const res = await apiClient.put<ApiResponse<{ feature: AdminFeature }>>(`/api/admin/features/${id}`, data);
+  updateFeature: async (
+    id: number,
+    data: { label?: string; is_active?: boolean },
+  ): Promise<AdminFeature> => {
+    const res = await apiClient.put<ApiResponse<{ feature: AdminFeature }>>(
+      `/api/admin/features/${id}`,
+      data,
+    );
     return res.data.data.feature;
   },
 
@@ -104,13 +121,19 @@ export const adminService = {
   },
 
   updateGateway: async (data: GatewayPayload): Promise<PaymentGatewayConfig> => {
-    const res = await apiClient.put<ApiResponse<{ gateway: PaymentGatewayConfig }>>('/api/admin/payment-gateway', data);
+    const res = await apiClient.put<ApiResponse<{ gateway: PaymentGatewayConfig }>>(
+      '/api/admin/payment-gateway',
+      data,
+    );
     return res.data.data.gateway;
   },
 
   // Payments (super-admin aggregate)
   listPayments: async (): Promise<PaginatedResponse<Payment>> => {
-    const res = await apiClient.get<ApiResponse<{ payments: PaginatedResponse<Payment> }>>('/api/admin/payments');
+    const res =
+      await apiClient.get<ApiResponse<{ payments: PaginatedResponse<Payment> }>>(
+        '/api/admin/payments',
+      );
     return res.data.data.payments;
   },
 

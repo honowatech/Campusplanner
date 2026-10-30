@@ -237,7 +237,9 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="blocking-room" className="block text-sm font-medium text-gray-700 mb-1">{t('room')}</label>
+            <label htmlFor="blocking-room" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('room')}
+            </label>
             <select
               required
               id="blocking-room"
@@ -258,7 +260,10 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="blocking-start-datetime" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="blocking-start-datetime"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('startDateTime')}
               </label>
               <input
@@ -271,7 +276,10 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="blocking-end-datetime" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="blocking-end-datetime"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('endDateTime')}
               </label>
               <input
@@ -308,7 +316,12 @@ export const RoomBlockingManager: React.FC<RoomBlockingManagerProps> = ({
           </div>
 
           <div>
-            <label htmlFor="blocking-reason" className="block text-sm font-medium text-gray-700 mb-1">{t('reason')}</label>
+            <label
+              htmlFor="blocking-reason"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t('reason')}
+            </label>
             <textarea
               required
               id="blocking-reason"
