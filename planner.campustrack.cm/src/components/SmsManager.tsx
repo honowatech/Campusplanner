@@ -51,7 +51,9 @@ export function SmsManager() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">SMS (Nexah)</h1>
-          <p className="text-gray-500 text-sm">Configurez vos crédences SMS et envoyez des notifications.</p>
+          <p className="text-gray-500 text-sm">
+            Configurez vos crédences SMS et envoyez des notifications.
+          </p>
         </div>
       </div>
 
@@ -60,7 +62,9 @@ export function SmsManager() {
         <h2 className="text-lg font-bold text-gray-900 mb-4">Configuration</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Utilisateur Nexah</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Utilisateur Nexah
+            </label>
             <input
               type="text"
               value={user}
@@ -80,7 +84,9 @@ export function SmsManager() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Sender ID (max 11)</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Sender ID (max 11)
+            </label>
             <input
               type="text"
               value={senderId}

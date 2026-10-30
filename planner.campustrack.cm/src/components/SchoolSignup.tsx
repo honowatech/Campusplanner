@@ -237,7 +237,9 @@ export function SchoolSignup({ initialPackId }: { initialPackId?: number }) {
                       setPeriod(value);
                       // Conserve le palier choisi en changeant de période.
                       const tier = packs?.find((pack) => pack.id === packId)?.tier;
-                      const match = packs?.find((pack) => pack.tier === tier && pack.billing_period === value);
+                      const match = packs?.find(
+                        (pack) => pack.tier === tier && pack.billing_period === value,
+                      );
                       if (match) setPackId(match.id);
                     }}
                     className={`px-4 py-1.5 text-sm font-medium transition-colors ${
@@ -276,7 +278,9 @@ export function SchoolSignup({ initialPackId }: { initialPackId?: number }) {
                           {formatAmount(pack.price, pack.currency)}
                         </span>
                         <span className="block text-xs text-gray-500">
-                          {t(pack.billing_period === 'annual' ? 'signup.perYear' : 'signup.perMonth')}
+                          {t(
+                            pack.billing_period === 'annual' ? 'signup.perYear' : 'signup.perMonth',
+                          )}
                         </span>
                       </>
                     }

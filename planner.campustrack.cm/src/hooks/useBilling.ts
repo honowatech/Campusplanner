@@ -19,8 +19,13 @@ export function useCheckout() {
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: ({ payload, idempotencyKey }: { payload: CheckoutPayload; idempotencyKey?: string }) =>
-      paymentService.checkout(payload, idempotencyKey),
+    mutationFn: ({
+      payload,
+      idempotencyKey,
+    }: {
+      payload: CheckoutPayload;
+      idempotencyKey?: string;
+    }) => paymentService.checkout(payload, idempotencyKey),
     onSuccess: (payment) => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['subscription'] });
@@ -52,7 +57,8 @@ export function usePaymentStatus(id: number | null) {
     queryKey: ['payment', id],
     queryFn: () => paymentService.get(id as number),
     enabled: id !== null,
-    refetchInterval: (query) => (isAwaitingPayment(query.state.data) || !query.state.data ? 4_000 : false),
+    refetchInterval: (query) =>
+      isAwaitingPayment(query.state.data) || !query.state.data ? 4_000 : false,
     refetchIntervalInBackground: true,
   });
 }

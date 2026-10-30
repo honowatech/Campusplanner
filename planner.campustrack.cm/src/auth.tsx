@@ -129,8 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string; data?: Record<string, string[]> }>;
-      const errorMessage =
-        axiosError.response?.data?.message || t('errors.loginRetry');
+      const errorMessage = axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       // On relance l'erreur axios pour permettre au formulaire d'extraire
       // les erreurs de champs (422) de la réponse.
@@ -160,8 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMessage =
-        axiosError.response?.data?.message || t('errors.loginRetry');
+      const errorMessage = axiosError.response?.data?.message || t('errors.loginRetry');
       setApiError(errorMessage);
       throw axiosError;
     } finally {

@@ -67,7 +67,10 @@ function RootComponent() {
 
   // `/signup` reste dans le layout public même une fois la session ouverte :
   // changer de layout remonterait la page et perdrait sa redirection.
-  if (location.pathname === '/signup' || (PUBLIC_ROUTES.includes(location.pathname) && !auth.isAuthenticated)) {
+  if (
+    location.pathname === '/signup' ||
+    (PUBLIC_ROUTES.includes(location.pathname) && !auth.isAuthenticated)
+  ) {
     return (
       <>
         <Outlet />
@@ -132,7 +135,7 @@ function RootComponent() {
               <div
                 className={`size-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm border-2 border-white ${auth.user?.role === 'super-admin' || auth.user?.role === 'administrateur' ? 'bg-linear-to-tr from-primary to-secondary' : 'bg-linear-to-tr from-secondary to-secondary'}`}
               >
-                {auth.user?.name ? auth.user?.name.charAt(0) : "U"}
+                {auth.user?.name ? auth.user?.name.charAt(0) : 'U'}
               </div>
 
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">

@@ -1,6 +1,27 @@
 import { DayOfWeek, TimeSlot } from '@/src/lib/types';
 
-export const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL;
+declare global {
+  interface Window {
+    /** Posé par /config.js (fichier propre à chaque serveur, voir public/config.js). */
+    HONOWA_CONFIG?: { apiBaseUrl?: string };
+  }
+}
+
+/**
+ * Origine de l'API, sans barre oblique finale. Deux sources, dans cet ordre :
+ * 1. `window.HONOWA_CONFIG.apiBaseUrl`, posée par `/config.js` au chargement de la
+ *    page : la même build sert en préproduction et en production ;
+ * 2. `VITE_API_BASE_URL`, figée au build (développement local, CI).
+ */
+export const API_BASE_URL: string = (
+  globalThis.window?.HONOWA_CONFIG?.apiBaseUrl?.trim() ||
+  ((import.meta as any).env.VITE_API_BASE_URL as string | undefined) ||
+  ''
+).replace(/\/+$/, '');
+
+/** Nom affiché de l'application : VITE_APP_NAME au build, sinon le nom du produit. */
+export const APP_NAME: string =
+  ((import.meta as any).env.VITE_APP_NAME as string | undefined) || 'Campus Planner';
 
 export const DEPARTMENTS = ['Computer Science', 'Mathematics', 'Physics', 'Literature', 'Arts'];
 

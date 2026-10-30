@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Pack;
+use App\Models\Feature;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\FeatureRegistry;
@@ -117,7 +117,7 @@ class TenantManagementTest extends TestCase
     {
         $this->actingAs($this->superAdmin());
 
-        $feature = \App\Models\Feature::where('key', 'sms')->firstOrFail();
+        $feature = Feature::where('key', 'sms')->firstOrFail();
 
         $this->putJson("/api/admin/features/{$feature->id}", ['is_active' => false])
             ->assertOk();

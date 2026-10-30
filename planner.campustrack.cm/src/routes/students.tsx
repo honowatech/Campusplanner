@@ -29,7 +29,12 @@ function StudentsPage() {
   const debouncedSearch = useDebouncedValue(search);
 
   const { user } = useAuth();
-  const { data: students, isLoading: studentsLoading, isError: studentsError, refetch: refetchStudents } = useStudents({
+  const {
+    data: students,
+    isLoading: studentsLoading,
+    isError: studentsError,
+    refetch: refetchStudents,
+  } = useStudents({
     page,
     search: debouncedSearch || undefined,
     course_class_id: filterClass ? Number(filterClass) : undefined,

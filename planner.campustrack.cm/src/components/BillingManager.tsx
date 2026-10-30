@@ -62,7 +62,8 @@ function useRemainingSeconds(payment?: Payment): number | null {
 
   if (!payment?.created_at || !payment.metadata?.timeout_minutes) return null;
 
-  const deadline = new Date(payment.created_at).getTime() + payment.metadata.timeout_minutes * 60_000;
+  const deadline =
+    new Date(payment.created_at).getTime() + payment.metadata.timeout_minutes * 60_000;
   return Math.max(0, Math.round((deadline - now) / 1000));
 }
 
@@ -103,7 +104,9 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
     const status = trackedPayment?.status;
     if (!status || status === previousStatus.current) return;
 
-    const wasAwaiting = previousStatus.current === undefined || ['pending', 'in_progress'].includes(previousStatus.current);
+    const wasAwaiting =
+      previousStatus.current === undefined ||
+      ['pending', 'in_progress'].includes(previousStatus.current);
     previousStatus.current = status;
 
     if (!wasAwaiting) return;
@@ -161,7 +164,8 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Abonnement & Facturation</h1>
           <p className="text-gray-500 text-sm">
-            Choisissez votre formule et payez par mobile money : elle est activée dès la confirmation.
+            Choisissez votre formule et payez par mobile money : elle est activée dès la
+            confirmation.
           </p>
         </div>
       </div>
@@ -174,8 +178,12 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
             <div className="flex items-center space-x-3">
               <Crown className="text-amber-500" size={28} />
               <div>
-                <p className="font-bold text-gray-900">{subscription.pack?.name ?? 'Essai gratuit'}</p>
-                <p className="text-sm text-gray-500 capitalize">{statusLabel(subscription.status)}</p>
+                <p className="font-bold text-gray-900">
+                  {subscription.pack?.name ?? 'Essai gratuit'}
+                </p>
+                <p className="text-sm text-gray-500 capitalize">
+                  {statusLabel(subscription.status)}
+                </p>
               </div>
             </div>
             <div className="text-sm text-gray-600">
@@ -229,7 +237,9 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
                 type="button"
                 onClick={() => changePeriod(period)}
                 className={`px-4 py-1.5 text-sm font-medium transition-colors ${
-                  billingPeriod === period ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'
+                  billingPeriod === period
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 {period === 'monthly' ? 'Mensuel' : 'Annuel'}
@@ -259,9 +269,15 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
                   </span>
                 )}
                 <p className="font-bold text-gray-900 capitalize">{pack.name}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{formatAmount(pack.price, pack.currency)}</p>
-                <p className="text-xs text-gray-500">{pack.billing_period === 'annual' ? '/ an' : '/ mois'}</p>
-                <p className="text-sm text-gray-600 mt-3">{pack.features.length} fonctionnalités incluses</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  {formatAmount(pack.price, pack.currency)}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {pack.billing_period === 'annual' ? '/ an' : '/ mois'}
+                </p>
+                <p className="text-sm text-gray-600 mt-3">
+                  {pack.features.length} fonctionnalités incluses
+                </p>
                 {selected && (
                   <span className="absolute bottom-3 right-3 text-primary">
                     <Check size={20} />
@@ -292,7 +308,8 @@ export function BillingManager({ initialPackId }: { initialPackId?: number }) {
           </button>
         </div>
         <p className="mt-2 text-xs text-gray-500">
-          Un paiement en cours d’abonnement prolonge votre échéance : aucune période déjà payée n’est perdue.
+          Un paiement en cours d’abonnement prolonge votre échéance : aucune période déjà payée
+          n’est perdue.
         </p>
       </div>
 
@@ -397,7 +414,10 @@ function PaymentTracker({
     const seconds = remaining !== null ? String(remaining % 60).padStart(2, '0') : null;
 
     return (
-      <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center gap-4" role="status">
+      <div
+        className="bg-indigo-50 border border-indigo-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center gap-4"
+        role="status"
+      >
         <div className="p-3 bg-white rounded-full shrink-0 self-start">
           <Smartphone className="text-primary" size={24} />
         </div>
@@ -409,8 +429,8 @@ function PaymentTracker({
           <p className="text-sm text-gray-600 mt-1">
             {formatAmount(payment.amount, payment.currency)}
             {payment.metadata?.pack_name ? ` — formule ${payment.metadata.pack_name}` : ''}
-            {payment.metadata?.phone ? ` — ${payment.metadata.phone}` : ''}. Composez votre code secret
-            mobile money à la demande de l’opérateur ; la formule s’active automatiquement.
+            {payment.metadata?.phone ? ` — ${payment.metadata.phone}` : ''}. Composez votre code
+            secret mobile money à la demande de l’opérateur ; la formule s’active automatiquement.
           </p>
           {minutes !== null && (
             <p className="text-xs text-gray-500 mt-2">
@@ -432,13 +452,16 @@ function PaymentTracker({
 
   if (payment.status === 'paid') {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-start gap-4" role="status">
+      <div
+        className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-start gap-4"
+        role="status"
+      >
         <CheckCircle2 className="text-green-600 shrink-0" size={28} />
         <div className="flex-1">
           <p className="font-bold text-gray-900">Paiement confirmé — votre formule est active</p>
           <p className="text-sm text-gray-600 mt-1">
-            Toutes les fonctionnalités de la formule {payment.metadata?.pack_name ?? ''} sont disponibles dès
-            maintenant.
+            Toutes les fonctionnalités de la formule {payment.metadata?.pack_name ?? ''} sont
+            disponibles dès maintenant.
           </p>
           {payment.receipt_url && (
             <a
@@ -451,7 +474,11 @@ function PaymentTracker({
             </a>
           )}
         </div>
-        <button type="button" onClick={onDismiss} className="text-sm text-gray-500 hover:text-gray-700">
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="text-sm text-gray-500 hover:text-gray-700"
+        >
           Fermer
         </button>
       </div>
@@ -461,21 +488,28 @@ function PaymentTracker({
   const cancelled = payment.gateway_status?.toUpperCase() === 'CANCELLED';
 
   return (
-    <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-start gap-4" role="alert">
+    <div
+      className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-start gap-4"
+      role="alert"
+    >
       <XCircle className="text-red-600 shrink-0" size={28} />
       <div className="flex-1">
         <p className="font-bold text-gray-900">
           {cancelled ? 'Demande annulée' : 'Le paiement n’a pas abouti'}
         </p>
         <p className="text-sm text-gray-600 mt-1">
-          {payment.metadata?.error ?? 'Aucun montant n’a été débité.'} Vous pouvez relancer le paiement
-          ci-dessous.
+          {payment.metadata?.error ?? 'Aucun montant n’a été débité.'} Vous pouvez relancer le
+          paiement ci-dessous.
           {cancelled || payment.gateway_status?.toUpperCase() === 'EXPIRED'
             ? ' Si vous validez quand même sur votre téléphone, la formule sera activée automatiquement.'
             : ''}
         </p>
       </div>
-      <button type="button" onClick={onDismiss} className="text-sm text-gray-500 hover:text-gray-700">
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="text-sm text-gray-500 hover:text-gray-700"
+      >
         Fermer
       </button>
     </div>

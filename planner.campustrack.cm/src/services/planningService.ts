@@ -365,7 +365,9 @@ export const planningService = {
     planningId: number,
     minSameTimeSlot?: number,
   ): Promise<{ opportunities: DoubleurOpportunity[]; total: number }> => {
-    const params: { planning_id: number; min_same_time_slot?: number } = { planning_id: planningId };
+    const params: { planning_id: number; min_same_time_slot?: number } = {
+      planning_id: planningId,
+    };
     if (minSameTimeSlot) params.min_same_time_slot = minSameTimeSlot;
     const res = await apiClient.get<
       ApiResponse<{ opportunities: DoubleurOpportunity[]; total: number }>

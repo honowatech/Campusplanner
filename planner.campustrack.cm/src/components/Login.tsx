@@ -39,7 +39,12 @@ interface LoginProps {
   isLoading: boolean;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiError, isLoading }) => {
+export const Login: React.FC<LoginProps> = ({
+  onLoginWithApi,
+  onDemoLogin,
+  apiError,
+  isLoading,
+}) => {
   const { t } = useTranslation();
   const { data: demoMode } = useDemoMode();
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -180,7 +185,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
           {mode === 'login' ? (
             <form onSubmit={handleSubmit} className="space-y-6 mb-8">
               <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label
+                  htmlFor="login-email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t('email')}
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail size={18} className="text-gray-400" />
@@ -206,7 +216,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
                 )}
               </div>
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="login-password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('password')}
                 </label>
                 <div className="relative">
@@ -252,7 +265,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-4 mb-6">
               <div>
-                <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="register-name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('fullName')}
                 </label>
                 <div className="relative">
@@ -282,7 +298,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
               </div>
 
               <div>
-                <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+                <label
+                  htmlFor="register-email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t('email')}
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail size={18} className="text-gray-400" />
@@ -310,7 +331,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
               </div>
 
               <div>
-                <label htmlFor="register-role" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="register-role"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('requestedRole')}
                 </label>
                 <select
@@ -341,7 +365,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="register-password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     {t('password')}
                   </label>
                   <div className="relative">
@@ -370,7 +397,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
                   )}
                 </div>
                 <div>
-                  <label htmlFor="register-password-confirmation" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="register-password-confirmation"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     {t('confirmPassword')}
                   </label>
                   <input
@@ -464,10 +494,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginWithApi, onDemoLogin, apiEr
                 <Building2 size={20} className="text-primary shrink-0" />
                 <span className="text-left">
                   <span className="block text-xs text-gray-500">{t('signup.ctaHint')}</span>
-                  <span className="block text-sm font-semibold text-primary">{t('signup.cta')}</span>
+                  <span className="block text-sm font-semibold text-primary">
+                    {t('signup.cta')}
+                  </span>
                 </span>
               </span>
-              <span aria-hidden className="text-primary">→</span>
+              <span aria-hidden className="text-primary">
+                →
+              </span>
             </Link>
           )}
 

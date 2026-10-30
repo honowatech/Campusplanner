@@ -27,7 +27,12 @@ function CoursesPage() {
   const debouncedSearch = useDebouncedValue(search);
   const { user } = useAuth();
   const readOnly = !hasAnyPermission(user?.permissions, ['courses.manage']);
-  const { data: courses, isLoading: coursesLoading, isError: coursesError, refetch: refetchCourses } = useCourses({
+  const {
+    data: courses,
+    isLoading: coursesLoading,
+    isError: coursesError,
+    refetch: refetchCourses,
+  } = useCourses({
     page,
     search: debouncedSearch || undefined,
   });

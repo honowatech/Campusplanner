@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Api\Controllers\AiController;
 use App\Http\Api\Controllers\AdminFeatureController;
 use App\Http\Api\Controllers\AdminImpersonationController;
 use App\Http\Api\Controllers\AdminPackController;
 use App\Http\Api\Controllers\AdminPaymentController;
+use App\Http\Api\Controllers\AiController;
 use App\Http\Api\Controllers\AuditLogController;
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BillingController;

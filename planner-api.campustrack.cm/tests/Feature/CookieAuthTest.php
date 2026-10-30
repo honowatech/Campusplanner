@@ -175,7 +175,7 @@ class CookieAuthTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Votre compte est en attente de validation par un administrateur.');
+            ->assertJsonPath('message', __('api.auth.account_pending'));
 
         $this->assertGuest('web');
     }

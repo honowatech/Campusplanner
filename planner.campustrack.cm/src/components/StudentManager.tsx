@@ -320,7 +320,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="student-first-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="student-first-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('firstName')}
               </label>
               <input
@@ -333,7 +336,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="student-last-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="student-last-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('lastName')}
               </label>
               <input
@@ -349,7 +355,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="student-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
+              <label
+                htmlFor="student-email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('email')}
+              </label>
               <input
                 required
                 id="student-email"
@@ -360,7 +371,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="student-matricule" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="student-matricule"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('matricule')}
               </label>
               <input
@@ -376,7 +390,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="student-phone" className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
+              <label
+                htmlFor="student-phone"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('phone')}
+              </label>
               <input
                 id="student-phone"
                 type="tel"
@@ -386,7 +405,12 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="student-gender" className="block text-sm font-medium text-gray-700 mb-1">{t('gender')}</label>
+              <label
+                htmlFor="student-gender"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('gender')}
+              </label>
               <select
                 id="student-gender"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -406,7 +430,9 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
           </div>
 
           <div>
-            <label htmlFor="student-class" className="block text-sm font-medium text-gray-700 mb-1">{t('class')}</label>
+            <label htmlFor="student-class" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('class')}
+            </label>
             <select
               required
               id="student-class"
@@ -458,7 +484,10 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
             {t('movingStudent')}: <strong>{studentToMove?.full_name}</strong>
           </p>
           <div>
-            <label htmlFor="student-target-class" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="student-target-class"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t('targetClass')}
             </label>
             <select
