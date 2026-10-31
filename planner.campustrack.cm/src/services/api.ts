@@ -81,9 +81,12 @@ apiClient.interceptors.response.use(
       url.includes('/login') ||
       url.includes('/register') ||
       url.includes('/onboarding') ||
+      url.includes('-password') ||
       url.includes('/auth-user');
 
-    const isPublicPage = ['/login', '/signup'].includes(window.location.pathname);
+    const isPublicPage = ['/login', '/signup', '/forgot-password', '/reset-password'].includes(
+      window.location.pathname,
+    );
 
     if (status === 401 && !isAuthRoute && !isPublicPage) {
       // L'état d'auth est reconstruit au chargement depuis le cookie de session

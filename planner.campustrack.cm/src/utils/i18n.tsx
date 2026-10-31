@@ -338,6 +338,26 @@ const translations = {
       loginRetry: 'Login error. Please try again.',
     },
 
+    passwordReset: {
+      forgotLink: 'Forgot password?',
+      forgotTitle: 'Forgot your password?',
+      forgotSubtitle: 'Enter your account email: we will send you a link to choose a new password.',
+      sendLink: 'Send the link',
+      sending: 'Sending…',
+      sentHint: 'Check your inbox (and spam folder). The link expires in 60 minutes.',
+      resetTitle: 'Choose a new password',
+      resetSubtitle: 'At least 8 characters.',
+      newPassword: 'New password',
+      submit: 'Save the new password',
+      saving: 'Saving…',
+      invalidLink: 'This link is incomplete. Request a new one.',
+      requestNew: 'Request a new link',
+      backToLogin: 'Back to sign in',
+      passwordTooShort: 'The password must contain at least 8 characters',
+      passwordsMismatch: 'Passwords do not match',
+      emailInvalid: 'Invalid email format',
+    },
+
     signup: {
       cta: 'Register my school',
       ctaHint: 'Your school does not have an account yet?',
@@ -784,6 +804,28 @@ const translations = {
       generic: 'Une erreur est survenue. Veuillez réessayer.',
       login: 'Erreur de connexion',
       loginRetry: 'Erreur de connexion. Veuillez réessayer.',
+    },
+
+    passwordReset: {
+      forgotLink: 'Mot de passe oublié ?',
+      forgotTitle: 'Mot de passe oublié ?',
+      forgotSubtitle:
+        'Saisissez l’email de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe.',
+      sendLink: 'Envoyer le lien',
+      sending: 'Envoi…',
+      sentHint:
+        'Consultez votre boîte de réception (et les indésirables). Le lien expire dans 60 minutes.',
+      resetTitle: 'Choisissez un nouveau mot de passe',
+      resetSubtitle: 'Au moins 8 caractères.',
+      newPassword: 'Nouveau mot de passe',
+      submit: 'Enregistrer le nouveau mot de passe',
+      saving: 'Enregistrement…',
+      invalidLink: 'Ce lien est incomplet. Demandez-en un nouveau.',
+      requestNew: 'Demander un nouveau lien',
+      backToLogin: 'Retour à la connexion',
+      passwordTooShort: 'Le mot de passe doit contenir au moins 8 caractères',
+      passwordsMismatch: 'Les mots de passe ne correspondent pas',
+      emailInvalid: "Format d'email invalide",
     },
 
     signup: {

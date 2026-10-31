@@ -25,6 +25,11 @@ The project is split into two independent Git repositories:
   (school + admin account, signed in immediately, free trial), picks a plan, pays by mobile
   money and gets the plan activated automatically: no super-admin action at any step.
 - Individual account registration (staff of an existing school) with approval workflow.
+- **Password reset** for every account (super-admin and school users): *Forgot password?* on
+  the sign-in page, link sent by email to the SPA (`FRONTEND_URL`), valid 60 minutes, other
+  sessions closed after the change. The super-admin sets the sending account (SMTP server,
+  sender address, default `admin@focusrent.cm`) in *Admin console → Emails* and tests it from
+  there (connection + test email).
 - AI-assisted scheduling via a server-side Gemini proxy (the API key never reaches the browser).
 - **In progress** — multi-tenancy, subscription packs, Nexah SMS and MamoniPay (PayMe)
   payments. See [the implementation plan](PLAN_IMPLEMENTATION_SAAS_MULTITENANT.md).
@@ -120,7 +125,7 @@ npm run dev                  # http://localhost:3000
 
 | Account | Password | Role |
 |---|---|---|
-| `superadmin@campustrack.com` | `password` | super-admin |
+| `admin@focusrent.cm` | `password` | super-admin |
 | `admin.<code>@campustrack.com` | `password` | administrateur |
 | `prof.<code>@campustrack.com` | `password` | professeur |
 
@@ -178,6 +183,9 @@ VITE_API_BASE_URL=https://planner-api.campustrack.cm VITE_APP_NAME="Campus Plann
 2. Super-admin console → *PayMe* tab: enter the merchant credentials (API address defaults to
    `https://console-v2.mamonipay.me/api`), save, then **Test the connection**.
 3. `php artisan packs:seed` (plans and features) if the catalogue is empty.
+4. `FRONTEND_URL` in the API `.env` (e.g. `https://planner.campustrack.cm`): password reset
+   links point to it. Then Admin console → *Emails*: SMTP account, save, **Test the connection**.
+   The super-admin account is `admin@focusrent.cm` (the migration renames the existing one).
 
 Serve `dist/` as a static SPA (fallback to `index.html`, HTTPS mandatory). Full details,
 including environment variables, CORS and background jobs, are in

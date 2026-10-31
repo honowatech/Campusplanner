@@ -77,7 +77,7 @@ npm run dev                  # http://localhost:3000
 
 | Account | Password | Role |
 |---|---|---|
-| `superadmin@campustrack.com` | `password` | super-admin |
+| `admin@focusrent.cm` | `password` | super-admin |
 | `admin.<code>@campustrack.com` | `password` | administrateur (one per department) |
 | `prof.<code>@campustrack.com` | `password` | professeur |
 
@@ -219,7 +219,7 @@ curl -i -c /tmp/c.txt https://planner-api.campustrack.cm/api/csrf-cookie
 # 2. Login (cookie jar)
 curl -i -b /tmp/c.txt -c /tmp/c.txt -X POST https://planner-api.campustrack.cm/api/login \
   -H "Content-Type: application/json" -H "X-XSRF-TOKEN: <valeur du cookie XSRF-TOKEN>" \
-  -d '{"email":"superadmin@campustrack.com","password":"<mot-de-passe>"}'
+  -d '{"email":"admin@focusrent.cm","password":"<mot-de-passe>"}'
 
 # 3. Session reused
 curl -b /tmp/c.txt https://planner-api.campustrack.cm/api/auth-user

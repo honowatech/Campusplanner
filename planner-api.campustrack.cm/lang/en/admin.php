@@ -69,6 +69,16 @@ return [
         'invalid_endpoint' => 'Enter the API base address (e.g. https://console-v2.mamonipay.me/api), never the documentation address nor a version suffix (/v1).',
     ],
 
+    'mail_settings' => [
+        'retrieved' => 'Email configuration retrieved',
+        'updated' => 'Email configuration updated',
+        'missing' => 'No email configuration saved.',
+        'test_subject' => ':app test email',
+        'test_body' => 'This email confirms that :app can send emails (password reset links).',
+        'test_sent' => 'Test email sent to :to.',
+        'test_failed' => 'The email configuration test failed.',
+    ],
+
     'onboarding' => [
         'registered' => 'Registration successful',
     ],

@@ -5,6 +5,8 @@ import {
   AdminFeature,
   PaymentGatewayConfig,
   GatewayTestResult,
+  MailSettings,
+  MailTestResult,
   Payment,
   ApiResponse,
   PaginatedResponse,
@@ -38,6 +40,18 @@ export type GatewayPayload = {
   endpoint?: string | null;
   client_fees_rate?: number | null;
   timeout_minutes?: number;
+  is_active?: boolean;
+};
+
+export type MailSettingsPayload = {
+  mailer: 'smtp' | 'log';
+  host?: string | null;
+  port?: number | null;
+  encryption?: 'tls' | 'ssl' | null;
+  username?: string | null;
+  password?: string;
+  from_address: string;
+  from_name?: string | null;
   is_active?: boolean;
 };
 
@@ -131,6 +145,29 @@ export const adminService = {
     const res = await apiClient.post<ApiResponse<GatewayTestResult>>(
       '/api/admin/payment-gateway/test',
     );
+    return res.data.data;
+  },
+
+  // Compte d'envoi des emails (réinitialisation du mot de passe)
+  getMailSettings: async (): Promise<MailSettings> => {
+    const res = await apiClient.get<ApiResponse<{ settings: MailSettings }>>(
+      '/api/admin/mail-settings',
+    );
+    return res.data.data.settings;
+  },
+
+  updateMailSettings: async (data: MailSettingsPayload): Promise<MailSettings> => {
+    const res = await apiClient.put<ApiResponse<{ settings: MailSettings }>>(
+      '/api/admin/mail-settings',
+      data,
+    );
+    return res.data.data.settings;
+  },
+
+  testMailSettings: async (to?: string): Promise<MailTestResult> => {
+    const res = await apiClient.post<ApiResponse<MailTestResult>>('/api/admin/mail-settings/test', {
+      to: to || undefined,
+    });
     return res.data.data;
   },
 

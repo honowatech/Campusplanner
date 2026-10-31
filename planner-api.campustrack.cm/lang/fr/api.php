@@ -11,6 +11,18 @@ return [
         'authenticated' => 'Utilisateur authentifié',
     ],
 
+    'password_reset' => [
+        'link_sent' => 'Si un compte existe pour cette adresse, un lien de réinitialisation vient d\'y être envoyé.',
+        'invalid_token' => 'Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau.',
+        'done' => 'Votre mot de passe a été modifié. Vous pouvez vous connecter.',
+        'mail_subject' => 'Réinitialisation de votre mot de passe :app',
+        'mail_greeting' => 'Bonjour :name,',
+        'mail_intro' => 'Vous recevez cet email car une réinitialisation du mot de passe a été demandée pour votre compte.',
+        'mail_action' => 'Choisir un nouveau mot de passe',
+        'mail_expire' => 'Ce lien expire dans :count minutes.',
+        'mail_ignore' => 'Si vous n\'êtes pas à l\'origine de cette demande, ignorez cet email : votre mot de passe reste inchangé.',
+    ],
+
     'settings' => [
         'retrieved' => 'Réglages récupérés',
         'updated' => 'Réglages mis à jour',

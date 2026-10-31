@@ -620,6 +620,25 @@ export type PaymentGatewayConfig = {
   is_active: boolean;
 };
 
+export type MailSettings = {
+  id: number | null;
+  mailer: 'smtp' | 'log';
+  host?: string | null;
+  port?: number | null;
+  encryption?: 'tls' | 'ssl' | null;
+  username?: string | null;
+  has_password: boolean;
+  from_address: string;
+  from_name?: string | null;
+  is_active: boolean;
+};
+
+export type MailTestResult = {
+  ok: boolean;
+  message: string;
+  to: string;
+};
+
 export type GatewayTestResult = {
   ok: boolean;
   status: number | null;

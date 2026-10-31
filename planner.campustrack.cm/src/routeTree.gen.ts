@@ -17,8 +17,10 @@ import { Route as SmsRouteImport } from './routes/sms'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as DemoModeRouteImport } from './routes/demo-mode'
 import { Route as CoursesRouteImport } from './routes/courses'
@@ -68,6 +70,11 @@ const RoomsRoute = RoomsRouteImport.update({
   path: '/rooms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -76,6 +83,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DepartmentsRoute = DepartmentsRouteImport.update({
@@ -127,8 +139,10 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -147,8 +161,10 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -168,8 +184,10 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRoute
   '/demo-mode': typeof DemoModeRoute
   '/departments': typeof DepartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -190,8 +208,10 @@ export interface FileRouteTypes {
     | '/courses'
     | '/demo-mode'
     | '/departments'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/rooms'
     | '/settings'
     | '/signup'
@@ -210,8 +230,10 @@ export interface FileRouteTypes {
     | '/courses'
     | '/demo-mode'
     | '/departments'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/rooms'
     | '/settings'
     | '/signup'
@@ -230,8 +252,10 @@ export interface FileRouteTypes {
     | '/courses'
     | '/demo-mode'
     | '/departments'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/rooms'
     | '/settings'
     | '/signup'
@@ -251,8 +275,10 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRoute
   DemoModeRoute: typeof DemoModeRoute
   DepartmentsRoute: typeof DepartmentsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RoomsRoute: typeof RoomsRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
@@ -322,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoomsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -334,6 +367,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/departments': {
@@ -403,8 +443,10 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRoute,
   DemoModeRoute: DemoModeRoute,
   DepartmentsRoute: DepartmentsRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RoomsRoute: RoomsRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,

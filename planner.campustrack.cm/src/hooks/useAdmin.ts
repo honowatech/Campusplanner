@@ -5,6 +5,7 @@ import {
   CreateTenantPayload,
   PackPayload,
   GatewayPayload,
+  MailSettingsPayload,
 } from '@/src/services/adminService';
 import {
   Tenant,
@@ -24,6 +25,7 @@ const ADMIN_QUERY_KEYS = {
   features: ['administrateur', 'features'],
   gateway: ['administrateur', 'payment-gateway'],
   payments: ['administrateur', 'payments'],
+  mail: ['administrateur', 'mail-settings'],
 };
 
 export function useTenants() {
@@ -154,6 +156,33 @@ export function useUpdatePaymentGateway() {
 export function useTestPaymentGateway() {
   return useMutation({
     mutationFn: adminService.testGateway,
+    onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
+  });
+}
+
+export function useMailSettings() {
+  return useQuery({
+    queryKey: ADMIN_QUERY_KEYS.mail,
+    queryFn: adminService.getMailSettings,
+  });
+}
+
+export function useUpdateMailSettings() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: MailSettingsPayload) => adminService.updateMailSettings(data),
+    onSuccess: (settings) => {
+      queryClient.setQueryData(ADMIN_QUERY_KEYS.mail, settings);
+      toast.success('Configuration email enregistrée');
+    },
+    onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
+  });
+}
+
+export function useTestMailSettings() {
+  return useMutation({
+    mutationFn: (to?: string) => adminService.testMailSettings(to),
     onError: (error) => toast.error(getErrorMessage(error as unknown as AxiosError)),
   });
 }

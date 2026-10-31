@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('📊 Summary:');
         $this->command->info('   - 5 Departments');
         $this->command->info('   - 6 Roles + ~70 Permissions');
-        $this->command->info('   - 1 Super Admin (superadmin@campustrack.com / password)');
+        $this->command->info('   - 1 Super Admin (admin@focusrent.cm / password)');
         $this->command->info('   - 4 Demo Accounts (1 per role, mode démo désactivé par défaut)');
         $this->command->info('   - 1 App Settings (singleton)');
         $this->command->info('   - 18 Courses');
