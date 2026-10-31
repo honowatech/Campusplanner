@@ -458,7 +458,7 @@ curl -X POST http://your-domain/api/roles \
 
 ## Super Admin par défaut
 
-**Email:** `superadmin@campustrack.com`
+**Email:** `admin@focusrent.cm`
 **Password:** `password`
 
 Ce compte possède toutes les permissions et peut gérer tous les rôles.

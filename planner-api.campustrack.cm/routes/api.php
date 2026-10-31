@@ -14,7 +14,9 @@ use App\Http\Api\Controllers\DashboardController;
 use App\Http\Api\Controllers\DemoModeController;
 use App\Http\Api\Controllers\DepartmentController;
 use App\Http\Api\Controllers\FeatureController;
+use App\Http\Api\Controllers\MailSettingsController;
 use App\Http\Api\Controllers\OnboardingController;
+use App\Http\Api\Controllers\PasswordResetController;
 use App\Http\Api\Controllers\PaymentController;
 use App\Http\Api\Controllers\PaymentGatewayController;
 use App\Http\Api\Controllers\PermissionController;
@@ -55,6 +57,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+
+// Mot de passe oublié (tous les comptes : super-admin et utilisateurs des tenants).
+Route::post('/forgot-password', [PasswordResetController::class, 'forgot'])->middleware('throttle:5,1');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1');
 
 // Onboarding public en libre-service : inscription d'une école (tenant +
 // admin initial connecté d'office + essai gratuit), sans validation super-admin.
@@ -121,6 +127,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('payment-gateway', [PaymentGatewayController::class, 'show']);
         Route::put('payment-gateway', [PaymentGatewayController::class, 'update']);
         Route::post('payment-gateway/test', [PaymentGatewayController::class, 'test']);
+
+        Route::get('mail-settings', [MailSettingsController::class, 'show']);
+        Route::put('mail-settings', [MailSettingsController::class, 'update']);
+        Route::post('mail-settings/test', [MailSettingsController::class, 'test']);
 
         Route::get('packs', [AdminPackController::class, 'index']);
         Route::post('packs', [AdminPackController::class, 'store']);

@@ -216,12 +216,21 @@ export const Login: React.FC<LoginProps> = ({
                 )}
               </div>
               <div>
-                <label
-                  htmlFor="login-password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t('password')}
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label
+                    htmlFor="login-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    {t('password')}
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    search={{ email: email || undefined }}
+                    className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                  >
+                    {t('passwordReset.forgotLink')}
+                  </Link>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock size={18} className="text-gray-400" />

@@ -17,7 +17,7 @@ class RoomBlockingSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@campustrack.com')->first();
+        $admin = User::where('email', 'admin@focusrent.cm')->first();
 
         if (! $admin) {
             $this->command->warn('Super admin user not found. Skipping RoomBlockingSeeder.');

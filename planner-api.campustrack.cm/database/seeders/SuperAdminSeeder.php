@@ -28,10 +28,10 @@ class SuperAdminSeeder extends Seeder
         $role->givePermissionTo('demo-mode.manage');
 
         $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@campustrack.com'],
+            ['email' => 'admin@focusrent.cm'],
             [
                 'name' => 'Super Administrator',
-                'email' => 'superadmin@campustrack.com',
+                'email' => 'admin@focusrent.cm',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -41,7 +41,7 @@ class SuperAdminSeeder extends Seeder
         $superAdmin->forceFill(['tenant_id' => null])->save();
 
         $this->command->info('Super Admin created successfully!');
-        $this->command->info('Email: superadmin@campustrack.com');
+        $this->command->info('Email: admin@focusrent.cm');
         $this->command->info('Password: password');
     }
 }

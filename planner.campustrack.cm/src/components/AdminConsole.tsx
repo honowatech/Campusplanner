@@ -7,6 +7,7 @@ import {
   Receipt,
   Plus,
   ShieldAlert,
+  Mail,
 } from 'lucide-react';
 import {
   useTenants,
@@ -21,12 +22,21 @@ import {
   useUpdatePaymentGateway,
   useTestPaymentGateway,
   useAdminPayments,
+  useMailSettings,
+  useUpdateMailSettings,
+  useTestMailSettings,
 } from '@/src/hooks/useAdmin';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
-import { Tenant, AdminPack, AdminFeature, PaymentGatewayConfig } from '@/src/lib/types';
+import {
+  Tenant,
+  AdminPack,
+  AdminFeature,
+  PaymentGatewayConfig,
+  MailSettings,
+} from '@/src/lib/types';
 import { getLocale } from '@/src/lib/locale';
 
-type Tab = 'tenants' | 'packs' | 'features' | 'gateway' | 'payments';
+type Tab = 'tenants' | 'packs' | 'features' | 'gateway' | 'payments' | 'mail';
 
 function formatAmount(amount: number, currency: string): string {
   return new Intl.NumberFormat(getLocale()).format(amount) + ' ' + currency;
@@ -41,6 +51,7 @@ export function AdminConsole() {
     { id: 'features', label: 'Fonctionnalités', icon: ListChecks },
     { id: 'gateway', label: 'PayMe', icon: CreditCard },
     { id: 'payments', label: 'Paiements', icon: Receipt },
+    { id: 'mail', label: 'Emails', icon: Mail },
   ];
 
   return (
@@ -52,7 +63,7 @@ export function AdminConsole() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Administration plateforme</h1>
           <p className="text-gray-500 text-sm">
-            Gestion des tenants, packs et configuration PayMe.
+            Gestion des tenants, packs, configuration PayMe et envoi des emails.
           </p>
         </div>
       </div>
@@ -81,6 +92,7 @@ export function AdminConsole() {
         {tab === 'features' && <FeaturesTab />}
         {tab === 'gateway' && <GatewayTab />}
         {tab === 'payments' && <PaymentsTab />}
+        {tab === 'mail' && <MailTab />}
       </div>
     </div>
   );
@@ -547,6 +559,206 @@ function PaymentsTab() {
           </tbody>
         </table>
       )}
+    </div>
+  );
+}
+
+function MailTab() {
+  const { data: settings, isLoading } = useMailSettings();
+
+  if (isLoading) return <LoadingSpinner fullScreen={false} />;
+
+  // Monté une fois la configuration chargée : le formulaire part des bonnes valeurs.
+  return <MailForm settings={settings ?? null} />;
+}
+
+function MailForm({ settings }: { settings: MailSettings | null }) {
+  const updateSettings = useUpdateMailSettings();
+  const testSettings = useTestMailSettings();
+
+  const [form, setForm] = useState({
+    mailer: settings?.mailer ?? 'smtp',
+    host: settings?.host ?? '',
+    port: settings?.port ? String(settings.port) : '587',
+    encryption: settings?.encryption ?? 'tls',
+    username: settings?.username ?? '',
+    password: '',
+    from_address: settings?.from_address ?? 'admin@focusrent.cm',
+    from_name: settings?.from_name ?? '',
+    is_active: settings?.is_active ?? true,
+  });
+  const [testTo, setTestTo] = useState('');
+
+  const set = (field: keyof typeof form) => (value: string | boolean) =>
+    setForm((f) => ({ ...f, [field]: value }));
+
+  const handleSave = () => {
+    updateSettings.mutate({
+      mailer: form.mailer as 'smtp' | 'log',
+      host: form.host.trim() || null,
+      port: form.port ? Number(form.port) : null,
+      encryption: (form.encryption || null) as 'tls' | 'ssl' | null,
+      username: form.username.trim() || null,
+      password: form.password || undefined,
+      from_address: form.from_address.trim(),
+      from_name: form.from_name.trim() || null,
+      is_active: form.is_active,
+    });
+  };
+
+  const smtp = form.mailer === 'smtp';
+  const result = testSettings.data;
+  const input = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm';
+
+  return (
+    <div>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Envoi des emails</h2>
+      <p className="text-sm text-gray-500 mb-4 max-w-2xl">
+        Compte qui envoie les liens de réinitialisation du mot de passe (super-admin et utilisateurs
+        des écoles). Enregistrez, puis testez la connexion : un email de test est envoyé.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Adresse d’envoi</label>
+          <input
+            type="email"
+            value={form.from_address}
+            onChange={(e) => set('from_address')(e.target.value)}
+            className={input}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Nom affiché</label>
+          <input
+            value={form.from_name}
+            onChange={(e) => set('from_name')(e.target.value)}
+            className={input}
+            placeholder="Campus Planner"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Mode d’envoi</label>
+          <select
+            value={form.mailer}
+            onChange={(e) => set('mailer')(e.target.value)}
+            className={input}
+          >
+            <option value="smtp">Serveur SMTP</option>
+            <option value="log">Journal (tests, aucun envoi réel)</option>
+          </select>
+        </div>
+        {smtp && (
+          <>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Serveur SMTP</label>
+              <input
+                value={form.host}
+                onChange={(e) => set('host')(e.target.value)}
+                className={input}
+                placeholder="mail.focusrent.cm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Port</label>
+              <input
+                type="number"
+                min={1}
+                max={65535}
+                value={form.port}
+                onChange={(e) => set('port')(e.target.value)}
+                className={input}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Chiffrement</label>
+              <select
+                value={form.encryption}
+                onChange={(e) => {
+                  set('encryption')(e.target.value);
+                  set('port')(e.target.value === 'ssl' ? '465' : '587');
+                }}
+                className={input}
+              >
+                <option value="tls">STARTTLS (port 587)</option>
+                <option value="ssl">SSL/TLS (port 465)</option>
+                <option value="">Aucun</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Identifiant</label>
+              <input
+                value={form.username}
+                onChange={(e) => set('username')(e.target.value)}
+                className={input}
+                placeholder="admin@focusrent.cm"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Mot de passe</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => set('password')(e.target.value)}
+                className={input}
+                placeholder={settings?.has_password ? 'Inchangé si vide' : '••••••••'}
+                autoComplete="new-password"
+              />
+            </div>
+          </>
+        )}
+        <label className="flex items-center gap-2 text-sm text-gray-700 md:col-span-2">
+          <input
+            type="checkbox"
+            checked={form.is_active}
+            onChange={(e) => set('is_active')(e.target.checked)}
+          />
+          Utiliser cette configuration (sinon, celle du fichier .env du serveur)
+        </label>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={updateSettings.isPending}
+        className="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50"
+      >
+        Enregistrer
+      </button>
+
+      <div className="mt-8 pt-6 border-t border-gray-100 max-w-2xl">
+        <h3 className="text-sm font-bold text-gray-900 mb-2">Tester la connexion</h3>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="email"
+            value={testTo}
+            onChange={(e) => setTestTo(e.target.value)}
+            className={`${input} flex-1`}
+            placeholder="Destinataire (par défaut : votre email)"
+          />
+          <button
+            type="button"
+            onClick={() => testSettings.mutate(testTo.trim() || undefined)}
+            disabled={testSettings.isPending || !settings?.id}
+            className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {testSettings.isPending ? 'Test en cours…' : 'Tester et envoyer un email'}
+          </button>
+        </div>
+        {!settings?.id && (
+          <p className="mt-2 text-xs text-gray-500">Enregistrez d’abord la configuration.</p>
+        )}
+        {result && (
+          <div
+            className={`mt-4 p-4 rounded-lg border text-sm ${result.ok ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}
+          >
+            <p className="font-semibold">
+              {result.ok ? 'Connexion réussie' : 'Échec de la connexion'}
+            </p>
+            <p className="mt-1 break-words">{result.message}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

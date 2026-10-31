@@ -22,8 +22,14 @@ function roleLabelKey(role?: string): string {
   return (role && ROLE_LABEL_KEYS[role]) || 'hodRole';
 }
 
-// Pages accessibles sans session (connexion et inscription libre-service).
-const PUBLIC_ROUTES = ['/login', '/signup'];
+// Pages accessibles sans session (connexion, inscription libre-service et
+// mot de passe oublié).
+const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password', '/reset-password'];
+
+// Pages publiques qui restent affichées une fois la session ouverte :
+// l'inscription (elle redirige elle-même vers le paiement) et le lien de
+// réinitialisation reçu par email, ouvert depuis un navigateur déjà connecté.
+const PUBLIC_WHEN_SIGNED_IN = ['/signup', '/reset-password'];
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -52,9 +58,7 @@ function RootComponent() {
       return;
     }
 
-    // La page d'inscription redirige elle-même (vers le paiement de la
-    // formule choisie) une fois l'école créée.
-    if (auth.isAuthenticated && location.pathname === '/signup') {
+    if (auth.isAuthenticated && PUBLIC_WHEN_SIGNED_IN.includes(location.pathname)) {
       return;
     }
 
@@ -65,10 +69,11 @@ function RootComponent() {
     }
   }, [auth.isAuthenticated, auth.user, location.pathname, navigate]);
 
-  // `/signup` reste dans le layout public même une fois la session ouverte :
-  // changer de layout remonterait la page et perdrait sa redirection.
+  // Ces pages restent dans le layout public même une fois la session ouverte :
+  // changer de layout remonterait la page (et perdrait la redirection de
+  // l'inscription).
   if (
-    location.pathname === '/signup' ||
+    PUBLIC_WHEN_SIGNED_IN.includes(location.pathname) ||
     (PUBLIC_ROUTES.includes(location.pathname) && !auth.isAuthenticated)
   ) {
     return (

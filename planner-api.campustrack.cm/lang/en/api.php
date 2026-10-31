@@ -11,6 +11,18 @@ return [
         'authenticated' => 'User is authenticated',
     ],
 
+    'password_reset' => [
+        'link_sent' => 'If an account exists for this address, a reset link has just been sent to it.',
+        'invalid_token' => 'This reset link is invalid or has expired. Request a new one.',
+        'done' => 'Your password has been changed. You can now sign in.',
+        'mail_subject' => 'Reset your :app password',
+        'mail_greeting' => 'Hello :name,',
+        'mail_intro' => 'You are receiving this email because a password reset was requested for your account.',
+        'mail_action' => 'Choose a new password',
+        'mail_expire' => 'This link expires in :count minutes.',
+        'mail_ignore' => 'If you did not request it, ignore this email: your password stays unchanged.',
+    ],
+
     'settings' => [
         'retrieved' => 'Settings retrieved',
         'updated' => 'Settings updated',
